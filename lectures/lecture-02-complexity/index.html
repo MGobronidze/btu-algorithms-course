@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 2 — ალგორითმის სირთულის ანალიზი | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg: #0B0E14;
+  --bg-panel: #12161F;
+  --bg-panel-2: #171C27;
+  --ink: #ECE8DE;
+  --ink-dim: #B7BCC9;
+  --muted: #7C849A;
+  --line: #232838;
+  --gold: #D9A64E;
+  --gold-dim: #8C7239;
+  --teal: #5AC2B6;
+  --teal-dim: #2F5F5A;
+  --green: #7CB88F;
+  --amber: #D9A64E;
+  --rose: #C97B84;
+  --code-bg: #0d1117;
+  --radius: 14px;
+  --serif: 'Noto Serif Georgian', 'Noto Serif', serif;
+  --sans: 'Noto Sans Georgian', 'Noto Sans', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --maxw: 760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-chart{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(680px,100%); height:auto; opacity:0.4; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(38px,7.5vw,72px); line-height:1.04; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:560px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.class-table{width:100%; border-collapse:collapse; margin:24px 0; font-size:14.5px;}
+.class-table th{font-family:var(--mono); font-size:12px; text-align:left; padding:10px 14px; color:var(--muted); border-bottom:1px solid var(--line);}
+.class-table td{padding:13px 14px; border-bottom:1px solid var(--line); color:var(--ink-dim); vertical-align:top;}
+.class-table tr:last-child td{border-bottom:none;}
+.class-table td.o{font-family:var(--mono); color:var(--gold); font-weight:600; white-space:nowrap;}
+.tag{display:inline-block; font-size:11.5px; font-family:var(--mono); padding:3px 9px; border-radius:999px;}
+.tag-vfast{background:rgba(124,184,143,0.18); color:var(--green);}
+.tag-fast{background:rgba(90,194,182,0.18); color:var(--teal);}
+.tag-normal{background:rgba(217,166,78,0.18); color:var(--amber);}
+.tag-ok{background:rgba(217,166,78,0.12); color:var(--amber);}
+.tag-slow{background:rgba(201,123,132,0.18); color:var(--rose);}
+.tag-bad{background:rgba(201,123,132,0.28); color:var(--rose);}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:20px;}
+.viz-controls label{font-size:14px; color:var(--muted);}
+.viz-controls input[type=range]{flex:1; min-width:160px; accent-color:var(--gold);}
+.viz-controls input[type=number]{width:64px; background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:8px 10px; font-family:var(--mono); font-size:14px;}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 20px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+.race-row{display:grid; grid-template-columns:96px 1fr 110px; align-items:center; gap:12px; margin-bottom:10px;}
+.race-label{font-family:var(--mono); font-size:13px; color:var(--ink-dim);}
+.race-track{height:20px; background:var(--bg); border-radius:6px; overflow:hidden;}
+.race-fill{height:100%; border-radius:6px; transition:width .35s ease;}
+.race-value{font-family:var(--mono); font-size:12.5px; color:var(--muted); text-align:right;}
+.viz-note{font-size:13.5px; color:var(--muted); margin-top:14px;}
+
+.array-boxes{display:flex; justify-content:center; gap:2px; margin:26px 0; flex-wrap:wrap;}
+.array-box{display:flex; flex-direction:column; align-items:center;}
+.array-box .idx{font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:4px;}
+.array-box .cell{width:56px; height:44px; display:flex; align-items:center; justify-content:center; background:var(--bg-panel-2); border:1px solid var(--line); font-family:var(--mono); font-weight:700; color:var(--ink);}
+.array-box.hit .cell{border-color:var(--gold); background:rgba(217,166,78,0.12); color:var(--gold);}
+.array-box .addr{font-family:var(--mono); font-size:10px; color:var(--muted); margin-top:4px;}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{padding:50px 24px 70px; text-align:center;}
+footer p{font-size:13.5px; color:var(--muted); margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · სირთულის ანალიზი — ლექცია 2</a>
+    <div class="nav-links">
+      <a href="#why-not-time">რატომ არა დრო</a>
+      <a href="#counting-steps">ნაბიჯების დათვლა</a>
+      <a href="#cases">საუკეთესო/უარესი</a>
+      <a href="#big-o">O-დიდი</a>
+      <a href="#classes">სირთულის კლასები</a>
+      <a href="#rules">წესები</a>
+      <a href="#examples">მაგალითები</a>
+      <a href="#fibonacci">ფიბონაჩი</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-chart" id="heroChart" viewBox="0 0 700 420"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 2</span>
+  <h1>ალგორითმის სირთულის ანალიზი</h1>
+  <p class="hero-sub">როგორ შევაფასოთ ალგორითმის ეფექტურობა კომპიუტერისა და იმპლემენტაციის მიუხედავად — და რატომ არის „რამდენ ხანს გაშვებული იყო" არასწორი შეკითხვა.</p>
+  <div class="hero-terms">
+    <span>O(1)</span><span>O(log n)</span><span>O(n)</span><span>O(n log n)</span><span>O(n²)</span><span>O(2ⁿ)</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ WHY NOT TIME ============ -->
+<section id="why-not-time">
+  <div class="wrap">
+    <span class="section-label">01 — გამოწვევა</span>
+    <h2 class="h-section">რატომ არ კმარა დროის გაზომვა?</h2>
+    <p class="lede">ერთსა და იმავე ამოცანას ბევრი განსხვავებული ალგორითმული ამოხსნა შეიძლება ჰქონდეს. ბუნებრივი შეკითხვაა: როდის სჯობს ერთი მეორეს? პასუხი — როცა ნაკლებ რესურსს ხარჯავს: დროს ან მეხსიერებას. ერთი გზა ამის შესაფასებლად — უბრალოდ გავზომოთ გაშვების დრო:</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">timing.py</span></div>
+      <pre><code class="language-python">import time
+
+def c_to_f(c: float) -> float:
+    return c * 9 / 5 + 32
+
+start = time.perf_counter()
+c_to_f(100_000)
+elapsed = time.perf_counter() - start
+print(f"დრო: {elapsed:.8f} წამი")</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>შესწორება ორიგინალი მასალიდან:</strong> საწყისი კოდი იყენებდა <code>time.clock()</code>-ს — ეს ფუნქცია Python 3.3-დან მოძველებულად იყო გამოცხადებული და <strong>საბოლოოდ წაშლილია Python 3.8-დან</strong>. თანამედროვე სტანდარტული ალტერნატივაა <code>time.perf_counter()</code> (ყველაზე ზუსტი, wall-clock დროისთვის) ან <code>time.process_time()</code> (მხოლოდ CPU-ს დროისთვის, I/O ლოდინის გარეშე).</p>
+    </div>
+
+    <p>მაგრამ დროის გაზომვას რამდენიმე ფუნდამენტური პრობლემა აქვს, როცა მიზანი <strong>ალგორითმის</strong> (და არა კონკრეტული პროგრამის) შეფასებაა:</p>
+
+    <table class="bigo-table">
+      <tr><th>პრობლემა</th><th>რატომ ერევა შეფასებას</th></tr>
+      <tr><td>განსხვავებული იმპლემენტაცია</td><td>იგივე ალგორითმი სხვადასხვანაირად შეიძლება დაიწეროს</td></tr>
+      <tr><td>განსხვავებული კომპიუტერი</td><td>პროცესორის სიმძლავრე ცვლის შედეგებს, არა ალგორითმის ხარისხს</td></tr>
+      <tr><td>განსხვავებული შემავალი მონაცემი</td><td>რამდენიმე გაზომვით შეუძლებელია ზუსტი კავშირის დანახვა ზომასა და დროს შორის</td></tr>
+    </table>
+
+    <p>შემდეგი მცდელობა — დროის ნაცვლად <strong>ოპერაციების რაოდენობის დათვლა</strong>. ეს გამორიცხავს კომპიუტერის სიმძლავრის ფაქტორს, მაგრამ კვლავ რჩება დამოკიდებული კონკრეტულ იმპლემენტაციაზე (რომელი ოპერაცია ჩავთვალოთ „საბაზისოდ"?). საბოლოო გამოსავალი — ორივეს გვერდის ავლა და ყურადღების გადატანა <strong>ზრდის რიგზე</strong> (growth rate): რამდენად სწრაფად იზრდება საჭირო სამუშაო, როცა შემავალი მონაცემის ზომა იზრდება.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ COUNTING STEPS ============ -->
+<section id="counting-steps" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — შუალედური ნაბიჯი</span>
+    <h2 class="h-section">ნაბიჯების დათვლა</h2>
+    <p class="lede">დავუშვათ, თითოეულ პრიმიტიულ ნაბიჯს (მათემატიკური ოპერაცია, შედარება, მინიჭება, მეხსიერებაში წვდომა) თანაბარი დრო სჭირდება. მაშინ ოპერაციათა რაოდენობა შეგვიძლია განვსაზღვროთ შემავალი ცვლადის ფუნქციად:</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">fact_iter.py</span></div>
+      <pre><code class="language-python">def fact_iter(n: int) -> int:
+    """მოსალოდნელია n >= 0."""
+    answer = 1                # 1 ნაბიჯი
+    while n > 1:               # მოწმდება n-ჯერ
+        answer *= n            # სრულდება (n-1)-ჯერ
+        n -= 1                 # სრულდება (n-1)-ჯერ
+    return answer              # 1 ნაბიჯი</code></pre>
+    </div>
+
+    <p>ჯამში — დაახლოებით <code>5n − 2</code> ნაბიჯი. მაგრამ ეს ზუსტი რიცხვი დიდ სურათს არაფერს გვეუბნება: ჩვენ გვაინტერესებს, თუ როგორ იზრდება ეს რიცხვი, <code>n</code>-ის ზრდასთან ერთად — არა ზუსტი მუდმივები.</p>
+
+    <div class="callout insight">
+      <span class="icon">✂️</span>
+      <p><strong>ორი გამარტივების წესი:</strong> ასიმპტოტური ანალიზისას (1) უგულებელვყოფთ <strong>ადიციურ მუდმივებს</strong> (<code>5n − 2</code> → <code>5n</code>) და (2) უგულებელვყოფთ <strong>მულტიპლიკაციურ მუდმივებს</strong> (<code>5n</code> → <code>n</code>). შედეგი: <code>fact_iter</code>-ის ასიმპტოტური სირთულეა <strong>O(n)</strong>.</p>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>გამოსახულება</th><th>გამარტივებული Big-O</th></tr>
+      <tr><td class="num">n² + 2n + 2</td><td class="num">O(n²)</td></tr>
+      <tr><td class="num">n² + 100000n + 3¹⁰⁰⁰</td><td class="num">O(n²)</td></tr>
+      <tr><td class="num">log(n) + n + 4</td><td class="num">O(n)</td></tr>
+      <tr><td class="num">0.0001·n·log(n) + 300n</td><td class="num">O(n log n)</td></tr>
+      <tr><td class="num">2n³⁰ + 3ⁿ</td><td class="num">O(3ⁿ)</td></tr>
+    </table>
+    <p>ყოველთვის ვინარჩუნებთ მხოლოდ ყველაზე სწრაფად მზარდ წევრს — მას, რომელიც დომინირებს, როცა <code>n</code> ძალიან დიდი ხდება.</p>
+  </div>
+</section>
+
+<!-- ============ CASES ============ -->
+<section id="cases">
+  <div class="wrap">
+    <span class="section-label">03 — შემავალზე დამოკიდებულება</span>
+    <h2 class="h-section">საუკეთესო, საშუალო და უარესი შემთხვევა</h2>
+    <p class="lede">ერთი და იმავე ალგორითმის სირთულე შეიძლება განსხვავდებოდეს იმის მიხედვით, თუ რა მონაცემი მოვა შესატანად:</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">search_for_elmt.py</span></div>
+      <pre><code class="language-python">def search_for_elmt(L: list, e) -> bool:
+    for i in L:
+        if i == e:
+            return True
+    return False</code></pre>
+    </div>
+
+    <table class="class-table">
+      <tr><th>შემთხვევა</th><th>რას ნიშნავს</th></tr>
+      <tr><td class="o">საუკეთესო</td><td>საძიებელი ელემენტი — სიის პირველივე წევრი. მინიმალური დრო, სიის სიგრძის მიუხედავად.</td></tr>
+      <tr><td class="o">საშუალო</td><td>ელემენტი საშუალოდ სიის შუაში გვხვდება.</td></tr>
+      <tr><td class="o">უარესი</td><td>ელემენტი საერთოდ არ არის სიაში — მთლიანი სიის შემოწმებაა საჭირო.</td></tr>
+    </table>
+
+    <div class="callout insight">
+      <span class="icon">🎯</span>
+      <p><strong>რატომ ვამახვილებთ ყურადღებას უარეს შემთხვევაზე:</strong> ზრდის რიგის დახასიათებისას, კურსის განმავლობაში თითქმის ყოველთვის <strong>worst case</strong>-ზე ვისაუბრებთ — ეს არის გარანტია: „ალგორითმი არასდროს იმუშავებს ამაზე ნელა", რაც კრიტიკულია production სისტემებისთვის, სადაც გაუთვალისწინებელი, „ცუდი" შემავალი მონაცემი ნებისმიერ დროს შეიძლება მოვიდეს.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ BIG O ============ -->
+<section id="big-o" class="section-full">
+  <div class="wrap">
+    <span class="section-label">04 — ფორმალური აღნიშვნა</span>
+    <h2 class="h-section">O-დიდი</h2>
+    <p class="lede"><strong>O-დიდი</strong> — ასიმპტოტური აღნიშვნაა, რომელიც აღწერს ფუნქციის ყოფაქცევას ზღვარში, როცა არგუმენტი (შემავალი მონაცემის ზომა) მიისწრაფვის უსასრულობისკენ. ის გვაძლევს მოხერხებულ კლასიფიკაციას ფუნქციებისთვის მათი ზრდის რიგის მიხედვით — ზუსტი მნიშვნელობის ნაცვლად.</p>
+
+    <p>O-დიდის განსაზღვრებისას სამი პრინციპი გვხელმძღვანელობს:</p>
+    <ol style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
+      <li style="margin-bottom:8px;">გვაინტერესებს, რამდენად სწრაფად იზრდება საჭირო დრო, როცა შემავალი მონაცემის ზომა იზრდება — არა ზუსტი მნიშვნელობა კონკრეტულ <code>n</code>-ზე.</li>
+      <li style="margin-bottom:8px;">ვაკვირდებით უარეს შემთხვევას — ზრდის ზედა საზღვარს (upper bound), რაც შეიძლება მჭიდროდ.</li>
+      <li>ვინარჩუნებთ მხოლოდ ყველაზე სწრაფად მზარდ ტერმს, უგულებელვყოფთ მუდმივებს — მათემატიკურად: <code>O(f(n))</code>, თუ არსებობს დადებითი მუდმივები <code>c</code> და <code>n₀</code>, ისეთი, რომ ნებისმიერი <code>n ≥ n₀</code>-სთვის ალგორითმის ნაბიჯების რაოდენობა ≤ <code>c · f(n)</code>.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ COMPLEXITY CLASSES ============ -->
+<section id="classes">
+  <div class="wrap-wide">
+    <span class="section-label">05 — ტაქსონომია</span>
+    <h2 class="h-section">კომპლექსურობის კლასები</h2>
+    <p class="lede">კომპლექსურობის კლასები გვეხმარება განვსაზღვროთ, რამდენი დრო (ან მეხსიერება) დასჭირდება ალგორითმს, როცა მონაცემთა რაოდენობა იზრდება — უმცირესიდან უდიდესამდე:</p>
+
+    <table class="class-table">
+      <tr><th>კლასი</th><th>დახასიათება</th><th>მაგალითი</th><th>შეფასება</th></tr>
+      <tr><td class="o">O(1)</td><td>მუდმივი დრო — არ არის დამოკიდებული მონაცემთა რაოდენობაზე.</td><td>მასივში ელემენტზე პირდაპირი წვდომა</td><td><span class="tag tag-vfast">ძალიან სწრაფი</span></td></tr>
+      <tr><td class="o">O(log n)</td><td>ლოგარითმული — ყოველ ნაბიჯზე მონაცემი ნახევრდება.</td><td>ორობითი ძებნა დალაგებულ სიაში</td><td><span class="tag tag-fast">სწრაფი</span></td></tr>
+      <tr><td class="o">O(n)</td><td>წრფივი — ყოველი ელემენტის ერთხელ გავლა.</td><td>ძებნა დაულაგებელ სიაში</td><td><span class="tag tag-normal">ნორმალური</span></td></tr>
+      <tr><td class="o">O(n log n)</td><td>ლოგ-ხაზოვანი — n-ჯერადი ოპერაცია, თითოეული ლოგარითმული ხარჯით.</td><td>Merge Sort, Quick Sort</td><td><span class="tag tag-ok">დასაშვები</span></td></tr>
+      <tr><td class="o">O(n²)</td><td>კვადრატული (პოლინომური) — ჩადგმული წრფივი ციკლი.</td><td>ორი სიის თანაკვეთის ნაივური ძებნა</td><td><span class="tag tag-slow">ნელი</span></td></tr>
+      <tr><td class="o">O(2ⁿ)</td><td>ექსპონენციალური — იზრდება კატასტროფულად სწრაფად.</td><td>ფიბონაჩის ნაივური რეკურსია</td><td><span class="tag tag-bad">პრაქტიკულად გამოუსადეგარი</span></td></tr>
+    </table>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="raceN">შემავალის ზომა n =</label>
+        <input type="range" id="raceN" min="1" max="32" value="12" oninput="updateRace()">
+        <span id="raceNVal" style="font-family:var(--mono); color:var(--gold); min-width:28px; display:inline-block;">12</span>
+      </div>
+      <div id="raceBars"></div>
+      <p class="viz-note">ზოლების სიგრძე ლოგარითმულ შკალაზეა (თორემ O(2ⁿ) დანარჩენებს უხილავს გახდიდა) — მარჯვნივ მოცემული რიცხვი კი ზუსტი ოპერაციების რაოდენობაა მოცემულ n-ზე. გადაათრიეთ სლაიდერი — შეამჩნევთ, რამდენად სწრაფად „გაექცევა" ექსპონენციალური კლასი დანარჩენებს.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ RULES ============ -->
+<section id="rules" class="section-full">
+  <div class="wrap">
+    <span class="section-label">06 — კომბინირება</span>
+    <h2 class="h-section">პროგრამებისა და მათი სირთულეების გაანალიზება</h2>
+    <p class="lede">როცა ალგორითმი რამდენიმე ნაწილისგან შედგება, ორი მარტივი წესი გვეხმარება საერთო სირთულის დათვლაში:</p>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">შეკრების წესი — თანმიმდევრული ბლოკები</h3>
+    <p style="font-size:14.5px;"><code>O(f(n)) + O(g(n)) = O(f(n) + g(n))</code> — ვინარჩუნებთ დომინანტს.</p>
+    <div class="code-window">
+      <pre><code class="language-python">def combo(n: int) -> None:
+    for i in range(n):        # O(n)
+        print('a')
+    for j in range(n * n):    # O(n²)
+        print('b')
+# ჯამის წესი: O(n) + O(n²) = O(n + n²) = O(n²)</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">ნამრავლის წესი — ჩადგმული ციკლები</h3>
+    <p style="font-size:14.5px;"><code>O(f(n)) × O(g(n)) = O(f(n) · g(n))</code></p>
+    <div class="code-window">
+      <pre><code class="language-python">def nested(n: int) -> int:
+    x = 0
+    for i in range(n):        # გარე ციკლი — n-ჯერ
+        for j in range(n):    # შიდა ციკლი — n-ჯერ, ყოველ გარე იტერაციაზე
+            x += 1
+    return x
+# ნამრავლის წესი: O(n) × O(n) = O(n²)</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">💡</span>
+      <p><strong>ზოგადი წესი:</strong> თუ ციკლები თანმიმდევრულია (ერთმანეთის მიყოლებით) — ვკრებთ. თუ ციკლი ჩადგმულია მეორეში — ვამრავლებთ. სამშრიანი ჩადგმული ციკლი (n-ზე დამოკიდებული სამივე) — <code>O(n³)</code>, და ასე შემდეგ.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXAMPLES BY CLASS ============ -->
+<section id="examples">
+  <div class="wrap-wide">
+    <span class="section-label">07 — მაგალითები კლასების მიხედვით</span>
+    <h2 class="h-section">რეალური მაგალითები, დახარისხებული</h2>
+
+    <h3 style="font-size:19px; margin:34px 0 6px;">O(1) — მასივში ელემენტზე წვდომა</h3>
+    <p>მასივის ელემენტები მეხსიერებაში თანმიმდევრულადაა განლაგებული, ერთმანეთისგან ფიქსირებული მანძილით — ამიტომ <code>A[i]</code>-ზე წვდომა უბრალო არითმეტიკაა (საწყისი მისამართი + i × ზომა), მონაცემთა რაოდენობის მიუხედავად.</p>
+    <div class="array-boxes">
+      <div class="array-box"><span class="idx">A[0]</span><div class="cell">10</div><span class="addr">1000</span></div>
+      <div class="array-box"><span class="idx">A[1]</span><div class="cell">20</div><span class="addr">1004</span></div>
+      <div class="array-box hit"><span class="idx">A[2]</span><div class="cell">30</div><span class="addr">1008</span></div>
+      <div class="array-box"><span class="idx">A[3]</span><div class="cell">40</div><span class="addr">1012</span></div>
+      <div class="array-box"><span class="idx">A[4]</span><div class="cell">50</div><span class="addr">1016</span></div>
+    </div>
+    <p style="text-align:center; font-size:14px; color:var(--muted); margin-top:-14px;"><code>A[2]</code>-ზე წვდომას იმდენივე დრო სჭირდება, რამდენიც <code>A[0]</code>-ზე — მუდმივი დრო.</p>
+
+    <h3 style="font-size:19px; margin:40px 0 6px;">O(n) — წრფივი ძებნა</h3>
+    <div class="code-pair">
+      <div>
+        <div class="code-pair-label">დაულაგებელ სიაში</div>
+        <div class="code-window">
+          <pre><code class="language-python">def linear_search(L: list, e) -> bool:
+    for x in L:
+        if x == e:
+            return True
+    return False</code></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-pair-label">დალაგებულ სიაში</div>
+        <div class="code-window">
+          <pre><code class="language-python">def linear_search_sorted(L: list, e) -> bool:
+    for x in L:
+        if x == e:
+            return True
+        if x > e:      # აღარაა აზრი გაგრძელებას
+            return False
+    return False</code></pre>
+        </div>
+      </div>
+    </div>
+    <p>ორივე ვერსია <strong>O(n)</strong> უარეს შემთხვევაში. დალაგებული ვერსია საშუალოდ სწრაფია (ადრე წყდება), მაგრამ ეს ასიმპტოტურ კლასს არ ცვლის — მხოლოდ პრაქტიკულ, კონსტანტურ გაუმჯობესებას იძლევა. (მომდევნო ლექციებში ვნახავთ, როგორ გვაძლევს დალაგებული მონაცემი გაცილებით ძლიერ ინსტრუმენტს — <strong>ორობით ძებნას</strong>, O(log n)-ს.)</p>
+
+    <h3 style="font-size:19px; margin:40px 0 6px;">O(n²) — ჩადგმული ციკლები ორ სიაზე</h3>
+    <p>განვსაზღვროთ, არის თუ არა ერთი სია მეორის ქვესიმრავლე:</p>
+    <div class="code-window">
+      <pre><code class="language-python">def is_subset(L1: list, L2: list) -> bool:
+    for e1 in L1:
+        matched = False
+        for e2 in L2:
+            if e1 == e2:
+                matched = True
+                break
+        if not matched:
+            return False
+    return True
+# O(len(L1) * len(L2))</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>ინდუსტრიული გაუმჯობესება:</strong> ჩადგმული ციკლი მუშაობს, მაგრამ Python-ის <code>set</code> სტრუქტურა (რომელსაც heap-ისა და hash table-ების შემდეგ უფრო დეტალურად შევისწავლით) საშუალო შემთხვევაში <code>O(1)</code>-ში ამოწმებს წევრობას. ამის წყალობით, იგივე ამოცანა <strong>O(n + m)</strong>-ში — ანუ წრფივ დროში — წყდება:</p>
+      <pre style="margin:10px 0 0; background:transparent; padding:0;"><code class="language-python" style="background:transparent;">def is_subset_fast(L1: list, L2: list) -> bool:
+    return set(L1) <= set(L2)</code></pre>
+    </div>
+
+    <p style="margin-top:26px;">იგივე ეხება ორი სიის თანაკვეთის პოვნასაც. საწყისი ვერსია მუშაობს ორ ნაბიჯად — ჯერ პოულობს საერთო ელემენტებს ჩადგმული ციკლით, შემდეგ ცალკე ციკლში იშორებს დუბლიკატებს:</p>
+    <div class="code-window">
+      <pre><code class="language-python">def intersect(L1: list, L2: list) -> list:
+    tmp = []
+    for e1 in L1:
+        for e2 in L2:
+            if e1 == e2:
+                tmp.append(e1)
+    res = []
+    for e in tmp:
+        if not (e in res):   # ეს შემოწმებაც თავად O(len(res))-ია!
+            res.append(e)
+    return res</code></pre>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">⚠️</span>
+      <p><strong>ფარული სირთულე:</strong> <code>if not (e in res)</code> თავადაც წრფივი ძებნაა სიაში — ანუ დუბლიკატების მოცილების ციკლიც შეიძლება <code>O(len(tmp)²)</code>-მდე გაიზარდოს უარეს შემთხვევაში, თუმცა ეს არ ცვლის საბოლოო <code>O(n²)</code> კლასს, რადგან ორივე ნაწილი ერთი და იმავე რიგისაა. მაგრამ სუფთა, თანამედროვე ამოხსნა სულაც გვერდს უვლის ამ პრობლემას:</p>
+      <pre style="margin:10px 0 0; background:transparent; padding:0;"><code class="language-python" style="background:transparent;">def intersect_fast(L1: list, L2: list) -> list:
+    return list(set(L1) & set(L2))   # O(n + m)</code></pre>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ FIBONACCI ============ -->
+<section id="fibonacci" class="section-full">
+  <div class="wrap">
+    <span class="section-label">08 — O(2ⁿ) vs O(n)</span>
+    <h2 class="h-section">ფიბონაჩი: რამდენად შეიძლება „ავფეთქდეს" სირთულე</h2>
+    <p class="lede">ფიბონაჩის ნაივური რეკურსია — ზუსტად ის მაგალითია, სადაც ერთი მარტივი შეცვლა სირთულეს ექსპონენციალურიდან წრფივამდე ამცირებს.</p>
+
+    <div class="code-pair" style="display:flex; flex-wrap:wrap; gap:20px;">
+      <div>
+        <div class="code-pair-label">ნაივური რეკურსია — O(2ⁿ)</div>
+        <div class="code-window">
+          <pre><code class="language-python">def fibonacci(n: int) -> int:
+    if n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)</code></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-pair-label">დინამიკური პროგრამირება — O(n)</div>
+        <div class="code-window">
+          <pre><code class="language-python">def fibonacci_dp(n: int, memo: dict | None = None) -> int:
+    if memo is None:
+        memo = {}
+    if n in memo:
+        return memo[n]
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    memo[n] = fibonacci_dp(n - 1, memo) + fibonacci_dp(n - 2, memo)
+    return memo[n]</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>მნიშვნელოვანი შესწორება — მოდიფიცირებადი ნაგულისხმევი არგუმენტი:</strong> ორიგინალი მასალის კოდი წერდა <code>def fibonacci_dp(n, memo={}):</code>. ეს Python-ის ერთ-ერთი ყველაზე ცნობილი „ხაფანგია": ნაგულისხმევი მნიშვნელობა (<code>{}</code>) იქმნება <strong>მხოლოდ ერთხელ</strong> — ფუნქციის განსაზღვრის დროს, არა ყოველ გამოძახებაზე — და ყველა შემდგომი გამოძახება <em>იმავე</em> dictionary-ს იზიარებს. ამან შეიძლება წარმოშვას ძნელად აღმოსაჩენი ბაგები, თუ ფუნქცია სხვადასხვა, დაუკავშირებელი გამოძახებებისთვის გამოიყენება. სწორი პატერნია: <code>memo: dict | None = None</code>, შემდეგ ფუნქციის სხეულში <code>if memo is None: memo = {}</code>.</p>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>ვერსია</th><th>დროითი სირთულე</th></tr>
+      <tr><td>ნაივური რეკურსია</td><td class="num">O(2ⁿ)</td></tr>
+      <tr><td>memoization (<code>fibonacci_dp</code>)</td><td class="num">O(n)</td></tr>
+    </table>
+
+    <div class="callout insight">
+      <span class="icon">🏭</span>
+      <p><strong>Tech Industry Insight:</strong> უფრო იდიომატური Python-ის გზა იგივის მისაღწევად — <code>functools.lru_cache</code> დეკორატორი, რომელიც ზუსტად ამ მემოიზაციის პატერნს გვთავაზობს ჩაშენებულად, მოდიფიცირებადი default-ის ხაფანგის გარეშე:</p>
+      <pre style="margin:10px 0 0; background:transparent; padding:0;"><code class="language-python" style="background:transparent;">from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fibonacci(n: int) -> int:
+    if n < 2:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry">
+  <div class="wrap-wide">
+    <span class="section-label">09 — რატომ აქცევს ამას ყურადღებას ინდუსტრია</span>
+    <h2 class="h-section">Big-O რეალურ სამყაროში</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🎤</div>
+        <h4>ტექნიკური გასაუბრებები</h4>
+        <p>Big-O ანალიზი Google-ის, Amazon-ისა და Meta-ის ინჟინრების გასაუბრებების სტანდარტული ნაწილია — არა კონკურსისთვის, არამედ იმიტომ, რომ არასწორად შერჩეული ალგორითმი production-ში მილიონობით მომხმარებელზე აისახება.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🗄️</div>
+        <h4>მონაცემთა სტრუქტურის არჩევანი</h4>
+        <p>Python-ის <code>list</code>-ში წევრობის შემოწმება — O(n), მაგრამ <code>set</code>-ში ან <code>dict</code>-ში — საშუალოდ O(1). სწორედ ეს განსხვავება წყვეტს, დაიტვირთება თუ არა ვებ-გვერდი წამში, თუ წუთებში, როცა მონაცემი მილიონობით ჩანაწერს აღწევს.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">📈</div>
+        <h4>მასშტაბირებადობა (Scalability)</h4>
+        <p>O(n²) ალგორითმი, რომელიც 1,000 ჩანაწერზე მილიწამებში მუშაობს, 1,000,000 ჩანაწერზე შეიძლება საათობით გაგრძელდეს — 1000² = 1,000,000-ჯერადი ზრდა. ეს ხშირად რეალურ production incident-ებში აღმოჩენილი პრობლემაა.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">💰</div>
+        <h4>ინფრასტრუქტურის ხარჯი</h4>
+        <p>Cloud-ში (AWS, GCP) გამოთვლითი დრო პირდაპირ ფულად ხარჯად გარდაიქმნება. O(n log n) ალგორითმზე გადასვლა O(n²)-დან რეალურად ამცირებს კომპანიის ყოველთვიურ ხარჯებსაც.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">10 — პრაქტიკა</span>
+    <h2 class="h-section">ინტერაქტიული სავარჯიშოები</h2>
+    <p class="lede">შეაფასეთ თითოეული ამოცანის სირთულე, სანამ ამოხსნას გახსნით.</p>
+
+    <h3 style="font-size:20px; margin:36px 0 6px;">საბაზისო სავარჯიშოები</h3>
+
+    <details class="exercise">
+      <summary><span class="ex-num">1.</span> A = [5,3,8,6,2,7,4] — შეამოწმეთ, გვხვდება თუ არა რიცხვი x სიაში</summary>
+      <div class="ex-body">
+        <div class="code-window">
+          <pre><code class="language-python">def search_in_list(A: list, x) -> bool:
+    for element in A:
+        if element == x:
+            return True
+    return False</code></pre>
+        </div>
+        <p><strong>სირთულე: O(n).</strong> უარეს შემთხვევაში (x სიაში არ არის, ან ბოლოშია) მთელი სიის გავლაა საჭირო. Pythonic ალტერნატივა იგივე კლასით: <code>x in A</code>.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><span class="ex-num">2.</span> s = "abc123def45" — შეკარით სტრიქონში შემავალი ყველა ციფრი</summary>
+      <div class="ex-body">
+        <div class="code-window">
+          <pre><code class="language-python">def sum_of_digits(s: str) -> int:
+    total = 0
+    for char in s:
+        if char.isdigit():
+            total += int(char)
+    return total</code></pre>
+        </div>
+        <p><strong>სირთულე: O(len(s)).</strong> თითოეული სიმბოლო ერთხელ მოწმდება — წრფივი დრო.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><span class="ex-num">3.</span> იპოვეთ სიის უდიდესი და უმცირესი ელემენტები</summary>
+      <div class="ex-body">
+        <div class="code-window">
+          <pre><code class="language-python">def find_min_max(A: list) -> tuple:
+    if not A:
+        raise ValueError("სია ცარიელია")
+    min_elem = max_elem = A[0]
+    for elem in A:
+        if elem < min_elem:
+            min_elem = elem
+        if elem > max_elem:
+            max_elem = elem
+    return min_elem, max_elem</code></pre>
+        </div>
+        <p><strong>სირთულე: O(n).</strong> ორიგინალ ვერსიას აკლდა ცარიელი სიის შემოწმება — <code>A[0]</code> ცარიელ სიაზე <code>IndexError</code>-ს გამოიწვევდა. ერთი გავლით ვამოწმებთ ორივე პირობას ერთდროულად, ამიტომ არა <code>O(2n)</code>, არამედ ზუსტად <code>O(n)</code> რჩება.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><span class="ex-num">4.</span> ორი სია — დააბრუნეთ ყველა შესაძლო წყვილი ელემენტებისა</summary>
+      <div class="ex-body">
+        <div class="code-window">
+          <pre><code class="language-python">def find_combinations(A: list, B: list) -> list:
+    combinations = []
+    for a in A:
+        for b in B:
+            combinations.append((a, b))
+    return combinations</code></pre>
+        </div>
+        <p><strong>სირთულე: O(len(A) · len(B)).</strong> ჩადგმული ციკლი — ნამრავლის წესი. სტანდარტული ბიბლიოთეკა ამას გვთავაზობს მზა სახით: <code>list(itertools.product(A, B))</code>.</p>
+      </div>
+    </details>
+
+    <h3 style="font-size:20px; margin:44px 0 6px;">LeetCode-ტიპის ამოცანები</h3>
+    <p style="font-size:14.5px; margin-bottom:20px;">კლასიკური „ნაივური vs ოპტიმალური" წყვილები — ზუსტად ის აზროვნება, რასაც გასაუბრებებზე ამოწმებენ.</p>
+
+    <details class="exercise">
+      <summary>Contains Duplicate <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>განსაზღვრეთ, შეიცავს თუ არა მასივი დუბლირებულ მნიშვნელობას (LeetCode 217).</p>
+        <div class="code-pair">
+          <div>
+            <div class="code-pair-label">ნაივური — O(n²)</div>
+            <div class="code-window">
+              <pre><code class="language-python">def contains_duplicate(nums):
+    n = len(nums)
+    for i in range(n):
+        for j in range(i+1, n):
+            if nums[i] == nums[j]:
+                return True
+    return False</code></pre>
+            </div>
+          </div>
+          <div>
+            <div class="code-pair-label">set-ით — O(n)</div>
+            <div class="code-window">
+              <pre><code class="language-python">def contains_duplicate(nums):
+    return len(set(nums)) != len(nums)</code></pre>
+            </div>
+          </div>
+        </div>
+        <p>თუ ყველა ელემენტი უნიკალურია, <code>set(nums)</code>-ის სიგრძე იგივე დარჩება — თუ დუბლიკატია, <code>set</code> „შეჭამს" ზედმეტ ასლებს და სიგრძე შემცირდება.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Two Sum <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>იპოვეთ ორი ინდექსი, რომელთა მნიშვნელობების ჯამი უდრის <code>target</code>-ს (LeetCode 1) — ალბათ ყველაზე ცნობილი Big-O გაკვეთილი ინდუსტრიაში.</p>
+        <div class="code-window">
+          <pre><code class="language-python">def two_sum(nums: list, target: int) -> list:
+    seen = {}                       # მნიშვნელობა → ინდექსი
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:      # O(1) საშუალოდ
+            return [seen[complement], i]
+        seen[num] = i
+    return []</code></pre>
+        </div>
+        <p>ნაივური ამოხსნა ყოველ წყვილს ჩადგმული ციკლით ამოწმებს — <code>O(n²)</code>. ერთი <code>dict</code>-ის დამატებით ამოცანა <code>O(n)</code>-მდე დაიყვანება: ყოველ ელემენტზე ვამოწმებთ, უკვე გვინახავს თუ არა „დაკლებული" მნიშვნელობა — კლასიკური <em>space-for-time trade-off</em> (მეტი მეხსიერება ნაკლები დროის სანაცვლოდ).</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Maximum Subarray (Kadane's Algorithm) <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>იპოვეთ მასივის უწყვეტი ქვემასივი მაქსიმალური ჯამით (LeetCode 53).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def max_subarray(nums: list) -> int:
+    best = current = nums[0]
+    for x in nums[1:]:
+        current = max(x, current + x)
+        best = max(best, current)
+    return best</code></pre>
+        </div>
+        <p>ნაივური ამოხსნა ყველა შესაძლო ქვემასივს ცალ-ცალკე ჯამავს — <code>O(n²)</code> ან უარესიც. კადანეს იდეა: თითოეულ პოზიციაზე ვირჩევთ — გავაგრძელოთ მიმდინარე ქვემასივი, თუ დავიწყოთ ახალი? ეს ერთი გავლა ალგორითმს <code>O(n)</code>-მდე ამცირებს — კლასიკური მაგალითი იმისა, თუ როგორ გვშველის სწორი „ლოკალური" დაკვირვება გლობალურად ოპტიმალურ ამოხსნაზე გადასვლისას (დინამიკური პროგრამირების საწყისები, რასაც შემდეგ კვირებში კიდევ შევეხებით).</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 2: ალგორითმის სირთულის ანალიზი</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* HERO — STATIC GROWTH CURVES */
+(function(){
+  const svg = document.getElementById('heroChart');
+  const W=700, H=420, pad=30;
+  const maxX = 30;
+  const curves = [
+    {fn:n=>1, color:'#3A4256'},
+    {fn:n=>Math.log2(n+1), color:'#5AC2B6'},
+    {fn:n=>n, color:'#7CB88F'},
+    {fn:n=>n*Math.log2(n+1), color:'#D9A64E'},
+    {fn:n=>n*n, color:'#C97B84'},
+  ];
+  const maxY = maxX*maxX;
+  let paths = '';
+  curves.forEach(c=>{
+    let d = '';
+    for(let x=0;x<=maxX;x+=0.5){
+      const px = pad + (x/maxX)*(W-2*pad);
+      const val = Math.min(c.fn(x), maxY);
+      const py = H-pad - (val/maxY)*(H-2*pad);
+      d += (x===0?'M':'L') + px.toFixed(1)+' '+py.toFixed(1)+' ';
+    }
+    paths += `<path d="${d}" fill="none" stroke="${c.color}" stroke-width="2.2" stroke-linecap="round"/>`;
+  });
+  svg.innerHTML = paths;
+})();
+
+/* GROWTH RACE VISUALIZER */
+const complexityClasses = [
+  {name:'O(1)', color:'#7C849A', fn:n=>1},
+  {name:'O(log n)', color:'#5AC2B6', fn:n=>Math.log2(n)},
+  {name:'O(n)', color:'#7CB88F', fn:n=>n},
+  {name:'O(n log n)', color:'#D9A64E', fn:n=>n*Math.log2(n)},
+  {name:'O(n²)', color:'#C97B84', fn:n=>n*n},
+  {name:'O(2ⁿ)', color:'#E0616F', fn:n=>Math.pow(2,n)},
+];
+function formatNum(x){
+  if(x>=1e6) return x.toExponential(2);
+  if(x < 10 && x % 1 !== 0) return x.toFixed(2);
+  return Math.round(x).toLocaleString('en-US');
+}
+function updateRace(){
+  const n = parseInt(document.getElementById('raceN').value, 10);
+  document.getElementById('raceNVal').textContent = n;
+  const values = complexityClasses.map(c => Math.max(c.fn(n), 0.001));
+  const maxLog = Math.log10(Math.max(...values) + 1);
+  const wrap = document.getElementById('raceBars');
+  wrap.innerHTML = '';
+  complexityClasses.forEach((c, i) => {
+    const val = values[i];
+    const pct = Math.max(2, (Math.log10(val + 1) / maxLog) * 100);
+    const row = document.createElement('div');
+    row.className = 'race-row';
+    row.innerHTML = `<span class="race-label">${c.name}</span><div class="race-track"><div class="race-fill" style="width:${pct}%; background:${c.color}"></div></div><span class="race-value">${formatNum(val)}</span>`;
+    wrap.appendChild(row);
+  });
+}
+updateRace();
+</script>
+</body>
+</html>
