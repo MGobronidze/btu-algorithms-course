@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>მონაცემთა სტრუქტურები და ალგორითმები I — BTU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A;
+  --line:#232838; --gold:#D9A64E; --teal:#5AC2B6;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7; font-size:17px;}
+h1,h2{font-family:var(--serif); font-weight:700; margin:0 0 0.4em;}
+p{color:var(--ink-dim); margin:0 0 1em;}
+a{color:inherit;}
+.wrap{max-width:980px; margin:0 auto; padding:0 24px;}
+
+header{
+  position:relative; overflow:hidden; text-align:center; padding:100px 24px 70px;
+  border-bottom:1px solid var(--line);
+}
+.hero-spiral{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(620px,100%); opacity:0.45; pointer-events:none;}
+.hero-spiral path{fill:none; stroke:url(#g); stroke-width:1.3; stroke-linecap:round;}
+.kicker{position:relative; z-index:1; display:inline-block; font-size:13px; color:var(--muted); margin-bottom:16px; font-family:var(--mono);}
+h1{position:relative; z-index:1; font-size:clamp(36px,7vw,58px); line-height:1.08; max-width:720px; margin:0 auto 18px;}
+.hero-sub{position:relative; z-index:1; max-width:520px; margin:0 auto; font-size:17px;}
+.hero-meta{position:relative; z-index:1; margin-top:26px; display:flex; gap:22px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px; color:var(--muted);}
+
+main{padding:60px 0 90px;}
+.progress-bar{
+  height:6px; border-radius:999px; background:var(--bg-panel); overflow:hidden; margin-bottom:10px;
+}
+.progress-fill{height:100%; background:linear-gradient(90deg,var(--gold),var(--teal)); border-radius:999px;}
+.progress-label{font-family:var(--mono); font-size:13px; color:var(--muted); margin-bottom:36px;}
+
+.lecture-list{display:flex; flex-direction:column; gap:2px;}
+.lecture-row{
+  display:grid; grid-template-columns:52px 1fr auto; align-items:center; gap:18px;
+  padding:18px 20px; border-radius:12px; background:var(--bg-panel);
+  text-decoration:none; transition:background .15s;
+}
+.lecture-row.available{cursor:pointer;}
+.lecture-row.available:hover{background:var(--bg-panel-2);}
+.lecture-row.soon{opacity:0.45;}
+.lec-num{font-family:var(--mono); font-size:15px; color:var(--muted);}
+.lecture-row.available .lec-num{color:var(--gold);}
+.lec-body h3{font-family:var(--serif); font-size:17px; margin:0 0 3px; font-weight:600; color:var(--ink);}
+.lec-body span{font-size:13.5px; color:var(--muted);}
+.lec-status{font-family:var(--mono); font-size:12px; padding:5px 12px; border-radius:999px; white-space:nowrap;}
+.lecture-row.available .lec-status{background:rgba(217,166,78,0.15); color:var(--gold);}
+.lecture-row.soon .lec-status{background:rgba(124,132,154,0.12); color:var(--muted);}
+
+.week-divider{
+  font-family:var(--mono); font-size:12px; color:var(--muted); margin:26px 0 10px; padding-left:4px;
+}
+
+footer{padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
+</style>
+</head>
+<body>
+
+<header>
+  <svg class="hero-spiral" id="spiralSvg" viewBox="0 0 600 600">
+    <defs>
+      <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#D9A64E"/>
+        <stop offset="100%" stop-color="#5AC2B6"/>
+      </linearGradient>
+    </defs>
+    <path id="spiralPath" d=""/>
+  </svg>
+  <span class="kicker">BIT-08.2022.G · ბიზნესისა და ტექნოლოგიების უნივერსიტეტი</span>
+  <h1>მონაცემთა სტრუქტურები და ალგორითმები I</h1>
+  <p class="hero-sub">16 კვირა, ერთი კონცეფციიდან მეორემდე — რეკურსიიდან AVL ხეებამდე. თითოეული ლექცია დამოუკიდებელი, ინტერაქტიული გვერდია: თეორია, Python კოდი, ვიზუალიზაციები და გასაწვრთი ამოცანები.</p>
+  <div class="hero-meta">
+    <span>6 ECTS</span>
+    <span>Python 3.12+</span>
+    <span>ბაკალავრიატი</span>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="progress-bar"><div class="progress-fill" style="width:6.25%"></div></div>
+    <div class="progress-label">1 / 16 ლექცია მზადაა</div>
+
+    <div class="week-divider">I ნაწილი — საფუძვლები</div>
+    <div class="lecture-list">
+      <a class="lecture-row available" href="lectures/lecture-01-recursion/index.html">
+        <span class="lec-num">01</span>
+        <span class="lec-body"><h3>რეკურსია</h3><span>Base case · Recursive step · call stack · ინდუქცია · ჰანოის კოშკები · ფიბონაჩი</span></span>
+        <span class="lec-status">ხელმისაწვდომია</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">02</span>
+        <span class="lec-body"><h3>ალგორითმის კომპლექსურობის ანალიზი</h3><span>O(1), O(log n), O(n), O(n log n), O(n²), O(2ⁿ)</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">03</span>
+        <span class="lec-body"><h3>ორობითი ძებნა და Power Set</h3><span>Binary Search · ქვესიმრავლეების პოვნა</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+    </div>
+
+    <div class="week-divider">II ნაწილი — დალაგების ალგორითმები</div>
+    <div class="lecture-list">
+      <a class="lecture-row soon">
+        <span class="lec-num">04</span>
+        <span class="lec-body"><h3>Insertion Sort და Merge Sort</h3><span>დალაგების ძირითადი მეთოდები</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">05</span>
+        <span class="lec-body"><h3>Quick Sort</h3><span>სწრაფი დალაგება</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">06</span>
+        <span class="lec-body"><h3>ამოცანები ძებნასა და დალაგებაზე</h3><span>პრაქტიკული სავარჯიშოები</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+    </div>
+
+    <div class="week-divider">III ნაწილი — ბმული სია</div>
+    <div class="lecture-list">
+      <a class="lecture-row soon">
+        <span class="lec-num">07</span>
+        <span class="lec-body"><h3>ბმული სია (Linked List)</h3><span>სტრუქტურა და ბაზისური ოპერაციები</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">08</span>
+        <span class="lec-body"><h3>შუალედური გამოცდა</h3><span>I–VII კვირის მასალა</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">09</span>
+        <span class="lec-body"><h3>ამოცანები ბმულ სიებზე</h3><span>Cycle Detection · Merge · Reverse</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+    </div>
+
+    <div class="week-divider">IV ნაწილი — ხეები</div>
+    <div class="lecture-list">
+      <a class="lecture-row soon">
+        <span class="lec-num">10</span>
+        <span class="lec-body"><h3>ორობითი ხე (Binary Tree)</h3><span>Traversal ალგორითმები</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">11</span>
+        <span class="lec-body"><h3>ამოცანები ორობით ხეებზე</h3><span>Depth · Path Sum · Invert</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">12</span>
+        <span class="lec-body"><h3>გროვა (Heap)</h3><span>Heap Sort</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">13</span>
+        <span class="lec-body"><h3>ორობითი ძებნის ხე (BST)</h3><span>BST Sort</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">14</span>
+        <span class="lec-body"><h3>ამოცანები BST-ზე</h3><span>Validate · Insert · Search</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+      <a class="lecture-row soon">
+        <span class="lec-num">15</span>
+        <span class="lec-body"><h3>AVL ხე</h3><span>თვითდაბალანსებადი ხე · AVL Sort</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+    </div>
+
+    <div class="week-divider">V ნაწილი — არასაშედარებელი დალაგება</div>
+    <div class="lecture-list">
+      <a class="lecture-row soon">
+        <span class="lec-num">16</span>
+        <span class="lec-body"><h3>Counting Sort და Radix Sort</h3><span>წრფივი დროის დალაგების ალგორითმები</span></span>
+        <span class="lec-status">მალე</span>
+      </a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · BTU</p>
+</footer>
+
+<script>
+(function(){
+  const phi=(1+Math.sqrt(5))/2, b=Math.log(phi)/(Math.PI/2), turns=2.6, steps=500;
+  const pts=[];
+  for(let i=0;i<=steps;i++){
+    const theta=(i/steps)*turns*2*Math.PI;
+    pts.push({theta, r:Math.exp(b*theta)});
+  }
+  const maxR=pts[pts.length-1].r, k=250/maxR, cx=300, cy=300;
+  let d='';
+  pts.forEach((p,i)=>{
+    const x=cx+p.r*k*Math.cos(p.theta), y=cy+p.r*k*Math.sin(p.theta);
+    d+=(i===0?'M':'L')+x.toFixed(2)+' '+y.toFixed(2)+' ';
+  });
+  const path=document.getElementById('spiralPath');
+  path.setAttribute('d', d);
+  const len=path.getTotalLength();
+  path.style.strokeDasharray=len; path.style.strokeDashoffset=len;
+  path.style.transition='stroke-dashoffset 2.4s cubic-bezier(.2,.7,.3,1)';
+  requestAnimationFrame(()=>{ setTimeout(()=>{ path.style.strokeDashoffset=0; }, 150); });
+})();
+</script>
+</body>
+</html>
