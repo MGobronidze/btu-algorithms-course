@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 3 — ორობითი ძებნა და Power Set | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg: #0B0E14; --bg-panel: #12161F; --bg-panel-2: #171C27;
+  --ink: #ECE8DE; --ink-dim: #B7BCC9; --muted: #7C849A; --line: #232838;
+  --gold: #D9A64E; --gold-dim: #8C7239; --teal: #5AC2B6; --teal-dim: #2F5F5A;
+  --green: #7CB88F; --amber: #D9A64E; --rose: #C97B84; --code-bg: #0d1117;
+  --radius: 14px;
+  --serif: 'Noto Serif Georgian', 'Noto Serif', serif;
+  --sans: 'Noto Sans Georgian', 'Noto Sans', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --maxw: 760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-bg{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(640px,100%); opacity:0.35; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(34px,7vw,64px); line-height:1.05; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+.callout.math{background:linear-gradient(135deg, rgba(124,184,143,0.10), rgba(124,184,143,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:22px;}
+.viz-controls label{font-size:13.5px; color:var(--muted);}
+.viz-controls input[type=text], .viz-controls input[type=number]{
+  background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink);
+  padding:8px 10px; font-family:var(--mono); font-size:13.5px;
+}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 20px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+.bs-grid{display:grid; gap:5px; margin-bottom:6px;}
+.bs-cell{aspect-ratio:1; display:flex; align-items:center; justify-content:center; background:var(--bg-panel-2); border:1px solid var(--line); border-radius:8px; font-family:var(--mono); font-weight:700; color:var(--ink-dim); font-size:clamp(11px,2.4vw,15px); transition:all .3s ease;}
+.bs-cell.in-range{color:var(--ink);}
+.bs-cell.out-range{opacity:0.28;}
+.bs-cell.mid{background:rgba(217,166,78,0.18); border-color:var(--gold); color:var(--gold);}
+.bs-cell.found{background:rgba(124,184,143,0.22); border-color:var(--green); color:var(--green);}
+.bs-idx{display:grid; gap:5px; margin-bottom:4px;}
+.bs-idx span{text-align:center; font-family:var(--mono); font-size:10px; color:var(--muted);}
+.bs-ptrs{display:grid; gap:5px; margin-top:4px; min-height:16px;}
+.bs-ptrs span{text-align:center; font-family:var(--mono); font-size:10px; font-weight:700;}
+.bs-ptr-L{color:var(--teal);}
+.bs-ptr-H{color:var(--rose);}
+.bs-ptr-M{color:var(--gold);}
+.bs-status{margin-top:16px; font-family:var(--mono); font-size:14px; color:var(--ink-dim); min-height:22px;}
+.bs-status strong{color:var(--gold);}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{padding:50px 24px 70px; text-align:center;}
+footer p{font-size:13.5px; color:var(--muted); margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · ორობითი ძებნა — ლექცია 3</a>
+    <div class="nav-links">
+      <a href="#formal-o">ფორმალური O</a>
+      <a href="#binary-search">ორობითი ძებნა</a>
+      <a href="#bs-viz">ვიზუალიზაცია</a>
+      <a href="#classes-recap">სირთულის კლასები</a>
+      <a href="#power-set">Power Set</a>
+      <a href="#hanoi-math">ჰანოი — დამტკიცება</a>
+      <a href="#fibonacci">ფიბონაჩი — ოქროს კვეთა</a>
+      <a href="#int-to-str">int → str</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-bg" viewBox="0 0 600 300" id="heroBinaryTree"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 3</span>
+  <h1>ორობითი ძებნა და Power Set</h1>
+  <p class="hero-sub">ერთი ალგორითმი, რომელიც დალაგებას ჯილდოს სახით გვისახავს — O(log n); და ერთი ამოცანა, სადაც ექსპონენციალური სირთულე თავად პასუხის ზომითაა გამართლებული.</p>
+  <div class="hero-terms">
+    <span>O(log n)</span><span>O(2ⁿ)</span><span>divide &amp; conquer</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ FORMAL BIG-O ============ -->
+<section id="formal-o">
+  <div class="wrap">
+    <span class="section-label">01 — ფორმალიზაცია</span>
+    <h2 class="h-section">Big-O-ს მათემატიკური განმარტება</h2>
+    <p class="lede">წინა ლექციაზე O-დიდი ინტუიციურად განვსაზღვრეთ — „ვინარჩუნებთ ყველაზე სწრაფად მზარდ წევრს, ვუგულებელყოფთ მუდმივებს". დროა ამას ზუსტი მათემატიკური ფორმა მივცეთ.</p>
+
+    <div class="callout math">
+      <span class="icon">∑</span>
+      <p><strong>განმარტება:</strong> ფუნქცია <code>f(n)</code> არის <code>O(g(n))</code>, თუ არსებობს დადებითი მუდმივები <code>c &gt; 0</code> და <code>n₀ ≥ 0</code>, ისეთები, რომ ყოველი <code>n ≥ n₀</code>-სთვის:</p>
+      <p style="text-align:center; font-family:var(--mono); font-size:16px; color:var(--ink); margin-top:10px;">f(n) ≤ c · g(n)</p>
+    </div>
+
+    <p>სიტყვებით: <code>g(n)</code> არის <code>f(n)</code>-ის ზედა საზღვარი (upper bound) — საკმარისად დიდი <code>n</code>-ისთვის, <code>f(n)</code> არასდროს „გადააჭარბებს" <code>g(n)</code>-ს (მუდმივ ჯერადობამდე). სწორედ ამიტომ შეგვიძლია ვთქვათ, რომ <code>3n² + 5n + 2</code> არის <code>O(n²)</code> — შეგვიძლია ავირჩიოთ, მაგალითად, <code>c = 4</code> და <code>n₀ = 6</code>, და უტოლობა ყოველთვის შესრულდება (n=6-ზე: 140 ≤ 144, და სხვაობა მხოლოდ იზრდება n-ის ზრდასთან ერთად).</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ LOG COMPLEXITY / BINARY SEARCH ============ -->
+<section id="binary-search" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — ლოგარითმული სირთულე</span>
+    <h2 class="h-section">ორობითი ძებნა (Binary Search)</h2>
+    <p class="lede">ორობითი ძებნა — ალგორითმი დალაგებულ სტრუქტურაში ელემენტის მოსაძებნად, რომელიც ყოველ ნაბიჯზე საძიებელ არეალს <strong>განახევრებს</strong>, სანამ არ იპოვის ელემენტს ან არეალი არ დაცარიელდება.</p>
+
+    <div class="callout insight">
+      <span class="icon">📋</span>
+      <p><strong>გამოყენების ორი წინაპირობა:</strong></p>
+      <p>1. სტრუქტურა უნდა იყოს <strong>დალაგებული</strong> — თორემ „მარჯვნივ თუ მარცხნივ წასვლის" გადაწყვეტილება აზრს კარგავს.<br>
+      2. ნებისმიერ ელემენტთან წვდომა უნდა ხდებოდეს <strong>მუდმივ დროში</strong> (O(1)) — მასივისთვის ეს მართალია, მაგრამ, მაგალითად, ბმული სიისთვის (Linked List) — არა, ამიტომ ორობითი ძებნა ბმულ სიაზე პირდაპირ ასე აღარ მუშაობს.</p>
+    </div>
+
+    <p><strong>ალგორითმის ნაბიჯები:</strong></p>
+    <ol style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
+      <li style="margin-bottom:8px;">გამოვთვალოთ შუა ინდექსი <code>mid</code> — არეალს ვყოფთ ორ ნაწილად.</li>
+      <li style="margin-bottom:8px;">შევადაროთ შუა ელემენტი საძიებელს. თუ ემთხვევა — ვიპოვეთ, ვასრულებთ.</li>
+      <li style="margin-bottom:8px;">თუ საძიებელი შუა ელემენტზე მეტია — ვირჩევთ მარჯვენა ნახევარს; თუ ნაკლები — მარცხენას.</li>
+      <li>ვიმეორებთ, სანამ არ ვიპოვნით ელემენტს, ან არეალის სიგრძე ნულს არ გაუტოლდება.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ BINARY SEARCH VISUALIZER ============ -->
+<section id="bs-viz">
+  <div class="wrap-wide">
+    <span class="section-label">03 — სცადეთ თავად</span>
+    <h2 class="h-section">ნაბიჯ-ნაბიჯ ვიზუალიზაცია</h2>
+    <p class="lede">შეიყვანეთ დალაგებული მასივი და საძიებელი რიცხვი, შემდეგ დააჭირეთ „შემდეგი ნაბიჯი" — თვალყური ადევნეთ, როგორ იკლებს საძიებელი არეალი ყოველ იტერაციაზე.</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="bsArrInput">მასივი:</label>
+        <input type="text" id="bsArrInput" value="2,5,8,12,16,23,38,56,72,91" style="width:260px;">
+        <label for="bsTargetInput">x =</label>
+        <input type="number" id="bsTargetInput" value="23" style="width:70px;">
+        <button class="btn" onclick="bsInit()">↺ დაწყება</button>
+        <button class="btn ghost" onclick="bsStep()">შემდეგი ნაბიჯი →</button>
+      </div>
+      <div class="bs-idx" id="bsIdxRow"></div>
+      <div class="bs-grid" id="bsGrid"></div>
+      <div class="bs-ptrs" id="bsPtrRow"></div>
+      <div class="bs-status" id="bsStatus"></div>
+    </div>
+
+    <div class="code-pair">
+      <div>
+        <div class="code-pair-label">იტერაციული იმპლემენტაცია</div>
+        <div class="code-window">
+          <pre><code class="language-python">def binary_search(arr: list, target) -> int:
+    low, high = 0, len(arr) - 1
+    while low <= high:
+        mid = low + (high - low) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1</code></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-pair-label">რეკურსიული იმპლემენტაცია</div>
+        <div class="code-window">
+          <pre><code class="language-python">def binary_search_rec(arr: list, low: int,
+                       high: int, target) -> int:
+    if low > high:
+        return -1
+    mid = low + (high - low) // 2
+    if arr[mid] == target:
+        return mid
+    elif arr[mid] < target:
+        return binary_search_rec(arr, mid + 1, high, target)
+    else:
+        return binary_search_rec(arr, low, mid - 1, target)</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">✅</span>
+      <p><strong>კარგი პრაქტიკა, რომელიც უკვე სწორადაა დაცული:</strong> ორივე ვერსია იყენებს <code>mid = low + (high - low) // 2</code>-ს — და არა თითქოს „უფრო მარტივ" <code>(low + high) // 2</code>-ს. სხვა ენებში (მაგ. Java, C++), სადაც მთელი რიცხვების ზომა შეზღუდულია, <code>low + high</code>-მა შეიძლება overflow გამოიწვიოს დიდ მასივებზე — Python-ში ეს კონკრეტული პრობლემა არ დგას (მთელი რიცხვები თვითნებურად დიდი შეიძლება იყოს), მაგრამ ეს პატერნი ინდუსტრიის სტანდარტული, „თავდაცვითი" ჩვევაა, რომელიც ღირს ისწავლოთ ერთხელ და ყოველთვის გამოიყენოთ.</p>
+    </div>
+
+    <p><strong>სირთულის ანალიზი:</strong> ყოველ ნაბიჯზე საძიებელი არეალი ნახევრდება: <code>n → n/2 → n/4 → … → 1</code>. კითხვა: რამდენჯერ შეგვიძლია <code>n</code>-ის გაყოფა 2-ზე, სანამ 1-ს არ მივაღწევთ? სწორედ ეს არის ლოგარითმის განმარტება: <code>log₂(n)</code>-ჯერ.</p>
+
+    <table class="bigo-table">
+      <tr><th>იმპლემენტაცია</th><th>დროითი სირთულე</th><th>მეხსიერების სირთულე</th></tr>
+      <tr><td>იტერაციული</td><td class="num">O(log n)</td><td class="num">O(1)</td></tr>
+      <tr><td>რეკურსიული</td><td class="num">O(log n)</td><td class="num">O(log n) — call stack</td></tr>
+    </table>
+    <p>ორივეს ერთნაირი დროითი სირთულე აქვს, მაგრამ რეკურსიული ვერსია დამატებით <code>O(log n)</code> მეხსიერებას ხარჯავს call stack-ზე — იგივე პრინციპი, რასაც ლექცია 1-ში ვნახეთ.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ CLASSES RECAP ============ -->
+<section id="classes-recap" class="section-full">
+  <div class="wrap">
+    <span class="section-label">04 — გამეორება მაგალითებით</span>
+    <h2 class="h-section">სირთულის კლასები — გამეორება</h2>
+
+    <table class="bigo-table">
+      <tr><th>კლასი</th><th>წარმოშობა</th></tr>
+      <tr><td class="num">O(log n)</td><td>არეალის განახევრება ყოველ ნაბიჯზე — ორობითი ძებნა</td></tr>
+      <tr><td class="num">O(n)</td><td>ერთი, არაჩადგმული იტერაციული ციკლი — ძებნა დაულაგებელ სიაში</td></tr>
+      <tr><td class="num">O(n²), O(nᶜ)</td><td>c-ჯერ ჩადგმული ციკლები — მაგ. ორი სიის თანაკვეთის ნაივური ძებნა</td></tr>
+      <tr><td class="num">O(2ⁿ)</td><td>რეკურსიული ფუნქცია, სადაც ერთზე მეტი რეკურსიული გამოძახება გვაქვს — ჰანოის კოშკები, ფიბონაჩის ნაივური რეკურსია</td></tr>
+    </table>
+    <p style="font-size:14.5px;">პოლინომიური სირთულის (ჩადგმული ციკლების) და წრფივი სირთულის მაგალითები დეტალურად უკვე განვიხილეთ მე-2 ლექციაზე (<code>isSubset</code>, <code>intersect</code>) — აქ ვამატებთ იმ შემთხვევას, რომელიც ჯერ არ გვინახავს: <strong>ექსპონენციალურს</strong>, და ვხედავთ, საიდან ჩნდება ის ზუსტად.</p>
+  </div>
+</section>
+
+<!-- ============ POWER SET ============ -->
+<section id="power-set">
+  <div class="wrap-wide">
+    <span class="section-label">05 — ყველა ქვესიმრავლის სიმრავლე</span>
+    <h2 class="h-section">Power Set</h2>
+    <p class="lede">n-ელემენტიანი სიმრავლის ყველა შესაძლო ქვესიმრავლეთა სიმრავლეს — <strong>Power Set</strong> ეწოდება. მაგალითად, <code>{a, b, c}</code>-ის power set შედგება 8 ქვესიმრავლისგან: ცარიელი სიმრავლიდან თავად <code>{a,b,c}</code>-მდე.</p>
+
+    <div class="callout insight">
+      <span class="icon">🔑</span>
+      <p><strong>რატომ 2ⁿ?</strong> თითოეული ელემენტისთვის ზუსტად ორი შესაძლებლობა გვაქვს — ან შედის ქვესიმრავლეში, ან არა. <code>n</code> დამოუკიდებელი ორარჩევანიანი გადაწყვეტილება → <code>2ⁿ</code> კომბინაცია.</p>
+    </div>
+
+    <h3 style="font-size:19px; margin:34px 0 6px;">მიდგომა 1 — ბიტური ნიღბები (bitmask)</h3>
+    <p>თითოეული ქვესიმრავლე შეესაბამება <code>n</code>-ბიტიან ორობით რიცხვს: 1 ნიშნავს „ეს ელემენტი შედის", 0 — „არ შედის". <code>{a,b,c}</code>-სთვის: <code>011₂ → {a, b}</code>, <code>101₂ → {a, c}</code> და ა.შ. საკმარისია ჩავთვალოთ 0-დან <code>2ⁿ − 1</code>-მდე ყველა რიცხვი.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">power_set_bitmask.py</span></div>
+      <pre><code class="language-python">def power_set(items: list) -> list[list]:
+    n = len(items)
+    result = []
+    for mask in range(1 << n):          # 0-დან 2ⁿ − 1-მდე
+        subset = [items[j] for j in range(n) if mask & (1 << j)]
+        result.append(subset)
+    return result</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>სამი შესწორება ორიგინალი მასალიდან:</strong></p>
+      <p>1. საწყისი კოდი იყენებდა ცვლადის სახელს <code>set</code> — ეს <strong>გადაფარავს</strong> Python-ის ჩაშენებულ <code>set</code> ტიპს იმავე scope-ში; შემდეგ იმავე ფუნქციაში <code>set()</code>-ის გამოძახება უკვე ვეღარ იმუშავებდა. ჩაშენებული ტიპების/ფუნქციების სახელების გადაფარვა კლასიკური, ადვილად თავიდან ასაცილებელი ბაგია.</p>
+      <p>2. <code>(int) (math.pow(2, n))</code> — C/Java-სტილის „cast" სინტაქსია; Python-ში ის ტექნიკურად მუშაობს (რადგან <code>(int)</code> უბრალოდ <code>int</code> ტიპის მიმართვაა ფრჩხილებში), მაგრამ არაიდიომატურია და შემცდომია დამწყებთათვის. ბიტურ ალგორითმში ბუნებრივი და ზუსტი ალტერნატივაა <code>1 &lt;&lt; n</code> — რჩება მთელ რიცხვებში, float-ის გავლის გარეშე.</p>
+      <p>3. გამოტოვებულია ცალკე ფუნქცია — ორიგინალი მხოლოდ <code>print</code>-ავდა შედეგს; ეს ვერსია სიმრავლეს <strong>აბრუნებს</strong>, რაც ტესტირებადს ხდის (იგივე პრინციპი, რასაც ჰანოის მაგალითში ვიყენებდით).</p>
+    </div>
+
+    <h3 style="font-size:19px; margin:34px 0 6px;">მიდგომა 2 — რეკურსია</h3>
+    <p>თუ უკვე გვაქვს ყველა ქვესიმრავლე პირველი <code>n−1</code> ელემენტისთვის, <code>n</code>-ური ელემენტის power set-ს ორი ნაწილისგან ავაწყობთ: ძველი ქვესიმრავლეები (ახალი ელემენტის გარეშე) + იგივე ქვესიმრავლეები (ახალი ელემენტის დამატებით).</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">power_set_recursive.py</span></div>
+      <pre><code class="language-python">def gen_subsets(items: list) -> list[list]:
+    if len(items) == 0:
+        return [[]]                         # ერთადერთი ქვესიმრავლე — ცარიელი
+    smaller = gen_subsets(items[:-1])        # ყველა ქვესიმრავლე ბოლო ელემენტის გარეშე
+    last = items[-1:]
+    with_last = [s + last for s in smaller]  # იგივეები + ბოლო ელემენტი
+    return smaller + with_last</code></pre>
+    </div>
+
+    <p style="font-size:14.5px;">(ორიგინალში იყო გამოუყენებელი ცვლადი <code>res = []</code>, რომელიც არსად გამოიყენებოდა — წაშლილია.)</p>
+
+    <table class="bigo-table">
+      <tr><th>მიდგომა</th><th>დროითი სირთულე</th></tr>
+      <tr><td>ბიტური ნიღბები</td><td class="num">O(n · 2ⁿ)</td></tr>
+      <tr><td>რეკურსია</td><td class="num">O(n · 2ⁿ)</td></tr>
+    </table>
+    <p>ორივეს ერთი და იგივე ასიმპტოტური სირთულე აქვს: <code>2ⁿ</code> ქვესიმრავლე გენერირდება, თითოეულს კი (საშუალოდ) <code>O(n)</code> დრო სჭირდება კოპირებისთვის — ჯამში <code>O(n · 2ⁿ)</code>. ეს არ არის ალგორითმის „ხარვეზი" — თავად პასუხი ექსპონენციალურად დიდია, ამიტომ ნებისმიერი ალგორითმი, რომელიც მას მთლიანად აგენერირებს, მინიმუმ ამდენ დროს მოითხოვს.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ HANOI MATH ============ -->
+<section id="hanoi-math" class="section-full">
+  <div class="wrap">
+    <span class="section-label">06 — რეკურენტული დამოკიდებულების ამოხსნა</span>
+    <h2 class="h-section">ჰანოის კოშკები — რატომ ზუსტად 2ⁿ − 1</h2>
+    <p class="lede">ლექცია 1-ში ვნახეთ, რომ ჰანოის ამოცანას <code>2ⁿ − 1</code> გადატანა სჭირდება — ახლა ამას მათემატიკურად დავამტკიცოთ. თუ <code>tₙ</code> აღვნიშნოთ, როგორც <code>n</code>-ზომის კოშკის გადასატანად საჭირო დრო:</p>
+
+    <div class="callout math">
+      <p style="font-family:var(--mono); font-size:15px; color:var(--ink); line-height:2;">
+        t<sub>n</sub> = 2t<sub>n−1</sub> + 1<br>
+        &nbsp;&nbsp;&nbsp;= 2(2t<sub>n−2</sub> + 1) + 1 = 4t<sub>n−2</sub> + 2 + 1<br>
+        &nbsp;&nbsp;&nbsp;= 4(2t<sub>n−3</sub> + 1) + 2 + 1 = 8t<sub>n−3</sub> + 4 + 2 + 1<br>
+        &nbsp;&nbsp;&nbsp;= … = 2ᵏt<sub>n−k</sub> + 2ᵏ⁻¹ + ⋯ + 4 + 2 + 1<br>
+        &nbsp;&nbsp;&nbsp;= … = 2ⁿ⁻¹ + 2ⁿ⁻² + ⋯ + 4 + 2 + 1 = <strong style="color:var(--gold);">2ⁿ − 1</strong>
+      </p>
+    </div>
+
+    <p>ბოლო ტოლობა გეომეტრიული პროგრესიის ჯამის ფორმულიდან გამომდინარეობს: <code>1 + 2 + 4 + ⋯ + 2ⁿ⁻¹ = 2ⁿ − 1</code>. შედეგი — ზუსტად <code>O(2ⁿ)</code>, ისე, როგორც ინტუიციურადაც მოსალოდნელი იყო: ყოველი დონე რეკურსიისა <em>ორმაგდება</em>.</p>
+  </div>
+</section>
+
+<!-- ============ FIBONACCI GOLDEN RATIO ============ -->
+<section id="fibonacci">
+  <div class="wrap">
+    <span class="section-label">07 — უფრო ზუსტი შეფასება</span>
+    <h2 class="h-section">ფიბონაჩი და ოქროს კვეთა</h2>
+    <p class="lede">წინა ლექციაზე ფიბონაჩის ნაივურ რეკურსიას <code>O(2ⁿ)</code> მივანიჭეთ — ეს სწორია, როგორც ზედა საზღვარი (რადგან ყოველი გამოძახება ≤2 შვილ-გამოძახებას წარმოშობს), მაგრამ არ არის ყველაზე <strong>მჭიდრო</strong> შეფასება.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">fib_recur.py</span></div>
+      <pre><code class="language-python">def fib_recur(n: int) -> int:
+    if n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fib_recur(n - 1) + fib_recur(n - 2)</code></pre>
+    </div>
+
+    <div class="callout math">
+      <span class="icon">φ</span>
+      <p><strong>უფრო მჭიდრო შეფასება:</strong> გამოძახებების ხის ზრდის ზუსტი ტემპი განისაზღვრება ოქროს კვეთით (<code>φ = (1+√5)/2 ≈ 1.618</code>) — ფიბონაჩის მიმდევრობის საკუთარი „ბუნებრივი მუდმივით":</p>
+      <p style="text-align:center; font-family:var(--mono); font-size:16px; color:var(--gold); margin-top:8px;">T(n) = O(φⁿ) ≈ O(1.618ⁿ)</p>
+      <p>ეს მკაცრად ნაკლებია, ვიდრე <code>O(2ⁿ)</code> — მაგრამ ორივე მაინც <strong>ექსპონენციალურია</strong>, ანუ პრაქტიკულად ერთნაირად „უსარგებლო" კლასს განეკუთვნება დიდი <code>n</code>-ისთვის. სწორედ ამიტომ საკმარისი და მისაღები იყო O(2ⁿ)-ის დასახელება ლექცია 2-ში — ზედა საზღვარი მჭიდრო არ იყო, მაგრამ ასიმპტოტურ კლასს სწორად ასახავდა.</p>
+    </div>
+
+    <p>საბედნიეროდ, ორივე ეს რიცხვი მთლიანად უსარგებლოა, თუ უბრალოდ იტერაციულად ვთვლით — მხოლოდ ბოლო ორი მნიშვნელობის დამახსოვრებით:</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">fib_iter.py</span></div>
+      <pre><code class="language-python">def fib_iter(n: int) -> int:
+    if n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    fib_i, fib_ii = 0, 1
+    for _ in range(n - 1):
+        fib_i, fib_ii = fib_ii, fib_i + fib_ii
+    return fib_ii</code></pre>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>ვერსია</th><th>დროითი სირთულე</th><th>მეხსიერების სირთულე</th></tr>
+      <tr><td>ნაივური რეკურსია</td><td class="num">O(φⁿ) ⊆ O(2ⁿ)</td><td class="num">O(n)</td></tr>
+      <tr><td>memoization (ლექცია 2)</td><td class="num">O(n)</td><td class="num">O(n)</td></tr>
+      <tr><td>იტერაციული (ეს ვერსია)</td><td class="num">O(n)</td><td class="num"><strong style="color:var(--green);">O(1)</strong></td></tr>
+    </table>
+    <p>იტერაციული ვერსია მხოლოდ ორ ცვლადს ინახავს — არც მთელი მემოიზაციის ცხრილი სჭირდება, არც call stack. ეს საუკეთესო შესაძლო ვარიანტია ამ კონკრეტული ამოცანისთვის — O(n) დროში და O(1) მეხსიერებაში.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ INT TO STR ============ -->
+<section id="int-to-str" class="section-full">
+  <div class="wrap">
+    <span class="section-label">08 — ოპერაციების სირთულე</span>
+    <h2 class="h-section">მთელი რიცხვის სტრიქონში კონვერტაცია</h2>
+    <p class="lede">ბოლო მაგალითი გვიჩვენებს, რომ პროდუქციაში მისაღები კოდის დაწერას ბევრი წვრილმანის გათვალისწინება სჭირდება — ერთი გამოტოვებული შემთხვევა საკმარისია რეალურ ბაგემდე.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">int_to_str_original.py</span></div>
+      <pre><code class="language-python">def intToStr(i):
+    digits = '0123456789'
+    if i == 0:
+        return '0'
+    result = ''
+    while i > 0:
+        result = digits[i % 10] + result
+        i = i // 10
+    return result</code></pre>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">🐞</span>
+      <p><strong>რეალური ბაგი — უარყოფითი რიცხვები საერთოდ არ მუშავდება:</strong> <code>intToStr(-42)</code> აბრუნებს ცარიელ სტრიქონს <code>''</code>-ს, სწორი <code>"-42"</code>-ის ნაცვლად! მიზეზი: ციკლის პირობა <code>while i &gt; 0</code> არასდროს სრულდება უარყოფით <code>i</code>-ზე — ციკლი საერთოდ არ იწყება. ეს ზუსტად იმ ტიპის ბაგია, რომელიც ტესტირებისას (მხოლოდ დადებითი მაგალითებით) შეიძლება შეუმჩნეველი დარჩეს.</p>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>წარმადობის დამატებითი შენიშვნა:</strong> <code>result = digits[i%10] + result</code> ყოველ იტერაციაზე ქმნის <strong>ახალ</strong> სტრიქონს (Python-ში სტრიქონები უცვლელია — immutable), რაც ამ კონკრეტულ კონტექსტში უმნიშვნელოა (რიცხვს რამდენიმე ათეული ციფრი აქვს მაქსიმუმ), მაგრამ ზოგადი პრინციპისთვის ღირს ცოდნა: ციკლში სტრიქონების განმეორებითი შეერთება დიდ მონაცემზე <code>O(k²)</code>-მდე შეიძლება გაიზარდოს (<code>k</code> — საბოლოო სტრიქონის სიგრძე). ინდუსტრიული სტანდარტია სიმბოლოების სიაში დაგროვება და ბოლოს ერთი <code>''.join(...)</code>-ის გამოძახება — O(k)-ში.</p>
+    </div>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">int_to_str_fixed.py</span></div>
+      <pre><code class="language-python">def int_to_str(i: int) -> str:
+    digits = '0123456789'
+    if i == 0:
+        return '0'
+    is_negative = i < 0
+    i = abs(i)
+    chars = []
+    while i > 0:
+        chars.append(digits[i % 10])
+        i //= 10
+    if is_negative:
+        chars.append('-')
+    return ''.join(reversed(chars))</code></pre>
+    </div>
+
+    <p><strong>სირთულე:</strong> <code>O(log₁₀ i)</code> — ციფრების რაოდენობა რიცხვში იზრდება ლოგარითმულად, თავად რიცხვის სიდიდესთან შედარებით.</p>
+  </div>
+</section>
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry">
+  <div class="wrap-wide">
+    <span class="section-label">09 — რეალურ სამყაროში</span>
+    <h2 class="h-section">O(log n) და O(2ⁿ) რეალურ სისტემებში</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🗄️</div>
+        <h4>მონაცემთა ბაზის ინდექსები</h4>
+        <p>B-tree ინდექსები (PostgreSQL, MySQL) სწორედ ორობითი ძებნის განზოგადებაზეა აგებული — მილიონობით ჩანაწერს შორის ერთის პოვნა რამდენიმე ათეულ შედარებაში ხერხდება, O(log n)-ის წყალობით.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🔀</div>
+        <h4>git bisect</h4>
+        <p>Git-ის ჩაშენებული <code>git bisect</code> ბრძანება ზუსტად ორობითი ძებნის ალგორითმს იყენებს, რომ იპოვოს, რომელმა commit-მა შემოიტანა ბაგი — ათასობით commit-ს შორის რამდენიმე ათეულ ნაბიჯში.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🎚️</div>
+        <h4>Binary Search on Answer</h4>
+        <p>ორობითი ძებნის იდეა ვრცელდება მასივების მიღმაც — „ვიპოვოთ მინიმალური სისწრაფე, რომელიც პირობას აკმაყოფილებს" ტიპის ამოცანები (მაგ. Koko Eating Bananas) იმავე half-and-conquer ლოგიკას იყენებენ პასუხთა სივრცეზე.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🧮</div>
+        <h4>Power Set და კომბინატორიკა</h4>
+        <p>Feature flag-ების ყველა კომბინაციის ტესტირება, subset-sum ტიპის ოპტიმიზაციის ამოცანები, ბიტმასკებზე დაფუძნებული დინამიკური პროგრამირება — ყველგან იგივე <code>2ⁿ</code> სტრუქტურა ჩნდება, რასაც დღეს ვნახეთ.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">10 — პრაქტიკა</span>
+    <h2 class="h-section">ინტერაქტიული სავარჯიშოები</h2>
+
+    <h3 style="font-size:20px; margin:36px 0 6px;">საბაზისო სავარჯიშოები</h3>
+
+    <details class="exercise">
+      <summary><span class="ex-num">1.</span> დაწერეთ ორობითი ძებნა მარცხნიდან მარჯვნივ დალაგებულ სიაზე — შეაფასეთ სირთულე</summary>
+      <div class="ex-body">
+        <div class="code-window">
+          <pre><code class="language-python">def binary_search(arr: list, target) -> int:
+    low, high = 0, len(arr) - 1
+    while low <= high:
+        mid = low + (high - low) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1</code></pre>
+        </div>
+        <p><strong>სირთულე: O(log n).</strong> საძიებელი არეალი ყოველ ნაბიჯზე ნახევრდება.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><span class="ex-num">2.</span> დაწერეთ ფუნქცია, რომელიც დააბრუნებს სიმრავლის ყველა ქვესიმრავლეს — შეაფასეთ სირთულე</summary>
+      <div class="ex-body">
+        <div class="code-window">
+          <pre><code class="language-python">def power_set(items: list) -> list[list]:
+    n = len(items)
+    return [[items[j] for j in range(n) if mask & (1 << j)]
+            for mask in range(1 << n)]</code></pre>
+        </div>
+        <p><strong>სირთულე: O(n · 2ⁿ).</strong> <code>2ⁿ</code> ქვესიმრავლე, თითოეულის აგებას საშუალოდ <code>O(n)</code> სჭირდება.</p>
+      </div>
+    </details>
+
+    <h3 style="font-size:20px; margin:44px 0 6px;">LeetCode-ტიპის ამოცანები</h3>
+
+    <details class="exercise">
+      <summary>Binary Search <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>კლასიკური ორობითი ძებნა (LeetCode 704) — ზუსტად ის, რაც დღეს ვისწავლეთ.</p>
+        <div class="code-window">
+          <pre><code class="language-python">def search(nums: list, target: int) -> int:
+    lo, hi = 0, len(nums) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if nums[mid] == target:
+            return mid
+        elif nums[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1</code></pre>
+        </div>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Search in Rotated Sorted Array <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>მასივი დალაგებული იყო, შემდეგ „დაბრუნდა" უცნობ წერტილში (LeetCode 33). მთლიანად დალაგებული აღარაა, მაგრამ ორობითი ძებნა მაინც გამოსადეგია — ყოველ ნაბიჯზე ერთი ნახევარი მაინც დალაგებულია.</p>
+        <div class="code-window">
+          <pre><code class="language-python">def search(nums: list, target: int) -> int:
+    lo, hi = 0, len(nums) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if nums[mid] == target:
+            return mid
+        if nums[lo] <= nums[mid]:            # მარცხენა ნახევარი დალაგებულია
+            if nums[lo] <= target < nums[mid]:
+                hi = mid - 1
+            else:
+                lo = mid + 1
+        else:                                 # მარჯვენა ნახევარი დალაგებულია
+            if nums[mid] < target <= nums[hi]:
+                lo = mid + 1
+            else:
+                hi = mid - 1
+    return -1</code></pre>
+        </div>
+        <p>სირთულე რჩება <code>O(log n)</code> — ყოველ ნაბიჯზე მაინც ვაგდებთ ნახევარს, თუნდაც ცოტა უფრო ფრთხილი ლოგიკით.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Koko Eating Bananas — Binary Search on Answer <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>კოკოს <code>h</code> საათი აქვს ბანანის <code>piles</code> გროვების შესაჭმელად, საათში მუდმივი სისწრაფით <code>k</code>. იპოვეთ მინიმალური <code>k</code>, რომლითაც ყველაფერს მოასწრებს (LeetCode 875).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def min_eating_speed(piles: list, h: int) -> int:
+    def hours_needed(speed: int) -> int:
+        return sum((p + speed - 1) // speed for p in piles)
+
+    lo, hi = 1, max(piles)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if hours_needed(mid) <= h:
+            hi = mid          # mid საკმარისია — ვცადოთ უფრო ნელა
+        else:
+            lo = mid + 1      # mid არ კმარა — უფრო სწრაფად უნდა
+    return lo</code></pre>
+        </div>
+        <p><strong>ეს ის მაგალითია, სადაც ორობითი ძებნა მასივს კი არა, არამედ „პასუხთა სივრცეს" ეძებს</strong> — <code>k</code>-ს 1-დან <code>max(piles)</code>-მდე. ვამოწმებთ: „საკმარისია თუ არა ეს სისწრაფე?" — და ეს კითხვა მონოტონურია (თუ k კმარა, ყველა k'&gt;k-ც იკმარებს), რაც ორობითი ძებნის გამოყენების პირობაა. სირთულე: <code>O(n · log(max(piles)))</code>, სადაც n — გროვების რაოდენობა.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 3: ორობითი ძებნა და Power Set</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* HERO — STATIC BINARY DECISION TREE (decorative) */
+(function(){
+  const svg = document.getElementById('heroBinaryTree');
+  const W=600,H=300;
+  const levels = 4;
+  let content = '';
+  const nodeR = 7;
+  for(let lvl=0; lvl<levels; lvl++){
+    const count = Math.pow(2,lvl);
+    const y = 30 + lvl*(H-60)/(levels-1);
+    for(let i=0;i<count;i++){
+      const x = (W/(count+1))*(i+1);
+      if(lvl>0){
+        const parentCount = Math.pow(2,lvl-1);
+        const parentX = (W/(parentCount+1))*(Math.floor(i/2)+1);
+        const parentY = 30 + (lvl-1)*(H-60)/(levels-1);
+        content += `<line x1="${parentX}" y1="${parentY}" x2="${x}" y2="${y}" stroke="#232838" stroke-width="1.5"/>`;
+      }
+      const color = lvl===levels-1 ? '#D9A64E' : '#5AC2B6';
+      content += `<circle cx="${x}" cy="${y}" r="${nodeR}" fill="none" stroke="${color}" stroke-width="1.8"/>`;
+    }
+  }
+  svg.innerHTML = content;
+})();
+
+/* BINARY SEARCH VISUALIZER */
+let bsState = { arr: [], target: null, low: 0, high: -1, mid: null, done: false };
+
+function bsInit(){
+  const raw = document.getElementById('bsArrInput').value;
+  const arr = raw.split(',').map(s => parseInt(s.trim(), 10)).filter(x => !isNaN(x));
+  const target = parseInt(document.getElementById('bsTargetInput').value, 10);
+  if(arr.length === 0 || isNaN(target)){ alert('შეიყვანეთ სწორი მასივი და საძიებელი რიცხვი.'); return; }
+  const sorted = [...arr].sort((a,b)=>a-b);
+  bsState = { arr: sorted, target, low: 0, high: sorted.length - 1, mid: null, done: false, found: null };
+  renderBS('დააჭირეთ „შემდეგი ნაბიჯს" დასაწყებად.');
+}
+
+function bsStep(){
+  if(bsState.arr.length === 0){ bsInit(); return; }
+  if(bsState.done) return;
+  const { arr, target } = bsState;
+  if(bsState.low > bsState.high){
+    bsState.done = true;
+    bsState.mid = null;
+    renderBS(`ელემენტი ${target} სიაში ვერ მოიძებნა.`);
+    return;
+  }
+  const mid = bsState.low + Math.floor((bsState.high - bsState.low) / 2);
+  bsState.mid = mid;
+  if(arr[mid] === target){
+    bsState.done = true;
+    bsState.found = mid;
+    renderBS(`ვიპოვეთ! arr[${mid}] = ${target}`);
+  } else if(arr[mid] < target){
+    renderBS(`arr[${mid}]=${arr[mid]} < ${target} → ვეძებთ მარჯვნივ`);
+    bsState.low = mid + 1;
+  } else {
+    renderBS(`arr[${mid}]=${arr[mid]} > ${target} → ვეძებთ მარცხნივ`);
+    bsState.high = mid - 1;
+  }
+}
+
+function renderBS(statusText){
+  const { arr, low, high, mid, found } = bsState;
+  const idxRow = document.getElementById('bsIdxRow');
+  const grid = document.getElementById('bsGrid');
+  const ptrRow = document.getElementById('bsPtrRow');
+  const cols = `repeat(${arr.length}, 1fr)`;
+  idxRow.style.gridTemplateColumns = cols;
+  grid.style.gridTemplateColumns = cols;
+  ptrRow.style.gridTemplateColumns = cols;
+
+  idxRow.innerHTML = arr.map((_, i) => `<span>${i}</span>`).join('');
+
+  grid.innerHTML = arr.map((v, i) => {
+    let cls = 'bs-cell';
+    if(found === i) cls += ' found';
+    else if(mid === i) cls += ' mid';
+    else if(i < low || i > high) cls += ' out-range';
+    else cls += ' in-range';
+    return `<div class="${cls}">${v}</div>`;
+  }).join('');
+
+  ptrRow.innerHTML = arr.map((_, i) => {
+    const labels = [];
+    if(i === low && found === null) labels.push('<span class="bs-ptr-L">L</span>');
+    if(i === mid) labels.push('<span class="bs-ptr-M">M</span>');
+    if(i === high && found === null) labels.push('<span class="bs-ptr-H">H</span>');
+    return `<span>${labels.join(' ')}</span>`;
+  }).join('');
+
+  document.getElementById('bsStatus').innerHTML = statusText;
+}
+
+bsInit();
+</script>
+</body>
+</html>

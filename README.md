@@ -22,11 +22,14 @@ btu-algorithms-course/
 ├── index.html                          # კურსის მთავარი გვერდი (ყველა ლექციის სია)
 ├── README.md
 └── lectures/
-    └── lecture-01-recursion/
-        └── index.html                  # ლექცია 1: რეკურსია
+    ├── lecture-01-recursion/
+    │   └── index.html                  # ლექცია 1: რეკურსია
+    ├── lecture-02-complexity/
+    │   └── index.html                  # ლექცია 2: ალგორითმის სირთულის ანალიზი
+    └── lecture-03-binary-search/
+        └── index.html                  # ლექცია 3: ორობითი ძებნა და Power Set
     # შემდეგი ლექციები დაემატება ამავე პატერნით:
-    # lecture-02-complexity/index.html
-    # lecture-03-binary-search/index.html
+    # lecture-04-insertion-merge-sort/index.html
     # ...
 ```
 
@@ -48,6 +51,11 @@ python3 -m http.server 8000
 
 დამატებითი კონფიგურაცია არ სჭირდება — არც build step, არც dependency ინსტალაცია.
 
+## ახალი ლექციის დამატება
+
+1. შექმენით ახალი საქაღალდე: `lectures/lecture-0N-თემა/`
+2. დაამატეთ `index.html` იმავე დიზაინის სისტემით (ფერები, ტიპოგრაფია, კომპონენტები — იხილეთ ლექცია 1-ის ფაილი როგორც ეტალონი)
+3. დაამატეთ ბმული მთავარ `index.html`-ში, შესაბამის `lecture-row`-ს `soon` კლასის ნაცვლად მიანიჭეთ `available` და `href`
 
 ## წყაროები
 
