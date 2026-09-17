@@ -156,7 +156,7 @@ hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
   min-height:220px;
 }
 .nest-box{
-  position:relative; width:220px; height:220px;
+  position:relative; width:250px; height:250px;
 }
 .nest-ring{
   position:absolute; inset:0; border-radius:50%;
@@ -305,9 +305,8 @@ details.exercise[open] summary::before{content:'–';}
 .insight-card h4{font-size:16px; margin-bottom:8px;}
 .insight-card p{font-size:14.5px; margin:0;}
 
-footer{padding:50px 24px 70px; text-align:center;}
-footer p{font-size:13.5px; color:var(--muted); margin:0;}
-
+footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
 .section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
 </style>
 </head>
@@ -362,13 +361,13 @@ footer p{font-size:13.5px; color:var(--muted); margin:0;}
 
     <p>ცენტრალური იდეა — <strong>დაყავი და იბატონე</strong> (divide and conquer): დიდი ამოცანა იშლება იმავე ტიპის, მაგრამ პატარა ქვეამოცანად, ვიდრე არ მივალთ იმდენად მარტივ შემთხვევამდე, რომ პასუხი პირდაპირ ცნობილია. ეს ზუსტად იმ პრინციპს გავს, რასაც მათემატიკური ინდუქცია იყენებს დამტკიცებისას — და ეს კავშირი შემთხვევითი არაა: ორივე მათემატიკური ინდუქციიდან იღებს სათავეს, და ლექციის ბოლოს ვნახავთ, როგორ ვამტკიცებთ რეკურსიული კოდის სისწორეს სწორედ ინდუქციით.</p>
 
-    <div class="nest-demo">
+    <div class="nest-demo" >
       <div class="nest-box">
         <div class="nest-ring"></div>
         <div class="nest-ring"></div>
         <div class="nest-ring"></div>
         <div class="nest-ring"></div>
-        <div class="nest-core">საბაზისო<br>შემთხვევა</div>
+        <div class="nest-core" style="padding: 20px">base<br>case</div>
       </div>
     </div>
     <p class="nest-caption">ყოველი რგოლი — ერთი რეკურსიული გამოძახება, რომელიც საკუთარ თავს გადასცემს ოდნავ „შემცირებულ" ამოცანას</p>
@@ -397,12 +396,12 @@ footer p{font-size:13.5px; color:var(--muted); margin:0;}
 
 <!-- ================= MULTIPLICATION ================= -->
 <section id="multiplication">
-  <div class="wrap">
+  <div class="wrap" >
     <span class="section-label">02 — პირველი მაგალითი</span>
     <h2 class="h-section">ორი რიცხვის გადამრავლება</h2>
     <p class="lede">ნამრავლი <code>a × b</code> შეიძლება წარმოვადგინოთ, როგორც <code>a</code>-ს საკუთარ თავთან დაჯამება <code>b</code>-ჯერ. ეს გვაძლევს ორ სრულიად განსხვავებულ, მაგრამ თანაბრად სწორ გზას ამოცანის გადასაჭრელად.</p>
 
-    <div class="code-pair">
+    <div class="code-pair" style="display: flex; flex-direction: column;">
       <div>
         <div class="code-pair-label">იტერაციული ამოხსნა</div>
         <div class="code-window">
@@ -630,7 +629,7 @@ footer p{font-size:13.5px; color:var(--muted); margin:0;}
       <tr><td>იტერაციული (ორი ცვლადით)</td><td class="num">O(n)</td><td class="num">O(1)</td></tr>
     </table>
 
-    <div class="callout insight">
+    <div class="callout insight"  style="display: flex; flex-direction: column; gap: 10px;">
       <span class="icon">🏭</span>
       <p><strong>Tech Industry Insight — Memoization:</strong> გამეორებადი ქვე-გამოძახებების პრობლემა (და მისი ამოხსნა — შედეგების დამახსოვრება) არის <em>dynamic programming</em>-ის საფუძველი, რომელსაც მომდევნო ლექციებში დეტალურად შეისწავლით. Python-ში ეს ერთი დეკორატორითაც კი წყდება:</p>
       <pre style="margin:10px 0 0; background:transparent; padding:0;"><code class="language-python" style="background:transparent;">from functools import lru_cache

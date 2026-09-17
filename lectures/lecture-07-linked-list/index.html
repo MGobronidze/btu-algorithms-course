@@ -146,8 +146,8 @@ details.exercise[open] summary::before{content:'–';}
 .ex-body{padding:0 22px 22px;}
 .ex-body p{font-size:14.5px;}
 
-footer{padding:50px 24px 70px; text-align:center;}
-footer p{font-size:13.5px; color:var(--muted); margin:0;}
+footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
 .section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
 </style>
 </head>
@@ -267,7 +267,7 @@ footer p{font-size:13.5px; color:var(--muted); margin:0;}
       <p><strong>შესწორება ორიგინალ მასალასთან შედარებით:</strong> საწყისი კოდი წერდა <code>print(current.data),</code> — მიბაძვით Python 2-ის სინტაქსზე, სადაც ბოლო მძიმე ბეჭდვისას ახალ ხაზზე გადასვლას თრგუნავდა. <strong>Python 3-ში ეს აღარ მუშაობს ასე</strong> — მძიმე უბრალოდ ქმნის ერთელემენტიან tuple-ს <code>print()</code>-ის შედეგისგან და არავითარ გავლენას არ ახდენს გამოტანაზე. შედეგად, კომენტარის დაპირების („სივრცით გამოყოფილი") საწინააღმდეგოდ, თითოეული მნიშვნელობა <strong>ცალკე ხაზზე</strong> დაიბეჭდებოდა. სწორი Python 3 იდიომაა <code>print(x, end=' ')</code>.</p>
     </div>
 
-    <div class="code-pair">
+    <div class="code-pair" style="display: flex; flex-direction: column; gap: 10px;">
       <div>
         <div class="code-pair-label">ძებნა</div>
         <div class="code-window">

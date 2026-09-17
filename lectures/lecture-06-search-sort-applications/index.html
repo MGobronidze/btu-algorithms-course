@@ -136,8 +136,8 @@ details.exercise[open] summary::before{content:'–';}
 .ex-body{padding:0 22px 22px;}
 .ex-body p{font-size:14.5px;}
 
-footer{padding:50px 24px 70px; text-align:center;}
-footer p{font-size:13.5px; color:var(--muted); margin:0;}
+footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
 .section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
 </style>
 </head>
@@ -307,7 +307,7 @@ footer p{font-size:13.5px; color:var(--muted); margin:0;}
 
     <p><strong>სირთულე:</strong> <code>O(n)</code> დროში (ერთი გავლა <code>sum()</code>-ისთვის), <code>O(1)</code> სივრცეში.</p>
 
-    <div class="callout fix">
+    <div class="callout fix" style="display: flex; flex-direction: column; gap: 10px;">
       <span class="icon">🔍</span>
       <p><strong>ინდუსტრიული ალტერნატივა — XOR ტექნიკა:</strong> ენებში, სადაც მთელი რიცხვის ზომა შეზღუდულია (Java, C++), დიდ <code>n</code>-ზე <code>n * (n+1)</code> შეიძლება overflow-ს იწვევდეს, სანამ 2-ზე გაიყოფოდეს. Python-ს ეს პრობლემა არ აქვს (მთელი რიცხვები თავისთავად იზრდება), მაგრამ ღირს იცოდეთ ალტერნატივა, რომელიც ამ პრობლემას სრულად გვერდს უვლის — <code>XOR</code> ოპერაცია:</p>
       <pre style="margin:10px 0 0; background:transparent; padding:0;"><code class="language-python" style="background:transparent;">def missing_number_xor(nums: list) -> int:

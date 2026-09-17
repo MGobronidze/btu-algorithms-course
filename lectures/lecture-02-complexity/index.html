@@ -151,8 +151,8 @@ details.exercise[open] summary::before{content:'–';}
 .ex-body{padding:0 22px 22px;}
 .ex-body p{font-size:14.5px;}
 
-footer{padding:50px 24px 70px; text-align:center;}
-footer p{font-size:13.5px; color:var(--muted); margin:0;}
+footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
 .section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
 </style>
 </head>
@@ -481,7 +481,7 @@ print(f"დრო: {elapsed:.8f} წამი")</code></pre>
     <h2 class="h-section">ფიბონაჩი: რამდენად შეიძლება „ავფეთქდეს" სირთულე</h2>
     <p class="lede">ფიბონაჩის ნაივური რეკურსია — ზუსტად ის მაგალითია, სადაც ერთი მარტივი შეცვლა სირთულეს ექსპონენციალურიდან წრფივამდე ამცირებს.</p>
 
-    <div class="code-pair">
+    <div class="code-pair"  style="display: flex; flex-direction: column; gap: 30px;">
       <div>
         <div class="code-pair-label">ნაივური რეკურსია — O(2ⁿ)</div>
         <div class="code-window">
@@ -523,7 +523,7 @@ print(f"დრო: {elapsed:.8f} წამი")</code></pre>
       <tr><td>memoization (<code>fibonacci_dp</code>)</td><td class="num">O(n)</td></tr>
     </table>
 
-    <div class="callout insight">
+    <div class="callout insight"  style="display: flex; flex-direction: column; gap: 30px;">
       <span class="icon">🏭</span>
       <p><strong>Tech Industry Insight:</strong> უფრო იდიომატური Python-ის გზა იგივის მისაღწევად — <code>functools.lru_cache</code> დეკორატორი, რომელიც ზუსტად ამ მემოიზაციის პატერნს გვთავაზობს ჩაშენებულად, მოდიფიცირებადი default-ის ხაფანგის გარეშე:</p>
       <pre style="margin:10px 0 0; background:transparent; padding:0;"><code class="language-python" style="background:transparent;">from functools import lru_cache
