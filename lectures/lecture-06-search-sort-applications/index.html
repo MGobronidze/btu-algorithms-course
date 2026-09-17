@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 6 — ამოცანები ძებნისა და დალაგების გამოყენებით | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A; --line:#232838;
+  --gold:#D9A64E; --gold-dim:#8C7239; --teal:#5AC2B6; --teal-dim:#2F5F5A;
+  --green:#7CB88F; --amber:#D9A64E; --rose:#C97B84; --code-bg:#0d1117;
+  --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-grid{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(500px,100%); opacity:0.3; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(30px,6vw,54px); line-height:1.1; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.recap-table{width:100%; border-collapse:collapse; margin:24px 0; font-size:14.5px;}
+.recap-table th{font-family:var(--mono); font-size:12px; text-align:left; padding:10px 14px; color:var(--muted); border-bottom:1px solid var(--line);}
+.recap-table td{padding:12px 14px; border-bottom:1px solid var(--line); color:var(--ink-dim); vertical-align:top;}
+.recap-table tr:last-child td{border-bottom:none;}
+.recap-table td.lec{font-family:var(--mono); color:var(--gold); white-space:nowrap;}
+.recap-table a{color:var(--teal); text-decoration:none;}
+.recap-table a:hover{text-decoration:underline;}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:20px;}
+.viz-controls label{font-size:13.5px; color:var(--muted);}
+.viz-controls input[type=text], .viz-controls input[type=number]{background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:8px 10px; font-family:var(--mono); font-size:13.5px;}
+.viz-controls input[type=text]{width:280px;}
+.viz-controls input[type=number]{width:64px;}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 20px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+.matrix-grid{display:inline-grid; gap:4px; margin:20px auto; justify-content:center;}
+.matrix-cell{
+  width:52px; height:44px; display:flex; align-items:center; justify-content:center;
+  background:var(--bg-panel-2); border:1px solid var(--line); border-radius:6px;
+  font-family:var(--mono); font-weight:700; color:var(--ink-dim); transition:all .25s ease;
+}
+.matrix-cell.current{border-color:var(--gold); background:rgba(217,166,78,0.18); color:var(--gold);}
+.matrix-cell.eliminated{opacity:0.2;}
+.matrix-cell.found{border-color:var(--green); background:rgba(124,184,143,0.22); color:var(--green);}
+.matrix-wrap{text-align:center;}
+.viz-status{font-family:var(--mono); font-size:13.5px; color:var(--ink-dim); margin-top:16px; min-height:22px; text-align:center;}
+.viz-status strong{color:var(--gold);}
+.viz-note{font-size:13.5px; color:var(--muted); margin-top:14px;}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{padding:50px 24px 70px; text-align:center;}
+footer p{font-size:13.5px; color:var(--muted); margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · გამოყენება — ლექცია 6</a>
+    <div class="nav-links">
+      <a href="#recap">მოკლე მიმოხილვა</a>
+      <a href="#search-insert">Search Insert Position</a>
+      <a href="#search-matrix">Search a 2D Matrix</a>
+      <a href="#missing-number">Missing Number</a>
+      <a href="#intersection">Intersection of Two Arrays</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-grid" id="heroGrid" viewBox="0 0 400 400"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 6</span>
+  <h1>ამოცანები ძებნისა და დალაგების გამოყენებით</h1>
+  <p class="hero-sub">ლექცია 1-დან 5-მდე ავაშენეთ ხელსაწყოთა ყუთი — რეკურსია, Big-O, ორობითი ძებნა, დალაგების სამი ალგორითმი. დღეს ვხედავთ, როგორ წყვეტენ ეს ხელსაწყოები რეალურ, გასაუბრებაზე ხშირად შემხვედრ ამოცანებს.</p>
+  <div class="hero-terms">
+    <span>Search Insert Position</span><span>Search a 2D Matrix</span><span>Missing Number</span><span>Intersection of Two Arrays</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ RECAP ============ -->
+<section id="recap">
+  <div class="wrap-wide">
+    <span class="section-label">01 — ხელსაწყოთა ყუთი</span>
+    <h2 class="h-section">რას ვეყრდნობით დღეს</h2>
+    <p class="lede">დღევანდელი ოთხივე ამოცანა წყდება უკვე ნასწავლი ტექნიკებით — ახალი ალგორითმის სწავლას კი არ ვცდილობთ, არამედ ვსწავლობთ <strong>რომელი ხელსაწყო რომელ სამუშაოსთვის გამოვიყენოთ</strong>.</p>
+
+    <table class="recap-table">
+      <tr><th>ტექნიკა</th><th>საიდან ვიცით</th><th>დღეს გამოიყენება</th></tr>
+      <tr><td class="lec"><a href="../lecture-03-binary-search/index.html">ლექცია 3</a></td><td>ორობითი ძებნა — O(log n)</td><td>Search Insert Position, Search a 2D Matrix (ვარიანტი)</td></tr>
+      <tr><td class="lec"><a href="../lecture-02-complexity/index.html">ლექცია 2</a></td><td>O(n) წრფივი გავლა, O(1) დამატებითი მეხსიერება</td><td>Missing Number-ის ჯამის ფორმულა</td></tr>
+      <tr><td class="lec"><a href="../lecture-02-complexity/index.html">ლექცია 2</a></td><td><code>set</code>-ის O(1) საშუალო წევრობის შემოწმება</td><td>Intersection of Two Arrays</td></tr>
+    </table>
+
+    <div class="callout insight">
+      <span class="icon">🧭</span>
+      <p><strong>ინტერვიუს უნარი #1:</strong> ამოცანის ამოხსნამდე ყველაზე მნიშვნელოვანი ნაბიჯია საკუთარი თავისთვის კითხვა — „რა თვისება აქვს ამ მონაცემს, რომლის გამოყენებაც შემიძლია?" დალაგებულია? საზღვრები ცნობილია? მთელი რიცხვების უწყვეტი დიაპაზონია? სწორედ ეს დაკვირვება მიგვიყვანს სწორ ალგორითმამდე — არა დამახსოვრებული პასუხი კონკრეტულ ამოცანაზე.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ SEARCH INSERT POSITION ============ -->
+<section id="search-insert" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — ამოცანა 1</span>
+    <h2 class="h-section">Search Insert Position</h2>
+    <p class="lede"><strong>ამოცანა:</strong> მოცემულია დალაგებული მასივი და რიცხვი <code>target</code>. თუ <code>target</code> მასივშია — დააბრუნეთ მისი ინდექსი. თუ არა — დააბრუნეთ ინდექსი, სადაც ის უნდა ჩაისვას, რომ მასივი დალაგებული დარჩეს.</p>
+
+    <div class="callout insight">
+      <span class="icon">🔗</span>
+      <p>ეს ამოცანა უკვე ამოვხსენით ლექცია 3-ის სავარჯიშოებში (LeetCode 35) — თუ გამოტოვეთ, კარგი მომენტია დასაბრუნებლად. საკვანძო დაკვირვება: მასივი <strong>დალაგებულია</strong> → ეს ორობითი ძებნის სიგნალია.</p>
+    </div>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">search_insert.py</span></div>
+      <pre><code class="language-python">def search_insert(nums: list, target: int) -> int:
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if nums[mid] == target:
+            return mid
+        elif nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return left   # target ვერ მოიძებნა — left არის სწორი ჩასმის წერტილი</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">💡</span>
+      <p><strong>რატომ სწორედ <code>left</code>:</strong> ციკლის დასრულებისას <code>left &gt; right</code>-ია, და ეს ორი მაჩვენებელი „გადაცდნენ" ერთმანეთს ზუსტად იმ წერტილში, სადაც <code>target</code> „ჯდება" — ყველა ელემენტი <code>left</code>-მდე მასზე პატარაა, ყველა <code>right</code>-იდან (ანუ <code>left</code>-იდანვე) — მასზე დიდი.</p>
+    </div>
+
+    <p><strong>სირთულე:</strong> <code>O(log n)</code> დროში, <code>O(1)</code> სივრცეში.</p>
+  </div>
+</section>
+
+<!-- ============ SEARCH A 2D MATRIX ============ -->
+<section id="search-matrix">
+  <div class="wrap-wide">
+    <span class="section-label">03 — ამოცანა 2</span>
+    <h2 class="h-section">Search a 2D Matrix</h2>
+    <p class="lede"><strong>ამოცანა:</strong> მოცემულია მატრიცა, სადაც <strong>თითოეული სტრიქონი</strong> და <strong>თითოეული სვეტი</strong> ზრდადობითაა დალაგებული. დავადგინოთ, გვხვდება თუ არა <code>target</code> მატრიცაში.</p>
+
+    <div class="callout warn">
+      <span class="icon">⚠️</span>
+      <p><strong>ორი განსხვავებული ამოცანა ერთი სახელით:</strong> LeetCode-ზე ორი მსგავსი ამოცანაა ამ სახელით. <strong>LeetCode 74</strong>-ს დამატებით პირობა აქვს — თითოეული სტრიქონის პირველი რიცხვი მეტია წინა სტრიქონის ბოლო რიცხვზე, ანუ მთელი მატრიცა შეიძლება „გაიშალოს" ერთ დალაგებულ მასივად. <strong>LeetCode 240</strong>-ს (და ამ ლექციის ალგორითმს) ეს დამატებითი პირობა არ სჭირდება — მხოლოდ სტრიქონები და სვეტები ცალ-ცალკეა დალაგებული. ეს განსხვავება <strong>მნიშვნელოვანია</strong>: რაც უფრო ძლიერია პირობა, მით უფრო სწრაფი ალგორითმის აგება შეგვიძლია — კლასიკური გაკვეთილი იმისა, თუ რატომაა ამოცანის ზუსტი პირობების წაკითხვა გადამწყვეტი.</p>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">ზოგადი ამოხსნა — „კიბის" ძებნა (LeetCode 240)</h3>
+    <p>დავიწყოთ მარჯვენა ზედა კუთხიდან. ეს კუთხე უნიკალურია: მისი მარცხნივ ყველაფერი პატარაა, მისი ქვემოთ ყველაფერი — დიდი. ამიტომ ერთი შედარებით ყოველთვის შეგვიძლია მთელი სტრიქონის ან სვეტის გამორიცხვა:</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">search_matrix.py</span></div>
+      <pre><code class="language-python">def search_matrix(matrix: list, target: int) -> bool:
+    if not matrix or not matrix[0]:
+        return False
+    rows, cols = len(matrix), len(matrix[0])
+    row, col = 0, cols - 1        # ვიწყებთ მარჯვენა ზედა კუთხიდან
+    while row < rows and col >= 0:
+        if matrix[row][col] == target:
+            return True
+        elif matrix[row][col] > target:
+            col -= 1               # ძალიან დიდია — მთელი სვეტი გამოირიცხა
+        else:
+            row += 1                # ძალიან პატარაა — მთელი სტრიქონი გამოირიცხა
+    return False</code></pre>
+    </div>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="matTarget">საძიებელი target =</label>
+        <input type="number" id="matTarget" value="9">
+        <button class="btn" onclick="matInit()">↺ დაწყება</button>
+        <button class="btn ghost" onclick="matStep()">შემდეგი ნაბიჯი →</button>
+      </div>
+      <div class="matrix-wrap"><div class="matrix-grid" id="matGrid"></div></div>
+      <div class="viz-status" id="matStatus"></div>
+    </div>
+    <p class="viz-note">ოქროსფერი — მიმდინარე უჯრედი. ჩამქრალი — უკვე გამორიცხული სტრიქონი/სვეტი. თითოეულ ნაბიჯზე ან მთელი სტრიქონი, ან მთელი სვეტი „ქრება" — ამიტომაა ალგორითმი O(n+m)-ში.</p>
+
+    <table class="bigo-table">
+      <tr><th>მიდგომა</th><th>პირობა</th><th>სირთულე</th></tr>
+      <tr><td>„კიბის" ძებნა (ზემოთ)</td><td>სტრიქონები და სვეტები ცალ-ცალკე დალაგებული</td><td class="num">O(n + m)</td></tr>
+      <tr><td>ერთი ორობითი ძებნა</td><td>მთელი მატრიცა „ვირტუალურად" ერთი დალაგებული მასივია (LeetCode 74)</td><td class="num">O(log(n·m))</td></tr>
+    </table>
+    <p>თუ LeetCode 74-ის უფრო ძლიერი პირობა გვაქვს, ინდექსის გადაქცევა <code>(row, col)</code>-დან 1D-ში ტრივიალურია: <code>row = mid // cols</code>, <code>col = mid % cols</code> — შედეგად სრული ორობითი ძებნის სიჩქარეს ვიღებთ, <code>O(n+m)</code>-ის ნაცვლად <code>O(log(n·m))</code>.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ MISSING NUMBER ============ -->
+<section id="missing-number" class="section-full">
+  <div class="wrap">
+    <span class="section-label">04 — ამოცანა 3</span>
+    <h2 class="h-section">Missing Number</h2>
+    <p class="lede"><strong>ამოცანა:</strong> მოცემულია <code>n</code> განსხვავებული რიცხვი დიაპაზონიდან <code>[0, n]</code> — ანუ სულ <code>n+1</code> შესაძლო მნიშვნელობიდან ზუსტად ერთია გამოტოვებული. იპოვეთ გამოტოვებული რიცხვი.</p>
+
+    <div class="callout insight">
+      <span class="icon">🧮</span>
+      <p><strong>საკვანძო დაკვირვება:</strong> არც კი გვჭირდება მასივის დალაგება ან ძებნა! თუ ვიცით, რა უნდა იყოს ჯამი დიაპაზონის ყველა რიცხვისთვის (ცნობილი ფორმულით), და გამოვაკლებთ რეალურ ჯამს — სხვაობა ზუსტად გამოტოვებული რიცხვი იქნება.</p>
+    </div>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">missing_number.py</span></div>
+      <pre><code class="language-python">def missing_number(nums: list) -> int:
+    n = len(nums)
+    expected_sum = n * (n + 1) // 2   # 0-დან n-მდე ჯამის ფორმულა
+    actual_sum = sum(nums)
+    return expected_sum - actual_sum</code></pre>
+    </div>
+
+    <p><strong>სირთულე:</strong> <code>O(n)</code> დროში (ერთი გავლა <code>sum()</code>-ისთვის), <code>O(1)</code> სივრცეში.</p>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>ინდუსტრიული ალტერნატივა — XOR ტექნიკა:</strong> ენებში, სადაც მთელი რიცხვის ზომა შეზღუდულია (Java, C++), დიდ <code>n</code>-ზე <code>n * (n+1)</code> შეიძლება overflow-ს იწვევდეს, სანამ 2-ზე გაიყოფოდეს. Python-ს ეს პრობლემა არ აქვს (მთელი რიცხვები თავისთავად იზრდება), მაგრამ ღირს იცოდეთ ალტერნატივა, რომელიც ამ პრობლემას სრულად გვერდს უვლის — <code>XOR</code> ოპერაცია:</p>
+      <pre style="margin:10px 0 0; background:transparent; padding:0;"><code class="language-python" style="background:transparent;">def missing_number_xor(nums: list) -> int:
+    result = len(nums)
+    for i, num in enumerate(nums):
+        result ^= i ^ num
+    return result</code></pre>
+      <p style="margin-top:10px;">მუშაობს იმიტომ, რომ <code>x ^ x = 0</code> — ყოველი წყვილი (ინდექსი, მნიშვნელობა), რომელიც ორივეჯერ გვხვდება, ერთმანეთს „აქრობს", და მხოლოდ დაუწყვილებელი (გამოტოვებული) რიცხვი რჩება. არც ჯამი გვჭირდება, არც overflow-ის რისკი.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INTERSECTION ============ -->
+<section id="intersection">
+  <div class="wrap">
+    <span class="section-label">05 — ამოცანა 4</span>
+    <h2 class="h-section">Intersection of Two Arrays</h2>
+    <p class="lede"><strong>ამოცანა:</strong> ორი მასივიდან დააბრუნეთ საერთო ელემენტები (თითოეული ერთხელ, თანმიმდევრობის მნიშვნელობის გარეშე).</p>
+
+    <div class="callout insight">
+      <span class="icon">🔗</span>
+      <p><strong>პირდაპირი კავშირი ლექცია 2-თან:</strong> გახსოვთ ჩადგმული ციკლით დაწერილი <code>intersect()</code>, რომელიც O(n²)-ში მუშაობდა — და მისი გაუმჯობესებული, <code>set</code>-ზე დაფუძნებული ვერსია? ეს ზუსტად ის ამოცანაა, უბრალოდ ახლა ოფიციალურ LeetCode ფორმატში (LeetCode 349).</p>
+    </div>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">intersection.py</span></div>
+      <pre><code class="language-python">def intersection(nums1: list, nums2: list) -> list:
+    return list(set(nums1) & set(nums2))</code></pre>
+    </div>
+
+    <p><strong>სირთულე:</strong> <code>O(n + m)</code> საშუალოდ — თითოეული მასივიდან <code>set</code>-ის აგება <code>O(n)</code>/<code>O(m)</code>-ია, თანაკვეთა საშუალოდ <code>O(min(n, m))</code>-ია.</p>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>შენიშვნა ორიგინალურობაზე:</strong> ეს ამოცანა კურსის მასალაში მხოლოდ სათაურის დონეზეა მოხსენიებული (სრული კოდი არ იყო მოცემული ორიგინალ სლაიდებში) — ამიტომ ზემოთ მოცემული ამოხსნა სრულად ჩვენს მიერაა დამატებული და გატესტილი, ლექცია 2-ის მასალის პირდაპირი გაგრძელების სახით.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">06 — რატომ სწორედ ეს ოთხი ამოცანა</span>
+    <h2 class="h-section">გასაუბრებებზე ხშირად შემხვედრი ნიმუშები</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🎤</div>
+        <h4>ეს ოთხივე — რეალური საკონკურსო/საგასაუბრებო ამოცანაა</h4>
+        <p>Search Insert Position, Search a 2D Matrix, Missing Number და Intersection of Two Arrays — ყველა მათგანი LeetCode-ის ყველაზე ხშირად დასმულ კითხვებს შორისაა Google-ის, Amazon-ისა და Meta-ის ტექნიკურ გასაუბრებებზე.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🗺️</div>
+        <h4>„კიბის" ძებნა რეალურ სისტემებში</h4>
+        <p>ორგანზომილებიან, ორმხრივ-დალაგებულ სტრუქტურებზე ძებნა (მაგ. ცხრილები Excel-ის მსგავს პროგრამებში, ან ლიდერბორდები თამაშებში) ხშირად ზუსტად ამ „კიბის" პრინციპს იყენებს.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🔐</div>
+        <h4>Missing Number — მონაცემთა მთლიანობის შემოწმება</h4>
+        <p>ჯამის/XOR-ის ტექნიკა გამოიყენება checksums-ში და მონაცემთა გადაცემის შემოწმებაში — სწრაფად დავადგინოთ, დაიკარგა თუ არა პაკეტი ან ჩანაწერი, სრული შედარების გარეშე.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🎯</div>
+        <h4>უნარი, რომელსაც ეს ლექცია ავითარებს</h4>
+        <p>ეს არაა ახალი ალგორითმების სია — ეს არის <strong>ტრანსფერი</strong>: უნარი ამოვიცნოთ ნაცნობი პატერნი ახალ ჩარჩოში. ზუსტად ეს უნარია გამოსაცდელი გასაუბრებებზე, და ზუსტად ამაზეა აგებული პრაქტიკული პროგრამირების ყოველდღიური მუშაობა.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises">
+  <div class="wrap-wide">
+    <span class="section-label">07 — შემდგომი პრაქტიკა</span>
+    <h2 class="h-section">დამატებითი LeetCode ვარიაციები</h2>
+    <p class="lede">იგივე ოთხი პატერნის ბუნებრივი გაგრძელება — ოდნავ რთული ვარიაციები.</p>
+
+    <details class="exercise">
+      <summary>First Bad Version <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>API <code>isBadVersion(version)</code> გეუბნებათ, ცუდია თუ არა კონკრეტული ვერსია — ყველა ვერსია ცუდი ვერსიის შემდეგაც ცუდია. იპოვეთ პირველი ცუდი ვერსია, API-ის გამოძახებების მინიმალური რაოდენობით (LeetCode 278).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def first_bad_version(n: int) -> int:
+    left, right = 1, n
+    while left < right:
+        mid = left + (right - left) // 2
+        if isBadVersion(mid):
+            right = mid          # mid შეიძლება იყოს პასუხი — არ გამორიცხოთ
+        else:
+            left = mid + 1
+    return left</code></pre>
+        </div>
+        <p>იგივე „ჩასმის წერტილის" ლოგიკა, რაც Search Insert Position-ში — ვეძებთ არა კონკრეტულ მნიშვნელობას, არამედ <strong>საზღვარს</strong> ორ ზონას შორის (კარგი/ცუდი).</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Intersection of Two Arrays II <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>იგივე ამოცანა, მაგრამ ახლა დუბლიკატებიც უნდა აისახოს შედეგში იმდენჯერ, რამდენჯერაც ორივე მასივში მეორდება (LeetCode 350).</p>
+        <div class="code-window">
+          <pre><code class="language-python">from collections import Counter
+
+def intersect(nums1: list, nums2: list) -> list:
+    counts1, counts2 = Counter(nums1), Counter(nums2)
+    result = []
+    for num, cnt in counts1.items():
+        if num in counts2:
+            result.extend([num] * min(cnt, counts2[num]))
+    return result</code></pre>
+        </div>
+        <p><code>set</code>-ი აქ საკმარისი აღარაა, რადგან სიხშირის ინფორმაციას ვკარგავთ — <code>Counter</code> (hash map სიხშირეებით) ინარჩუნებს ორივე მასივში განმეორებათა რაოდენობას. სირთულე კვლავ <code>O(n + m)</code>-ია.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Find First and Last Position of Element in Sorted Array <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>დალაგებულ მასივში, სადაც შესაძლოა დუბლიკატები იყოს, იპოვეთ <code>target</code>-ის პირველი და ბოლო პოზიცია <code>O(log n)</code> დროში (LeetCode 34).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def search_range(nums: list, target: int) -> list:
+    def find_bound(is_first: bool) -> int:
+        left, right = 0, len(nums) - 1
+        result = -1
+        while left <= right:
+            mid = (left + right) // 2
+            if nums[mid] == target:
+                result = mid
+                if is_first:
+                    right = mid - 1   # ვაგრძელებთ მარცხნივ, უფრო ადრეულის საძებნად
+                else:
+                    left = mid + 1    # ვაგრძელებთ მარჯვნივ
+            elif nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+        return result
+
+    return [find_bound(True), find_bound(False)]</code></pre>
+        </div>
+        <p><strong>იდეა:</strong> ორი ცალკე ორობითი ძებნა — ერთი „არ ჩერდება" პირველი დამთხვევისას, აგრძელებს მარცხნივ ყველაზე ადრეული პოზიციის საპოვნელად; მეორე იგივეს აკეთებს მარჯვნივ. სირთულე რჩება <code>O(log n)</code>, თუნდაც ორჯერ ვასრულოთ ორობითი ძებნა — მუდმივი ჯერადობა ასიმპტოტურ კლასს არ ცვლის.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 6: ამოცანები ძებნისა და დალაგების გამოყენებით</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* HERO DECORATIVE GRID */
+(function(){
+  const svg = document.getElementById('heroGrid');
+  const size = 5, cell = 76, gap = 4;
+  let content = '';
+  for(let r=0;r<size;r++){
+    for(let c=0;c<size;c++){
+      const x = c*(cell+gap), y = r*(cell+gap);
+      const onStaircase = (r+c === size-1) || (r===0 && c===size-1);
+      content += `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="6" fill="none" stroke="${onStaircase?'#D9A64E':'#232838'}" stroke-width="1.6"/>`;
+    }
+  }
+  svg.setAttribute('viewBox', `0 0 ${size*(cell+gap)-gap} ${size*(cell+gap)-gap}`);
+  svg.innerHTML = content;
+})();
+
+/* ============ SEARCH A 2D MATRIX VISUALIZER ============ */
+const matData = [
+  [1,4,7,11,15],
+  [2,5,8,12,19],
+  [3,6,9,16,22],
+  [10,13,14,17,24],
+  [18,21,23,26,30]
+];
+let matState = { row:0, col:0, done:false, found:false };
+
+function matInit(){
+  matState = { row:0, col: matData[0].length-1, done:false, found:false };
+  renderMat('დააჭირეთ „შემდეგი ნაბიჯს" — ვიწყებთ მარჯვენა ზედა კუთხიდან.');
+}
+
+function matStep(){
+  if(matState.done) return;
+  const target = parseInt(document.getElementById('matTarget').value, 10);
+  const s = matState;
+  if(s.row >= matData.length || s.col < 0){
+    s.done = true;
+    renderMat(`target = ${target} მატრიცაში არ მოიძებნა.`);
+    return;
+  }
+  const val = matData[s.row][s.col];
+  if(val === target){
+    s.done = true; s.found = true;
+    renderMat(`matrix[${s.row}][${s.col}] = ${val} = target → ნაპოვნია!`);
+  } else if(val > target){
+    renderMat(`matrix[${s.row}][${s.col}] = ${val} > ${target} → მთელი სვეტი ${s.col} გამოირიცხა`, s.row, s.col);
+    s.col -= 1;
+  } else {
+    renderMat(`matrix[${s.row}][${s.col}] = ${val} < ${target} → მთელი სტრიქონი ${s.row} გამოირიცხა`, s.row, s.col);
+    s.row += 1;
+  }
+}
+
+function renderMat(statusText, elimRow, elimCol){
+  const grid = document.getElementById('matGrid');
+  const rows = matData.length, cols = matData[0].length;
+  grid.style.gridTemplateColumns = `repeat(${cols}, 52px)`;
+  let html = '';
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      let cls = 'matrix-cell';
+      if(matState.found && r===matState.row && c===matState.col) cls += ' found';
+      else if(!matState.done && r===matState.row && c===matState.col) cls += ' current';
+      else if((elimRow!==undefined && r===elimRow) || (elimCol!==undefined && c===elimCol)) cls += ' eliminated';
+      else if(r > matState.row || c < matState.col){
+        // already permanently eliminated zone (rows above current row's start eliminated cols, etc.)
+      }
+      if(!matState.done){
+        if(r < matState.row) cls += ' eliminated';
+        if(c > matState.col) cls += ' eliminated';
+      }
+      html += `<div class="${cls}">${matData[r][c]}</div>`;
+    }
+  }
+  grid.innerHTML = html;
+  document.getElementById('matStatus').innerHTML = statusText;
+}
+matInit();
+</script>
+</body>
+</html>

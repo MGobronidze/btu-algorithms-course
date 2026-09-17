@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 9 — ამოცანები ბმულ სიებზე | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A; --line:#232838;
+  --gold:#D9A64E; --gold-dim:#8C7239; --teal:#5AC2B6; --teal-dim:#2F5F5A;
+  --green:#7CB88F; --amber:#D9A64E; --rose:#C97B84; --code-bg:#0d1117;
+  --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-loop{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(420px,100%); opacity:0.3; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(32px,6.5vw,58px); line-height:1.1; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.summary-table{width:100%; border-collapse:collapse; margin:24px 0; font-size:14.5px;}
+.summary-table th{font-family:var(--mono); font-size:12px; text-align:left; padding:10px 14px; color:var(--muted); border-bottom:1px solid var(--line);}
+.summary-table td{padding:12px 14px; border-bottom:1px solid var(--line); color:var(--ink-dim); vertical-align:top;}
+.summary-table tr:last-child td{border-bottom:none;}
+.summary-table td.num{font-family:var(--mono); color:var(--gold); white-space:nowrap;}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:20px;}
+.viz-controls label{font-size:13.5px; color:var(--muted);}
+.viz-controls input[type=text]{background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:8px 10px; font-family:var(--mono); font-size:13.5px; width:200px;}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 20px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+.rev-stage{display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:0; min-height:150px; padding:30px 4px 10px;}
+.rev-slot{display:flex; align-items:center;}
+.rev-node{
+  display:flex; flex-direction:column; align-items:center; position:relative;
+}
+.rev-node-box{
+  width:56px; height:44px; border-radius:8px; border:1.5px solid var(--line); background:var(--bg-panel-2);
+  display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-weight:700; color:var(--ink-dim);
+  transition:all .3s ease;
+}
+.rev-node.done .rev-node-box{border-color:var(--green); background:rgba(124,184,143,0.15); color:var(--green);}
+.rev-node.curr .rev-node-box{border-color:var(--gold); background:rgba(217,166,78,0.18); color:var(--gold);}
+.rev-label{position:absolute; top:-26px; font-family:var(--mono); font-size:11px; white-space:nowrap;}
+.rev-label.prev{color:var(--green);}
+.rev-label.curr{color:var(--gold);}
+.rev-arrow{width:34px; text-align:center; font-family:var(--mono); font-size:18px; color:var(--muted); transition:color .3s;}
+.rev-arrow.left{color:var(--green);}
+.rev-arrow.gap{color:var(--line);}
+.rev-null{font-family:var(--mono); font-size:12px; color:var(--muted); padding:0 8px; opacity:0; transition:opacity .3s;}
+.rev-null.visible{opacity:1; color:var(--green);}
+.viz-status{font-family:var(--mono); font-size:13.5px; color:var(--ink-dim); margin-top:20px; text-align:center; min-height:22px;}
+.viz-status strong{color:var(--gold);}
+.viz-note{font-size:13.5px; color:var(--muted); margin-top:14px;}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{padding:50px 24px 70px; text-align:center;}
+footer p{font-size:13.5px; color:var(--muted); margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · ბმული სია: ამოცანები — ლექცია 9</a>
+    <div class="nav-links">
+      <a href="#bridge">გაგრძელება</a>
+      <a href="#cycle">Linked List Cycle</a>
+      <a href="#dedup">Remove Duplicates</a>
+      <a href="#merge">Merge Two Sorted Lists</a>
+      <a href="#reverse">Reverse Linked List</a>
+      <a href="#viz">ვიზუალიზატორი</a>
+      <a href="#summary">შეჯამება</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-loop" id="heroLoop" viewBox="0 0 400 300"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 9</span>
+  <h1>ამოცანები ბმულ სიებზე</h1>
+  <p class="hero-sub">ოთხი კლასიკური ამოცანა, რომლებიც ლექცია 7-ის საფუძვლებზეა აგებული — თითოეული რამდენიმე მიდგომით, ნაივურიდან ოპტიმალურამდე.</p>
+  <div class="hero-terms">
+    <span>Cycle Detection</span><span>Remove Duplicates</span><span>Merge Two Lists</span><span>Reverse List</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ BRIDGE ============ -->
+<section id="bridge">
+  <div class="wrap">
+    <span class="section-label">01 — გაგრძელება</span>
+    <h2 class="h-section">ლექცია 7-დან აქამდე</h2>
+    <p class="lede">შუალედური გამოცდის შემდეგ ვუბრუნდებით ბმულ სიას — ახლა კი აღარ ვაშენებთ საბაზისო ოპერაციებს, არამედ ვხსნით ოთხ კლასიკურ, გასაუბრებებზე ხშირად შემხვედრ ამოცანას, რომლებიც ყველა ამ საბაზისო ოპერაციებზეა აგებული.</p>
+
+    <div class="callout insight">
+      <span class="icon">🔗</span>
+      <p><strong>საერთო ძაფი:</strong> ოთხივე დღევანდელი ამოცანა ამოიხსნება ერთი-ორი მაჩვენებლით (<code>curr</code>, <code>prev</code>, <code>slow</code>/<code>fast</code>) და მასივის ან დამატებითი მეხსიერების გარეშე. სწორედ ეს არის ბმული სიების ამოცანების საერთო ხასიათი — ცოტა მეხსიერებით, ბევრი „მაჩვენებლების ჟონგლირებით".</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ CYCLE ============ -->
+<section id="cycle" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — ამოცანა 1</span>
+    <h2 class="h-section">Linked List Cycle</h2>
+    <p class="lede"><strong>ამოცანა:</strong> დაადგინეთ, შეიცავს თუ არა ბმული სია ციკლს (მარყუჟს) — ანუ უბრუნდება თუ არა რომელიმე კვანძის <code>next</code> ადრე უკვე მონახულებულ კვანძს.</p>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">მიდგომა 1 — HashSet</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def detect_loop(head: "Node") -> bool:
+    visited = set()
+    while head is not None:
+        if head in visited:      # კვანძს უკვე ვნახეთ → ციკლია
+            return True
+        visited.add(head)
+        head = head.next
+    return False   # head-მა None-ს მიაღწია → ციკლი არაა</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">მიდგომა 2 — Floyd-ის „კუისა და კურდღლის" ალგორითმი</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def detect_loop(head: "Node") -> bool:
+    slow = fast = head
+    while slow and fast and fast.next:
+        slow = slow.next        # ერთი ნაბიჯი
+        fast = fast.next.next   # ორი ნაბიჯი
+        if slow is fast:        # შეხვდნენ → ციკლია
+            return True
+    return False</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">🐢</span>
+      <p><strong>რატომ ბადებს კურდღელი კუს, თუ ციკლია:</strong> თუ ციკლი არსებობს, ორივე მაჩვენებელი მასში „ჩაიხვევა" და ვერასდროს გავა — ეს გარანტირებთ, რომ საბოლოოდ შეხვდებიან (fast აგდებს slow-ს, სანამ არ დაეწევა ციკლის შიგნით). თუ ციკლი არ არსებობს, <code>fast</code> უბრალოდ პირველი მიაღწევს <code>None</code>-ს.</p>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>მიდგომა</th><th>დროითი სირთულე</th><th>სივრცითი სირთულე</th></tr>
+      <tr><td>HashSet</td><td class="num">O(n)</td><td class="num">O(n)</td></tr>
+      <tr><td>Floyd (slow/fast)</td><td class="num">O(n)</td><td class="num">O(1)</td></tr>
+    </table>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>სტილისტური დაკვირვება:</strong> ორიგინალ კოდში წერია <code>if slow == fast</code>. Node-ის კლასს საკუთარი <code>__eq__</code> არ აქვს განსაზღვრული, ამიტომ Python ავტომატურად უბრუნდება ობიექტის იდენტობის შედარებას — ანუ <code>==</code> აქ ფაქტობრივად იგივეა, რაც <code>is</code>. მაინც, როცა განზრახვა „იგივე ობიექტია თუ არა" შემოწმებაა (და არა მნიშვნელობითი ტოლობა), იდიომატური და მკაფიო Python მოითხოვს <code>is</code>-ს — ეს განზრახვას ცალსახად აცხადებს და მომავალში, თუ ვინმემ <code>Node</code>-ს <code>__eq__</code> დაამატებს, ბაგისგან იცავს კოდს.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEDUP ============ -->
+<section id="dedup">
+  <div class="wrap">
+    <span class="section-label">03 — ამოცანა 2</span>
+    <h2 class="h-section">Remove Duplicates from Sorted List</h2>
+    <p class="lede"><strong>ამოცანა:</strong> მოცემულია დალაგებული ბმული სია — წაშალეთ ყველა დუბლიკატი ისე, რომ თითოეული მნიშვნელობა მხოლოდ ერთხელ დარჩეს.</p>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">ოპტიმალური მიდგომა — ორი მეზობელი კვანძის შედარება (O(1) სივრცე)</h3>
+    <p>რადგან სია უკვე <strong>დალაგებულია</strong>, ყველა დუბლიკატი ერთმანეთის გვერდიგვერდ დგას — საკმარისია მხოლოდ მეზობელი წყვილების შედარება, HashSet საერთოდ არ გვჭირდება:</p>
+    <div class="code-window">
+      <pre><code class="language-python">def remove_duplicates(head: "Node") -> "Node":
+    curr = head
+    while curr and curr.next:
+        if curr.data == curr.next.data:
+            curr.next = curr.next.next   # გამოვტოვოთ დუბლიკატი
+        else:
+            curr = curr.next
+    return head</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">💡</span>
+      <p><strong>რატომ არა <code>curr = curr.next</code> ყოველთვის:</strong> დუბლიკატის პოვნისას <code>curr</code> ადგილზე რჩება განზრახ — შესაძლოა სამი ან მეტი ზედიზედ ტოლი მნიშვნელობა იყოს (<code>[1,1,1,2]</code>), და <code>curr</code>-ს სჭირდება იგივე პოზიციაზე დარჩენა, სანამ ყველა დუბლიკატს არ „გადაახტება".</p>
+    </div>
+
+    <h3 style="font-size:19px; margin:34px 0 6px;">ალტერნატივები</h3>
+    <table class="summary-table">
+      <tr><th>მიდგომა</th><th>მოქმედების არეალი</th><th>სირთულე</th></tr>
+      <tr><td>ორი მეზობელი კვანძი (ზემოთ)</td><td>მხოლოდ დალაგებული სია</td><td class="num">O(n) დრო, O(1) სივრცე</td></tr>
+      <tr><td>HashSet ყველა მონახულებულზე</td><td>ნებისმიერი სია (დაულაგებელიც!)</td><td class="num">O(n) დრო, O(n) სივრცე</td></tr>
+      <tr><td>რეკურსიული (იგივე ორი-კვანძის იდეა)</td><td>დალაგებული სია</td><td class="num">O(n) დრო, O(n) სივრცე — call stack</td></tr>
+    </table>
+    <p style="font-size:14.5px;">კარგი მაგალითია იმისა, თუ როგორ იძლევა <strong>ამოცანის დამატებითი პირობა</strong> (აქ: „დალაგებულია") გზას ბევრად უფრო მარტივი და მეხსიერება-ეფექტური ამონახსნისკენ — ზუსტად ისე, როგორც ლექცია 6-ში Search a 2D Matrix-ის ორ ვერსიას შორის ვნახეთ.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ MERGE ============ -->
+<section id="merge" class="section-full">
+  <div class="wrap">
+    <span class="section-label">04 — ამოცანა 3</span>
+    <h2 class="h-section">Merge Two Sorted Lists</h2>
+    <p class="lede"><strong>ამოცანა:</strong> ორი დალაგებული ბმული სია გააერთიანეთ ერთ დალაგებულ სიად.</p>
+
+    <div class="callout warn">
+      <span class="icon">⚠️</span>
+      <p><strong>Brute Force მიდგომა (რატომ არ ღირს):</strong> ორიგინალი მასალა აღწერს მიდგომას — ყველა ელემენტის მასივში/ვექტორში ჩაწერა, დალაგება, და ახალი ბმული სიის აგება. ეს მუშაობს, მაგრამ <strong>დაუსაბუთებლად ფლანგავს ინფორმაციას</strong>: ორივე შემავალი სია <em>უკვე</em> დალაგებულია — მთლიანი კომბინირებული მასივის ხელახლა დალაგება (<code>O((n+m) log(n+m))</code>) სრულიად ზედმეტია, როცა უბრალო შერწყმა (merge) საკმარისია <code>O(n+m)</code>-ში. ეს ლექცია 4-ის Merge Sort-ის <code>merge()</code> ეტაპის პირდაპირი გამოყენებაა.</p>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">რეკურსიული შერწყმა</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def merge_sorted_lists(a: "Node", b: "Node") -> "Node":
+    if a is None:
+        return b
+    elif b is None:
+        return a
+
+    if a.data <= b.data:
+        result = a
+        result.next = merge_sorted_lists(a.next, b)
+    else:
+        result = b
+        result.next = merge_sorted_lists(a, b.next)
+    return result</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">იტერაციული შერწყმა</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def merge_sorted_lists_iter(a: "Node", b: "Node") -> "Node":
+    if not a:
+        return b
+    if not b:
+        return a
+
+    if a.data <= b.data:
+        head = tail = a
+        a = a.next
+    else:
+        head = tail = b
+        b = b.next
+
+    while a and b:
+        if a.data <= b.data:
+            tail.next = a; tail = a; a = a.next
+        else:
+            tail.next = b; tail = b; b = b.next
+
+    tail.next = a if a else b   # დარჩენილი „კუდის" პირდაპირ მიბმა
+    return head</code></pre>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>მიდგომა</th><th>დროითი სირთულე</th><th>სივრცითი სირთულე</th></tr>
+      <tr><td>Brute force (მასივში დალაგება)</td><td class="num">O((n+m) log(n+m))</td><td class="num">O(n+m)</td></tr>
+      <tr><td>რეკურსიული merge</td><td class="num">O(n+m)</td><td class="num">O(n+m) — call stack</td></tr>
+      <tr><td>იტერაციული merge</td><td class="num">O(n+m)</td><td class="num">O(1)</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ REVERSE ============ -->
+<section id="reverse">
+  <div class="wrap">
+    <span class="section-label">05 — ამოცანა 4</span>
+    <h2 class="h-section">Reverse Linked List</h2>
+    <p class="lede"><strong>ამოცანა:</strong> შეაბრუნეთ ბმული სიის მიმართულება — ისე, რომ ბოლო კვანძი გახდეს ახალი <code>head</code>.</p>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">იტერაციული ამონახსნი — სამი მაჩვენებელი</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def reverse_list(head: "Node") -> "Node":
+    prev = None
+    curr = head
+    while curr is not None:
+        next_node = curr.next   # 1. შევინახოთ შემდეგი, სანამ არ დავკარგავთ მასზე წვდომას
+        curr.next = prev        # 2. მიმართულების შებრუნება
+        prev = curr              # 3. მაჩვენებლების წინ წაწევა
+        curr = next_node
+    return prev   # prev არის ახალი head</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">რეკურსიული ამონახსნი</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def reverse_list_recursive(head: "Node") -> "Node":
+    if head is None or head.next is None:
+        return head              # საბაზისო შემთხვევა — 0 ან 1 კვანძი
+
+    rest = reverse_list_recursive(head.next)   # დანარჩენის შებრუნება
+    head.next.next = head        # თავდაპირველი მეორე კვანძი ახლა თავზე მიუთითებს
+    head.next = None             # თავი ხდება ახალი კუდი
+    return rest                   # ახალი head, ცვლილების გარეშე მთელი რეკურსიის განმავლობაში</code></pre>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>მიდგომა</th><th>დროითი სირთულე</th><th>სივრცითი სირთულე</th></tr>
+      <tr><td>იტერაციული</td><td class="num">O(n)</td><td class="num">O(1)</td></tr>
+      <tr><td>რეკურსიული</td><td class="num">O(n)</td><td class="num">O(n) — call stack</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ VISUALIZER ============ -->
+<section id="viz" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">06 — სცადეთ თავად</span>
+    <h2 class="h-section">Reverse Linked List — ნაბიჯ-ნაბიჯ</h2>
+    <p class="lede">დააჭირეთ „შემდეგი ნაბიჯს" და თვალი ადევნეთ, როგორ „ბრუნდება" ისარი უკან, ერთ კვანძზე ერთი ნაბიჯი — ზუსტად ისე, როგორც ზემოთ მოცემული იტერაციული კოდი მუშაობს.</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="revInput">სია:</label>
+        <input type="text" id="revInput" value="1,2,3,4,5">
+        <button class="btn" onclick="revInit()">↺ დაწყება</button>
+        <button class="btn ghost" onclick="revStep()">შემდეგი ნაბიჯი →</button>
+      </div>
+      <div class="rev-stage" id="revStage"></div>
+      <div class="viz-status" id="revStatus"></div>
+    </div>
+    <p class="viz-note">მწვანე — უკვე შებრუნებული ნაწილი (<code>prev</code>-მხარე). ოქროსფერი — მიმდინარე <code>curr</code>. ცარიელი ხარვეზი <code>curr</code>-ის წინ გვიჩვენებს, რომ ის ბმული ჯერ არ არსებობს — <code>curr</code> ჯერ არ დამუშავებულა.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ SUMMARY ============ -->
+<section id="summary">
+  <div class="wrap">
+    <span class="section-label">07 — შეჯამება</span>
+    <h2 class="h-section">ოთხივე ამოცანა — ერთ ცხრილში</h2>
+
+    <table class="summary-table">
+      <tr><th>ამოცანა</th><th>საუკეთესო ტექნიკა</th><th>დრო</th><th>სივრცე</th></tr>
+      <tr><td>Linked List Cycle</td><td>Floyd (slow/fast)</td><td class="num">O(n)</td><td class="num">O(1)</td></tr>
+      <tr><td>Remove Duplicates (Sorted)</td><td>მეზობელი კვანძების შედარება</td><td class="num">O(n)</td><td class="num">O(1)</td></tr>
+      <tr><td>Merge Two Sorted Lists</td><td>იტერაციული merge</td><td class="num">O(n+m)</td><td class="num">O(1)</td></tr>
+      <tr><td>Reverse Linked List</td><td>იტერაციული სამი-მაჩვენებელი</td><td class="num">O(n)</td><td class="num">O(1)</td></tr>
+    </table>
+
+    <div class="callout insight">
+      <span class="icon">🎯</span>
+      <p><strong>შესამჩნევი პატერნი:</strong> ოთხივე ამოცანის ოპტიმალურ ამონახსნს <strong>O(1) დამატებითი სივრცე</strong> აქვს — HashSet-ები, ვექტორები და call stack-ის ღრმა გამოყენება ყოველთვის შესაძლებელია ერიდოთ ერთი-ორი მაჩვენებლის ჭკვიანური მართვით. ეს ბმული სიის ამოცანების ერთ-ერთი მთავარი, გადამწყვეტი უნარია.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">08 — რეალურ სამყაროში</span>
+    <h2 class="h-section">სად მუშაობს ეს რეალურად</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🔁</div>
+        <h4>ციკლის აღმოჩენა — memory leaks</h4>
+        <p>Floyd-ის ალგორითმის კონცეფცია (ორი მაჩვენებელი, სხვადასხვა სიჩქარით) გამოიყენება garbage collector-ებში ციკლური მითითებების საპოვნელად, რაც მეხსიერების გაჟონვის ხშირი მიზეზია.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🗄️</div>
+        <h4>დუბლიკატების მოცილება — მონაცემთა გაწმენდა</h4>
+        <p>დალაგებული ჩანაწერებიდან დუბლიკატების ერთი გავლით მოცილება ხშირად გამოიყენება ETL (Extract-Transform-Load) პროცესებში, სანამ დიდი მონაცემთა ბაზები დაიტვირთება.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🔀</div>
+        <h4>Merge — გავრცელებული სისტემის ნიმუში</h4>
+        <p>ორი დალაგებული ნაკადის (streams) შერწყმა ერთ დალაგებულ შედეგად — ზუსტად ეს ხდება, როცა რამდენიმე სერვერიდან უკვე დალაგებული შედეგები უნდა გაერთიანდეს (distributed sorting, log aggregation).</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">↩️</div>
+        <h4>Reverse — Undo ფუნქციონალი</h4>
+        <p>მოქმედებების ისტორიის (undo stack) შებრუნება, ან ბრაუზერის navigation stack-ის უკუღმა დამუშავება კონცეპტუალურად იმავე „სამი მაჩვენებლის" პატერნს იყენებს.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises">
+  <div class="wrap-wide">
+    <span class="section-label">09 — პრაქტიკა</span>
+    <h2 class="h-section">სავარჯიშოები — დღევანდელი ტექნიკების კომბინაცია</h2>
+    <p class="lede">სამივე ქვემოთ მოცემული ამოცანა დღეს ნასწავლი ტექნიკების ბუნებრივი გაფართოებაა.</p>
+
+    <details class="exercise">
+      <summary>Palindrome Linked List <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>დაადგინეთ, არის თუ არა ბმული სია პალინდრომი (LeetCode 234) — <code>O(n)</code> დროში, <code>O(1)</code> დამატებით სივრცეში.</p>
+        <div class="code-window">
+          <pre><code class="language-python">def is_palindrome(head: "Node") -> bool:
+    # 1. ვიპოვოთ შუა წერტილი (slow/fast — ლექცია 7-დან)
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+
+    # 2. შევაბრუნოთ მეორე ნახევარი (დღევანდელი Reverse ტექნიკა)
+    prev = None
+    while slow:
+        nxt = slow.next
+        slow.next = prev
+        prev = slow
+        slow = nxt
+
+    # 3. შევადაროთ პირველი ნახევარი შებრუნებულ მეორეს
+    left, right = head, prev
+    while right:
+        if left.data != right.data:
+            return False
+        left = left.next
+        right = right.next
+    return True</code></pre>
+        </div>
+        <p>ეს ამოცანა პირდაპირ აერთიანებს ლექცია 7-ის <strong>fast/slow</strong> ტექნიკას დღევანდელ <strong>Reverse</strong>-თან — კარგი დემონსტრაცია იმისა, თუ როგორ შენდება რთული ამონახსნი უკვე ნასწავლი მარტივი ბლოკებისგან.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Linked List Cycle II <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>წინა ამოცანისგან განსხვავებით, არა მხოლოდ დაადგინეთ არის თუ არა ციკლი — იპოვეთ ის კვანძი, საიდანაც ციკლი <strong>იწყება</strong> (LeetCode 142).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def detect_cycle_start(head: "Node"):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow is fast:
+            # ციკლი ნაპოვნია — ვიპოვოთ მისი დასაწყისი
+            pointer = head
+            while pointer is not slow:
+                pointer = pointer.next
+                slow = slow.next
+            return pointer
+    return None</code></pre>
+        </div>
+        <p><strong>მათემატიკური ჩვევა:</strong> როცა <code>slow</code> და <code>fast</code> პირველად შეხვდებიან, დამტკიცებადია, რომ head-იდან ციკლის დასაწყისამდე მანძილი ტოლია შეხვედრის წერტილიდან ციკლის დასაწყისამდე მანძილისა — ამიტომ ერთი მაჩვენებელი <code>head</code>-იდან და მეორე შეხვედრის წერტილიდან, ორივე ერთი ნაბიჯით, ზუსტად ციკლის დასაწყისში შეხვდება.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Reorder List <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>მოცემულია სია <code>L0 → L1 → … → Ln</code>. გადაალაგეთ ის <code>L0 → Ln → L1 → Ln-1 → L2 → Ln-2 → …</code> სახით — ახალი კვანძების შექმნის ან მასივში კოპირების გარეშე (LeetCode 143).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def reorder_list(head: "Node") -> None:
+    if not head or not head.next:
+        return
+
+    # 1. შუა წერტილის პოვნა (fast/slow)
+    slow, fast = head, head
+    while fast.next and fast.next.next:
+        slow = slow.next
+        fast = fast.next.next
+
+    # 2. მეორე ნახევრის შებრუნება
+    second = slow.next
+    slow.next = None
+    prev = None
+    while second:
+        nxt = second.next
+        second.next = prev
+        prev = second
+        second = nxt
+
+    # 3. ორი ნახევრის გადაწნეხვა (interleave)
+    first, second = head, prev
+    while second:
+        tmp1, tmp2 = first.next, second.next
+        first.next = second
+        second.next = tmp1
+        first, second = tmp1, tmp2</code></pre>
+        </div>
+        <p>ეს ამოცანა აერთიანებს <strong>სამივე</strong> დღეს ნასწავლ ტექნიკას ერთბაშად: fast/slow შუის საპოვნელად, Reverse — მეორე ნახევრისთვის, და ბოლოს ორი სიის „ჩავარცხნა" (merge-ის მსგავსი, მაგრამ მონაცვლეობითი პრინციპით). კარგი მტკიცებულებაა იმისა, რომ რთული ამოცანები ხშირად უბრალოდ რამდენიმე ცნობილი ტექნიკის კომბინაციაა.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 9: ამოცანები ბმულ სიებზე</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* HERO DECORATIVE LOOP */
+(function(){
+  const svg = document.getElementById('heroLoop');
+  const n = 6, cx = 200, cy = 150, r = 100;
+  let content = '';
+  const pts = [];
+  for(let i=0;i<n;i++){
+    const angle = (i/n)*2*Math.PI - Math.PI/2;
+    pts.push({x: cx + r*Math.cos(angle), y: cy + r*Math.sin(angle)});
+  }
+  for(let i=0;i<n;i++){
+    const a = pts[i], b = pts[(i+1)%n];
+    content += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${i===n-1?'#D9A64E':'#5AC2B6'}" stroke-width="1.6"/>`;
+  }
+  pts.forEach((p,i)=>{
+    content += `<circle cx="${p.x}" cy="${p.y}" r="10" fill="none" stroke="#7C849A" stroke-width="1.6"/>`;
+  });
+  svg.innerHTML = content;
+})();
+
+/* ============ REVERSE LINKED LIST VISUALIZER ============ */
+let revValues = [1,2,3,4,5];
+let revT = 0;   // number of nodes processed so far
+
+function revInit(){
+  const raw = document.getElementById('revInput').value;
+  const arr = raw.split(',').map(s=>s.trim()).filter(Boolean);
+  if(arr.length < 1 || arr.length > 8){ alert('შეიყვანეთ 1-8 მნიშვნელობა, მძიმით გამოყოფილი.'); return; }
+  revValues = arr;
+  revT = 0;
+  revRender('დააჭირეთ „შემდეგი ნაბიჯს" — prev = NULL, curr = head.');
+}
+
+function revStep(){
+  if(revValues.length === 0){ revInit(); return; }
+  const k = revValues.length;
+  if(revT >= k){ revRender('სია სრულად შებრუნებულია!'); return; }
+  const currVal = revValues[revT];
+  const prevVal = revT > 0 ? revValues[revT-1] : 'NULL';
+  revT++;
+  const newPrevVal = revValues[revT-1];
+  revRender(`curr.next = prev → კვანძი <strong>${currVal}</strong>-ის ისარი ახლა მიუთითებს ${prevVal}-ზე. prev = ${newPrevVal}.`);
+}
+
+function revRender(statusText){
+  const stage = document.getElementById('revStage');
+  const k = revValues.length;
+  const t = revT;
+  let html = '';
+
+  // leftEnd NULL marker (visible once box0 processed, i.e., t>=1)
+  html += `<span class="rev-null${t>=1 ? ' visible' : ''}">NULL ←</span>`;
+
+  for(let i=0;i<k;i++){
+    const nodeClass = i < t ? 'done' : (i === t ? 'curr' : '');
+    let label = '';
+    if(i === t-1) label = '<span class="rev-label prev">prev</span>';
+    if(i === t && t < k) label = '<span class="rev-label curr">curr</span>';
+    html += `<div class="rev-node ${nodeClass}">${label}<div class="rev-node-box">${revValues[i]}</div></div>`;
+
+    if(i < k-1){
+      let arrowClass, arrowSymbol;
+      if(i >= t){ arrowClass = ''; arrowSymbol = '→'; }
+      else if(i === t-1){ arrowClass = 'gap'; arrowSymbol = '·'; }
+      else { arrowClass = 'left'; arrowSymbol = '←'; }
+      html += `<span class="rev-arrow ${arrowClass}">${arrowSymbol}</span>`;
+    }
+  }
+
+  // rightEnd tail NULL (visible while last node not yet processed)
+  html += `<span class="rev-null${t < k ? ' visible' : ''}" style="color:var(--muted);">→ NULL</span>`;
+
+  stage.innerHTML = html;
+  document.getElementById('revStatus').innerHTML = statusText;
+}
+
+revInit();
+</script>
+</body>
+</html>

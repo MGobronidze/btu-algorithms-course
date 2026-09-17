@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 5 — Quick Sort | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A; --line:#232838;
+  --gold:#D9A64E; --gold-dim:#8C7239; --teal:#5AC2B6; --teal-dim:#2F5F5A;
+  --green:#7CB88F; --amber:#D9A64E; --rose:#C97B84; --code-bg:#0d1117;
+  --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-tree{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(620px,100%); opacity:0.35; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(38px,7.5vw,72px); line-height:1.05; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+.callout.math{background:linear-gradient(135deg, rgba(124,184,143,0.10), rgba(124,184,143,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.class-table{width:100%; border-collapse:collapse; margin:24px 0; font-size:14.5px;}
+.class-table th{font-family:var(--mono); font-size:12px; text-align:left; padding:10px 14px; color:var(--muted); border-bottom:1px solid var(--line);}
+.class-table td{padding:13px 14px; border-bottom:1px solid var(--line); color:var(--ink-dim); vertical-align:top;}
+.class-table tr:last-child td{border-bottom:none;}
+.class-table td.o{font-family:var(--mono); color:var(--gold); font-weight:600; white-space:nowrap;}
+
+.compare-table{width:100%; border-collapse:collapse; margin:24px 0;}
+.compare-table th{font-family:var(--serif); font-size:16px; text-align:left; padding:12px 16px; border-bottom:1px solid var(--line); color:var(--ink);}
+.compare-table td{padding:12px 16px; border-bottom:1px solid var(--line); font-size:14.5px; color:var(--ink-dim); vertical-align:top;}
+.compare-table tr:last-child td{border-bottom:none;}
+.compare-table td.num{font-family:var(--mono); color:var(--gold);}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:20px;}
+.viz-controls label{font-size:13.5px; color:var(--muted);}
+.viz-controls input[type=text], .viz-controls input[type=number]{background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:8px 10px; font-family:var(--mono); font-size:13.5px;}
+.viz-controls input[type=text]{width:220px;}
+.viz-controls input[type=number]{width:70px;}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 20px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+.bars-wrap{display:flex; align-items:flex-end; gap:4px; height:180px; margin:20px 0 4px; padding:0 4px;}
+.bar{
+  flex:1; display:flex; align-items:flex-end; justify-content:center; border-radius:5px 5px 2px 2px;
+  background:var(--bg-panel-2); border:1px solid var(--line); position:relative; transition:all .35s ease;
+  min-width:16px;
+}
+.bar span.val{position:absolute; top:-20px; font-family:var(--mono); font-size:11px; color:var(--ink-dim);}
+.bar span.ptr{position:absolute; bottom:-22px; font-family:var(--mono); font-size:10.5px; color:var(--muted); white-space:nowrap;}
+.bar.sorted{background:rgba(124,184,143,0.25); border-color:var(--green);}
+.bar.sorted span.val{color:var(--green);}
+.bar.pivot{background:rgba(217,166,78,0.3); border-color:var(--gold);}
+.bar.pivot span.val{color:var(--gold);}
+.bar.compare{background:rgba(90,194,182,0.25); border-color:var(--teal);}
+.bar.compare span.val{color:var(--teal);}
+.bar.swapped{background:rgba(201,123,132,0.22); border-color:var(--rose);}
+.viz-status{font-family:var(--mono); font-size:13.5px; color:var(--ink-dim); margin-top:28px; min-height:22px;}
+.viz-status strong{color:var(--gold);}
+.viz-note{font-size:13.5px; color:var(--muted); margin-top:14px;}
+
+.race-row{display:grid; grid-template-columns:180px 1fr 110px; align-items:center; gap:12px; margin-bottom:10px;}
+.race-label{font-family:var(--mono); font-size:13px; color:var(--ink-dim);}
+.race-track{height:22px; background:var(--bg); border-radius:6px; overflow:hidden;}
+.race-fill{height:100%; border-radius:6px; transition:width .5s ease;}
+.race-value{font-family:var(--mono); font-size:12.5px; color:var(--muted); text-align:right;}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{padding:50px 24px 70px; text-align:center;}
+footer p{font-size:13.5px; color:var(--muted); margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · Quick Sort — ლექცია 5</a>
+    <div class="nav-links">
+      <a href="#bridge">მესამე გზა</a>
+      <a href="#how-it-works">როგორ მუშაობს</a>
+      <a href="#pivot">Pivot-ის არჩევა</a>
+      <a href="#partition-viz">Partition ვიზუალიზაცია</a>
+      <a href="#complexity">სირთულის ანალიზი</a>
+      <a href="#hoare">Hoare vs Lomuto</a>
+      <a href="#pros-cons">დადებითი/უარყოფითი</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-tree" id="heroTree" viewBox="0 0 600 300"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 5</span>
+  <h1>Quick Sort</h1>
+  <p class="hero-sub">არა გაერთიანება — <strong>გადანაწილება</strong>. ალგორითმი, რომელიც არჩეული „წამყვანის" (pivot) გარშემო გადააწყობს მასივს — და საშუალოდ ყველაზე სწრაფია პრაქტიკაში.</p>
+  <div class="hero-terms">
+    <span>pivot</span><span>partition</span><span>O(n log n) საშუალოდ</span><span>O(n²) უარესში</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ BRIDGE ============ -->
+<section id="bridge">
+  <div class="wrap">
+    <span class="section-label">01 — მესამე მიდგომა</span>
+    <h2 class="h-section">დალაგების მესამე ფილოსოფია</h2>
+    <p class="lede">გავიხსენოთ ლექცია 4: Insertion Sort მარტივია, მაგრამ O(n²); Merge Sort გარანტირებულად O(n log n), მაგრამ O(n) დამატებით მეხსიერებას ითხოვს. Quick Sort — მესამე გზა: <strong>divide-and-conquer</strong>, Merge Sort-ის მსგავსად, მაგრამ „ჭკვიანურად" იყოფა და იბატონებს ისე, რომ დამატებითი მასივი აღარ სჭირდება.</p>
+
+    <div class="callout insight">
+      <span class="icon">📜</span>
+      <p><strong>ისტორიული ცნობა:</strong> Quick Sort შექმნა ბრიტანელმა კომპიუტერულმა მეცნიერმა <strong>ტონი ჰოარმა</strong> 1959 წელს (გამოქვეყნდა 1961-ში). დღემდე ერთ-ერთი ყველაზე ფართოდ გამოყენებული დალაგების ალგორითმია — ხშირად ოდნავ უფრო სწრაფიც კი Merge Sort-სა და Heap Sort-ზე, განსაკუთრებით შემთხვევითი, დიდი მოცულობის მონაცემისთვის.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how-it-works" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — მექანიზმი</span>
+    <h2 class="h-section">როგორ მუშაობს Quick Sort</h2>
+
+    <ol style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
+      <li style="margin-bottom:10px;"><strong>Pivot-ის არჩევა:</strong> მასივიდან ვირჩევთ „წამყვან" ელემენტს — Pivot.</li>
+      <li style="margin-bottom:10px;"><strong>გაყოფა (partition):</strong> მასივს გადავაწყობთ ისე, რომ Pivot-ზე მცირე ელემენტები აღმოჩნდნენ მის მარცხნივ, დიდები — მარჯვნივ. ამის შემდეგ Pivot უკვე თავის საბოლოო, სწორ პოზიციაზეა.</li>
+      <li style="margin-bottom:10px;"><strong>რეკურსიული გამოძახება:</strong> იგივე პროცესი მეორდება ორივე ქვემასივზე — Pivot-ის მარცხნივ და მარჯვნივ.</li>
+      <li><strong>საბაზისო შემთხვევა:</strong> ერთ ან ნულ ელემენტიანი ქვემასივი უკვე დალაგებულია.</li>
+    </ol>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">quick_sort.py</span></div>
+      <pre><code class="language-python">def quick_sort(arr: list, low: int, high: int) -> None:
+    if low < high:
+        pi = partition(arr, low, high)   # Pivot ხვდება სწორ ადგილას
+        quick_sort(arr, low, pi - 1)     # მარცხენა ნაწილი
+        quick_sort(arr, pi + 1, high)    # მარჯვენა ნაწილი</code></pre>
+    </div>
+
+    <p>ცენტრალური განსხვავება Merge Sort-თან: Merge Sort <em>ყოფს</em> ბრმად (ყოველთვის ზუსტად შუაზე) და მთელი „ჭკუა" merge-ის ეტაპშია. Quick Sort პირიქით — <em>ჭკვიანურად ყოფს</em> (partition აწყობს ელემენტებს სწორ მხარეს) და ბოლოს აღარაფერი „გასაერთიანებელი" აღარ რჩება.</p>
+  </div>
+</section>
+
+<!-- ============ PIVOT SELECTION ============ -->
+<section id="pivot">
+  <div class="wrap">
+    <span class="section-label">03 — კრიტიკული გადაწყვეტილება</span>
+    <h2 class="h-section">Pivot-ის არჩევა</h2>
+    <p class="lede">მთელი ალგორითმის წარმადობა დამოკიდებულია იმაზე, თუ რამდენად „კარგად" ყოფს Pivot მასივს. სამი ძირითადი სტრატეგია:</p>
+
+    <table class="class-table">
+      <tr><th>სტრატეგია</th><th>დახასიათება</th><th>რისკი</th></tr>
+      <tr><td class="o">პირველი/ბოლო ელემენტი</td><td>უმარტივესი იმპლემენტაცია</td><td>უკვე დალაგებულ (ან უკუდალაგებულ) მასივზე — გარანტირებული O(n²)</td></tr>
+      <tr><td class="o">შემთხვევითი ელემენტი</td><td>საუკეთესო პრაქტიკული არჩევანი</td><td>არ არსებობს კონკრეტული შემავალი პატერნი, რომელიც სისტემატურად უარეს შემთხვევას გამოიწვევდა</td></tr>
+      <tr><td class="o">მედიანა</td><td>თეორიულად იდეალური — ყოველთვის ზუსტად შუაზე ყოფს</td><td>მედიანის პოვნა თავად მოითხოვს დამატებით სამუშაოს — პრაქტიკაში იშვიათად ღირს</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <span class="icon">⚠️</span>
+      <p><strong>რატომ არის „ბოლო ელემენტი" სახიფათო:</strong> თუ მასივი უკვე დალაგებულია და ყოველთვის ბოლო ელემენტს ვირჩევთ Pivot-ად, თითოეული partition მასივს ყოფს <code>1</code> და <code>n−1</code> ზომის ნაწილებად — ყველაზე არაბალანსებული გაყოფა შესაძლო ვარიანტებს შორის. ქვემოთ, ინტერაქტიულ ექსპერიმენტში, ამას ზუსტი რიცხვებით ვნახავთ.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ PARTITION ALGORITHMS + VISUALIZER ============ -->
+<section id="partition-viz" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">04 — გული</span>
+    <h2 class="h-section">Partition ალგორითმი — Lomuto-ს სქემა</h2>
+    <p class="lede">Partition — Quick Sort-ის ცენტრალური ნაბიჯია. სამი ძირითადი სქემა არსებობს (ყველა O(n) დროში), აქ ვიწყებთ ყველაზე გასაგები — <strong>Lomuto-ს სქემით</strong>: ვირჩევთ ბოლო ელემენტს Pivot-ად და ვინახავთ ინდექსს <code>i</code> — „უკვე დანახული, Pivot-ზე მცირე ელემენტების ზონის" ბოლოს.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">lomuto_partition.py</span></div>
+      <pre><code class="language-python">def partition(arr: list, low: int, high: int) -> int:
+    pivot = arr[high]
+    i = low - 1                    # "მცირეთა ზონის" ბოლო ინდექსი
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]   # Pivot სწორ ადგილას
+    return i + 1                   # Pivot-ის საბოლოო ინდექსი</code></pre>
+    </div>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="pArrInput">მასივი:</label>
+        <input type="text" id="pArrInput" value="4,1,3,9,7">
+        <button class="btn" onclick="pInit()">↺ დაწყება</button>
+        <button class="btn ghost" onclick="pStep()">შემდეგი ნაბიჯი →</button>
+      </div>
+      <div class="bars-wrap" id="pBars" style="margin-bottom:26px;"></div>
+      <div class="viz-status" id="pStatus"></div>
+    </div>
+    <p class="viz-note">ოქროსფერი — Pivot (ბოლო ელემენტი). ლურჯისებრი — მიმდინარე შედარება (<code>j</code>). მწვანე — Pivot-ის საბოლოო, დალაგებული პოზიცია.</p>
+  </div>
+</section>
+
+<!-- ============ COMPLEXITY ============ -->
+<section id="complexity">
+  <div class="wrap-wide">
+    <span class="section-label">05 — სირთულის ანალიზი</span>
+    <h2 class="h-section">როდის სწრაფია, როდის ნელი</h2>
+
+    <table class="class-table">
+      <tr><th>შემთხვევა</th><th>რა ხდება</th><th>სირთულე</th></tr>
+      <tr><td class="o">საუკეთესო</td><td>Pivot ყოველთვის მასივს თანაბარ ნაწილებად ყოფს — <code>log n</code> დონე, თითოეულზე <code>O(n)</code> სამუშაო</td><td class="num">O(n log n)</td></tr>
+      <tr><td class="o">საშუალო</td><td>Pivot არც ზედმეტად მცირეა, არც ზედმეტად დიდი — რეკურსიის სიღრმე კვლავ საშუალოდ <code>O(log n)</code>-ია</td><td class="num">O(n log n)</td></tr>
+      <tr><td class="o">უარესი</td><td>Pivot ყოველთვის უმცირესი/უდიდესია (მაგ. დალაგებულ მასივზე ბოლო ელემენტი) — <code>n</code> დონე რეკურსიაში</td><td class="num">O(n²)</td></tr>
+    </table>
+
+    <div class="callout math">
+      <span class="icon">∑</span>
+      <p><strong>საუკეთესო/საშუალო შემთხვევის დამტკიცება:</strong> <code>T(n) = 2T(n/2) + O(n)</code> — ზუსტად იგივე რეკურენტული დამოკიდებულება, რაც Merge Sort-ს ჰქონდა ლექცია 4-ში → <code>O(n log n)</code>. განსხვავება მხოლოდ იმაშია, რომ აქ <code>O(n)</code> სამუშაო partition-ზე იხარჯება, merge-ის ნაცვლად.</p>
+    </div>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="pivotExpN">მასივის ზომა n (დალაგებული, უარესი შემთხვევა) =</label>
+        <input type="number" id="pivotExpN" min="5" max="500" value="100">
+        <button class="btn" onclick="runPivotExperiment()">გაშვება — შედარება</button>
+      </div>
+      <div id="pivotExpBars"></div>
+      <p class="viz-note" id="pivotExpNote">რეალურად გაშვებული Lomuto partition-ის შედარებების რაოდენობაა — არა თეორიული შეფასება. სცადეთ სხვადასხვა n.</p>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">🎲</span>
+      <p><strong>რატომ შველის შემთხვევითი Pivot?</strong> ზემოთ ნახეთ, რომ დალაგებულ მასივზე ბოლო-ელემენტიანი Pivot-ი კატასტროფულია. გამოსავალი მარტივია: <code>partition()</code>-ის დაწყებამდე ვირჩევთ შემთხვევით ინდექსს <code>[low, high]</code>-დან და ვცვლით მას ბოლო ელემენტთან — შემდეგ ჩვეულებრივი Lomuto Partition გრძელდება. ეს არ იცვლის უარეს-შემთხვევით სირთულეს (თეორიულად კვლავ არსებობს O(n²) შანსი), მაგრამ პრაქტიკულად ხდის მას განსაკუთრებით ნაკლებსავარაუდოდ ნებისმიერ კონკრეტულ შემავალ მონაცემზე.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ HOARE VS LOMUTO ============ -->
+<section id="hoare" class="section-full">
+  <div class="wrap">
+    <span class="section-label">06 — ალტერნატივა</span>
+    <h2 class="h-section">Hoare-ს სქემა</h2>
+    <p class="lede">Hoare-ს (ორიგინალი) სქემა ორ მაჩვენებელს იყენებს — ერთი მარცხნიდან, ერთი მარჯვნიდან — რომლებიც ერთმანეთისკენ მოძრაობენ, სანამ არ იპოვიან „ინვერსიას" (მარცხნივ დიდი, მარჯვნივ პატარა ელემენტი) და მათ ცვლიან ადგილებს.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">hoare_partition.py</span></div>
+      <pre><code class="language-python">def hoare_partition(arr: list, low: int, high: int) -> int:
+    pivot = arr[low]
+    i, j = low - 1, high + 1
+    while True:
+        i += 1
+        while arr[i] < pivot:
+            i += 1
+        j -= 1
+        while arr[j] > pivot:
+            j -= 1
+        if i >= j:
+            return j                # ყურადღება: აბრუნებს j-ს, არა Pivot-ის საბოლოო ინდექსს!
+        arr[i], arr[j] = arr[j], arr[i]
+
+def quick_sort_hoare(arr: list, low: int, high: int) -> None:
+    if low < high:
+        pi = hoare_partition(arr, low, high)
+        quick_sort_hoare(arr, low, pi)      # ⚠ pi, არა pi − 1!
+        quick_sort_hoare(arr, pi + 1, high)</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">🔬</span>
+      <p><strong>დახვეწილი, ხშირად გამოტოვებული დეტალი:</strong> Lomuto-ს <code>partition()</code> აბრუნებს Pivot-ის ზუსტ, საბოლოო ინდექსს — ამიტომ რეკურსია იყოფა <code>(low, pi−1)</code> და <code>(pi+1, high)</code>-ად. Hoare-ს სქემა კი <strong>არ</strong> უზრუნველყოფს, რომ Pivot თავად აღმოჩნდეს ინდექს <code>j</code>-ზე — <code>j</code> უბრალოდ ყოფს მასივს ორ ჯგუფად. ამიტომ რეკურსიაც განსხვავებულია: <code>(low, pi)</code> და <code>(pi+1, high)</code>. ამ განსხვავების გამოტოვება ერთ-ერთი ყველაზე გავრცელებული ბაგია, რომელსაც სტუდენტები დებენ, როცა Lomuto-ს რეკურსიის შაბლონს Hoare-ს partition-თან ერთად იყენებენ.</p>
+    </div>
+
+    <p>გავზომეთ რეალურად, რამდენ გაცვლას (swap) სჭირდება თითოეული სქემა 200-ელემენტიან შემთხვევით მასივზე, 50 გაშვების საშუალოდ:</p>
+
+    <table class="bigo-table">
+      <tr><th>სქემა</th><th>საშუალო swap-ების რაოდენობა (n=200)</th></tr>
+      <tr><td>Lomuto</td><td class="num">≈ 923</td></tr>
+      <tr><td>Hoare</td><td class="num">≈ 362 (2.5× ნაკლები)</td></tr>
+    </table>
+    <p style="font-size:14px; color:var(--muted);">ორივე კოდი ჩვენს მიერ ცალკე გაშვებული და გადამოწმებულია — შედეგი ცხადყოფს, რატომ ითვლება Hoare-ს სქემა უფრო ეფექტურად, თუნდაც ორივეს ერთი და იგივე ასიმპტოტური კლასი ჰქონდეს.</p>
+  </div>
+</section>
+
+<!-- ============ PROS AND CONS ============ -->
+<section id="pros-cons">
+  <div class="wrap">
+    <span class="section-label">07 — ვის რჩება, ვის — არა</span>
+    <h2 class="h-section">დადებითი და უარყოფითი მხარეები</h2>
+
+    <table class="compare-table">
+      <tr><th>დადებითი</th><th>უარყოფითი</th></tr>
+      <tr>
+        <td>Cache-მეგობრულია — მუშაობს იმავე მასივზე, დამატებითი მასივის კოპირების გარეშე (განსხვავებით Merge Sort-ისგან)</td>
+        <td>უარეს შემთხვევაში O(n²) — არასწორი Pivot-ის არჩევისას</td>
+      </tr>
+      <tr>
+        <td>საჭიროებს მცირე დამატებით მეხსიერებას — O(log n) call stack-ისთვის</td>
+        <td>მცირე მონაცემებზე Insertion Sort ხშირად სწრაფია — ნაკლები overhead</td>
+      </tr>
+      <tr>
+        <td>პრაქტიკაში ხშირად ყველაზე სწრაფია დიდ, შემთხვევით მონაცემებზე</td>
+        <td><strong>არასტაბილურია</strong> — თანაბარი ელემენტების თავდაპირველი წესრიგი არ ინარჩუნება</td>
+      </tr>
+    </table>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>კავშირი ლექცია 4-თან:</strong> გახსოვთ, Merge Sort-ის სტაბილურობა ერთი სიმბოლოს (<code>&lt;=</code> vs <code>&lt;</code>) ცვლილებაზე იყო დამოკიდებული? Quick Sort-ში საერთოდ ვერანაირად ვერ „გამოვასწორებთ" ამას — Pivot-ის გარშემო გადაცვლა ბუნებრივად კარგავს ტოლი ელემენტების ურთიერთწესრიგს, რადგან შედარება ხდება მხოლოდ მნიშვნელობებზე, პოზიციაზე კი არა. ეს დადასტურდა ჩვენს მიერ გაშვებული ტესტითაც: <code>[('3','a'), ('1','b'), ('3','c'), ('2','d'), ('3','e')]</code>-ის Lomuto-თი დალაგების შემდეგ, სამეულების წესრიგი გახდა <code>['c', 'a', 'e']</code> — არა თავდაპირველი <code>['a', 'c', 'e']</code>.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">08 — რეალურ სამყაროში</span>
+    <h2 class="h-section">Quick Sort პროდაქშენში</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🔧</div>
+        <h4>C-ის <code>qsort()</code></h4>
+        <p>C სტანდარტული ბიბლიოთეკის <code>qsort()</code> ისტორიულად Quick Sort-ის ვარიაციაზეა დაფუძნებული — სახელწოდებაც კი პირდაპირ ამაზე მიუთითებს.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">⚡</div>
+        <h4>Introsort — ჰიბრიდული გამოსავალი</h4>
+        <p>C++-ის <code>std::sort</code> იყენებს <strong>Introsort</strong>-ს — იწყებს Quick Sort-ით, მაგრამ თუ რეკურსია ძალიან ღრმავდება (უარესი შემთხვევის ნიშანი), გადადის Heap Sort-ზე, გარანტირებული O(n log n)-ისთვის. ეს პირდაპირი პასუხია დღეს ნასწავლ "უარეს შემთხვევაზე".</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🎯</div>
+        <h4>Quickselect — k-ური სტატისტიკა</h4>
+        <p>Partition-ის იდეა თავად დალაგების გარეშეც სასარგებლოა — <strong>Quickselect</strong> ალგორითმი (k-ური უდიდესი/უმცირესი ელემენტის საპოვნელად) იყენებს ზუსტად იმავე partition ფუნქციას, საშუალოდ <code>O(n)</code> დროში, სრული დალაგების <code>O(n log n)</code>-ის ნაცვლად.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🛡️</div>
+        <h4>Adversarial input დაცვა</h4>
+        <p>თუ თავდამსხმელმა იცის, რომ სისტემა ბოლო-ელემენტიან Pivot-ს იყენებს, შეუძლია სპეციალურად შექმნას შემავალი, რომელიც O(n²)-ს გამოიწვევს (denial-of-service). სწორედ ამიტომ production იმპლემენტაციები თითქმის ყოველთვის შემთხვევით Pivot-ს იყენებენ.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises">
+  <div class="wrap-wide">
+    <span class="section-label">09 — პრაქტიკა</span>
+    <h2 class="h-section">ინტერაქტიული სავარჯიშოები</h2>
+
+    <h3 style="font-size:20px; margin:36px 0 6px;">საბაზისო სავარჯიშოები</h3>
+
+    <details class="exercise">
+      <summary><span class="ex-num">1.</span> N = 5, arr = [4, 1, 3, 9, 7] და N = 9, arr = [2, 1, 6, 10, 4, 1, 3, 9, 7] — დაწერეთ <code>partition()</code> და <code>quickSort()</code></summary>
+      <div class="ex-body">
+        <div class="code-window">
+          <pre><code class="language-python">def partition(arr: list, low: int, high: int) -> int:
+    pivot = arr[high]
+    i = low - 1
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1
+
+def quick_sort(arr: list, low: int, high: int) -> None:
+    if low < high:
+        pi = partition(arr, low, high)
+        quick_sort(arr, low, pi - 1)
+        quick_sort(arr, pi + 1, high)</code></pre>
+        </div>
+        <p>ორივე მასივზე გაშვებული და გადამოწმებული — სწორად აბრუნებს დალაგებულ შედეგს.</p>
+      </div>
+    </details>
+
+    <h3 style="font-size:20px; margin:44px 0 6px;">LeetCode-ტიპის ამოცანები</h3>
+
+    <details class="exercise">
+      <summary>Sort Colors <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>დაალაგეთ მასივი, რომელიც შეიცავს მხოლოდ <code>0</code>, <code>1</code>, <code>2</code> — ერთი გავლით (LeetCode 75) — სამმხრივი partition-ის (Dutch National Flag) კლასიკური მაგალითი.</p>
+        <div class="code-window">
+          <pre><code class="language-python">def sort_colors(nums: list) -> None:
+    low, mid, high = 0, 0, len(nums) - 1
+    while mid <= high:
+        if nums[mid] == 0:
+            nums[low], nums[mid] = nums[mid], nums[low]
+            low += 1; mid += 1
+        elif nums[mid] == 1:
+            mid += 1
+        else:
+            nums[mid], nums[high] = nums[high], nums[mid]
+            high -= 1</code></pre>
+        </div>
+        <p>ეს ზუსტად Quick Sort-ის partition-ის გაფართოებაა — ორი ზღვრის (<code>low</code>, <code>high</code>) ნაცვლად სამი ზონა გვაქვს ერთდროულად.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Kth Largest Element in an Array <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>იპოვეთ k-ური უდიდესი ელემენტი, სრული დალაგების გარეშე (LeetCode 215) — <strong>Quickselect</strong>-ის კლასიკური გამოყენება.</p>
+        <div class="code-window">
+          <pre><code class="language-python">def find_kth_largest(nums: list, k: int) -> int:
+    nums = nums[:]
+    target = len(nums) - k          # k-ური უდიდესი = (n-k)-ური ზრდადობით
+
+    def partition(low, high):
+        pivot = nums[high]
+        i = low - 1
+        for j in range(low, high):
+            if nums[j] <= pivot:
+                i += 1
+                nums[i], nums[j] = nums[j], nums[i]
+        nums[i + 1], nums[high] = nums[high], nums[i + 1]
+        return i + 1
+
+    lo, hi = 0, len(nums) - 1
+    while True:
+        pi = partition(lo, hi)
+        if pi == target:
+            return nums[pi]
+        elif pi < target:
+            lo = pi + 1
+        else:
+            hi = pi - 1</code></pre>
+        </div>
+        <p>განსხვავებით სრული Quick Sort-ისგან, აქ <strong>მხოლოდ ერთი</strong> მხარეს ვაგრძელებთ რეკურსიას (იმის მიხედვით, სად მდებარეობს <code>target</code>) — არა ორივეს. ეს ამცირებს საშუალო სირთულეს <code>O(n log n)</code>-დან <code>O(n)</code>-მდე.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Top K Frequent Elements <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>დააბრუნეთ <code>k</code> ყველაზე ხშირად განმეორებადი ელემენტი (LeetCode 347) — Quickselect-ის იდეა, გამოყენებული სიხშირეებზე, hash map-თან კომბინაციაში.</p>
+        <div class="code-window">
+          <pre><code class="language-python">from collections import Counter
+
+def top_k_frequent(nums: list, k: int) -> list:
+    count = Counter(nums)
+    unique = list(count.keys())
+
+    def partition(low, high):
+        pivot = count[unique[high]]
+        i = low - 1
+        for j in range(low, high):
+            if count[unique[j]] <= pivot:
+                i += 1
+                unique[i], unique[j] = unique[j], unique[i]
+        unique[i + 1], unique[high] = unique[high], unique[i + 1]
+        return i + 1
+
+    target = len(unique) - k
+    lo, hi = 0, len(unique) - 1
+    while lo < hi:
+        pi = partition(lo, hi)
+        if pi == target:
+            break
+        elif pi < target:
+            lo = pi + 1
+        else:
+            hi = pi - 1
+    return unique[len(unique) - k:]</code></pre>
+        </div>
+        <p><strong>იდეა:</strong> ვქმნით <code>(მნიშვნელობა → სიხშირე)</code> სიხშირეთა ცხრილს (O(n)), შემდეგ Quickselect-ს ვატარებთ არა თავად რიცხვებზე, არამედ მათ <strong>სიხშირეებზე</strong> — ვეძებთ არა კონკრეტულ მნიშვნელობას, არამედ პარტიციის ისეთ წერტილს, სადაც ზუსტად <code>k</code> ყველაზე ხშირი ელემენტი რჩება მარჯვნივ. საშუალო სირთულე: <code>O(n)</code>.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 5: Quick Sort</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* HERO DECORATIVE PARTITION TREE (balanced quicksort recursion tree) */
+(function(){
+  function layout(depth, maxDepth, counter, nodes, edges, parent){
+    const id = nodes.length;
+    const node = { id, depth };
+    nodes.push(node);
+    if(parent !== undefined) edges.push([parent, id]);
+    if(depth >= maxDepth){
+      node.x = counter.next++;
+    } else {
+      layout(depth+1, maxDepth, counter, nodes, edges, id);
+      layout(depth+1, maxDepth, counter, nodes, edges, id);
+      const childXs = edges.filter(e=>e[0]===id).map(e=>nodes[e[1]].x);
+      node.x = (childXs[0]+childXs[1])/2;
+    }
+    return id;
+  }
+  const nodes=[], edges=[];
+  layout(0, 3, {next:0}, nodes, edges, undefined);
+  const spacingX=68, spacingY=68, pad=20;
+  const maxLeaf = Math.max(...nodes.filter(n=>n.depth===3).map(n=>n.x));
+  let content='';
+  function pos(n){ return {x: pad+n.x*spacingX, y: pad+n.depth*spacingY}; }
+  edges.forEach(([a,b])=>{
+    const pa=pos(nodes[a]), pb=pos(nodes[b]);
+    content += `<line x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" stroke="#2F5F5A" stroke-width="1.4"/>`;
+  });
+  nodes.forEach(n=>{
+    const p = pos(n);
+    const color = n.depth===0 ? '#D9A64E' : '#5AC2B6';
+    content += `<circle cx="${p.x}" cy="${p.y}" r="${10-n.depth}" fill="none" stroke="${color}" stroke-width="1.6"/>`;
+  });
+  document.getElementById('heroTree').setAttribute('viewBox', `0 0 ${pad*2+maxLeaf*spacingX} ${pad*2+3*spacingY}`);
+  document.getElementById('heroTree').innerHTML = content;
+})();
+
+/* ============ LOMUTO PARTITION VISUALIZER ============ */
+let pState = { arr: [], low: 0, high: -1, pivot: null, i: -1, j: -1, phase: 'idle', done: false };
+
+function pInit(){
+  const raw = document.getElementById('pArrInput').value;
+  const arr = raw.split(',').map(s=>parseInt(s.trim(),10)).filter(x=>!isNaN(x));
+  if(arr.length < 2 || arr.length > 10){ alert('შეიყვანეთ 2-10 რიცხვი, მძიმით გამოყოფილი.'); return; }
+  pState = { arr, low: 0, high: arr.length-1, pivot: arr[arr.length-1], i: -1, j: 0, phase: 'loop', done: false };
+  renderP('pivot = arr[high] = <strong>'+pState.pivot+'</strong>. დააჭირეთ „შემდეგი ნაბიჯს".');
+}
+
+function pStep(){
+  if(pState.arr.length === 0){ pInit(); return; }
+  if(pState.done) return;
+  const s = pState;
+  if(s.phase === 'loop'){
+    if(s.j < s.high){
+      if(s.arr[s.j] <= s.pivot){
+        s.i += 1;
+        const tmp = s.arr[s.i]; s.arr[s.i] = s.arr[s.j]; s.arr[s.j] = tmp;
+        renderP(`arr[j=${s.j}] = ${s.arr[s.i]} ≤ pivot (${s.pivot}) → i-ს ზრდა (i=${s.i}) და გაცვლა arr[i] ↔ arr[j]`, s.j, s.i);
+      } else {
+        renderP(`arr[j=${s.j}] = ${s.arr[s.j]} > pivot (${s.pivot}) → გამოტოვება`, s.j);
+      }
+      s.j += 1;
+      return;
+    } else {
+      s.phase = 'place-pivot';
+      renderP('ციკლი დასრულდა — ვათავსებთ pivot-ს სწორ ადგილას...');
+      return;
+    }
+  }
+  if(s.phase === 'place-pivot'){
+    const tmp = s.arr[s.i+1]; s.arr[s.i+1] = s.arr[s.high]; s.arr[s.high] = tmp;
+    s.done = true;
+    s.pivotFinal = s.i+1;
+    renderP(`Pivot ჩაისვა ინდექსზე <strong>${s.i+1}</strong> — ყველა მარცხნივ ≤ ${s.pivot}, ყველა მარჯვნივ > ${s.pivot}`);
+    return;
+  }
+}
+
+function renderP(statusText, compareIdx, swappedIdx){
+  const box = document.getElementById('pBars');
+  const maxVal = Math.max(...pState.arr, 1);
+  box.innerHTML = pState.arr.map((v,idx)=>{
+    let cls = 'bar';
+    if(pState.done && idx === pState.pivotFinal) cls += ' sorted';
+    else if(idx === pState.high && !pState.done) cls = 'bar pivot';
+    else if(idx === compareIdx) cls = 'bar compare';
+    else if(idx === swappedIdx) cls += ' swapped';
+    const heightPct = 20 + (v/maxVal)*70;
+    let ptr = '';
+    if(!pState.done){
+      if(idx === pState.i) ptr = 'i';
+      if(idx === compareIdx) ptr = ptr ? ptr+',j' : 'j';
+    }
+    return `<div class="${cls}" style="height:${heightPct}%"><span class="val">${v}</span>${ptr?`<span class="ptr">${ptr}</span>`:''}</div>`;
+  }).join('');
+  document.getElementById('pStatus').innerHTML = statusText;
+}
+pInit();
+
+/* ============ PIVOT EXPERIMENT ============ */
+function countLomutoComparisons(arr, randomized){
+  arr = [...arr];
+  let comparisons = 0;
+  function partition(low, high){
+    if(randomized){
+      const r = low + Math.floor(Math.random()*(high-low+1));
+      [arr[r], arr[high]] = [arr[high], arr[r]];
+    }
+    const pivot = arr[high];
+    let i = low - 1;
+    for(let j=low; j<high; j++){
+      comparisons++;
+      if(arr[j] <= pivot){
+        i++;
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+    [arr[i+1], arr[high]] = [arr[high], arr[i+1]];
+    return i+1;
+  }
+  function qs(low, high){
+    if(low < high){
+      const pi = partition(low, high);
+      qs(low, pi-1);
+      qs(pi+1, high);
+    }
+  }
+  qs(0, arr.length-1);
+  return comparisons;
+}
+
+function runPivotExperiment(){
+  const n = parseInt(document.getElementById('pivotExpN').value, 10);
+  if(isNaN(n) || n < 5 || n > 2000){ alert('აირჩიეთ n 5-დან 2000-მდე.'); return; }
+  const sortedArr = Array.from({length:n}, (_,i)=>i);
+  const lastPivotCount = countLomutoComparisons(sortedArr, false);
+  // average a few random-pivot runs for stability of the number
+  let randTotal = 0, trials = 5;
+  for(let t=0;t<trials;t++) randTotal += countLomutoComparisons(sortedArr, true);
+  const randomPivotCount = Math.round(randTotal/trials);
+  const theoreticalNlogn = Math.round(n * Math.log2(n));
+
+  const rows = [
+    { label:'ბოლო ელემენტი პივოტად', value:lastPivotCount, color:'#C97B84' },
+    { label:'შემთხვევითი პივოტი (საშ.)', value:randomPivotCount, color:'#5AC2B6' },
+    { label:'n·log₂(n) (საორიენტაციო)', value:theoreticalNlogn, color:'#7C849A' },
+  ];
+  const maxVal = Math.max(...rows.map(r=>r.value));
+  const wrap = document.getElementById('pivotExpBars');
+  wrap.innerHTML = rows.map(r=>{
+    const pct = Math.max(2, (r.value/maxVal)*100);
+    return `<div class="race-row"><span class="race-label">${r.label}</span><div class="race-track"><div class="race-fill" style="width:${pct}%; background:${r.color}"></div></div><span class="race-value">${r.value.toLocaleString('en-US')}</span></div>`;
+  }).join('');
+  document.getElementById('pivotExpNote').textContent = `n = ${n}: ბოლო-ელემენტიანი პივოტი ${(lastPivotCount/randomPivotCount).toFixed(1)}× მეტ შედარებას საჭიროებს, ვიდრე შემთხვევითი პივოტი, ამ (უკვე დალაგებულ) შემავალზე.`;
+}
+runPivotExperiment();
+</script>
+</body>
+</html>

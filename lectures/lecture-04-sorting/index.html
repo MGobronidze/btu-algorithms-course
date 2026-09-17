@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 4 — Insertion Sort და Merge Sort | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A; --line:#232838;
+  --gold:#D9A64E; --gold-dim:#8C7239; --teal:#5AC2B6; --teal-dim:#2F5F5A;
+  --green:#7CB88F; --amber:#D9A64E; --rose:#C97B84; --code-bg:#0d1117;
+  --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-bars{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(640px,100%); opacity:0.35; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(32px,6.5vw,60px); line-height:1.05; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+.callout.math{background:linear-gradient(135deg, rgba(124,184,143,0.10), rgba(124,184,143,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.compare-table{width:100%; border-collapse:collapse; margin:24px 0;}
+.compare-table th{font-family:var(--serif); font-size:16px; text-align:left; padding:12px 16px; border-bottom:1px solid var(--line); color:var(--ink);}
+.compare-table td{padding:12px 16px; border-bottom:1px solid var(--line); font-size:14.5px; color:var(--ink-dim); vertical-align:top;}
+.compare-table tr:last-child td{border-bottom:none;}
+.compare-table td.num{font-family:var(--mono); color:var(--gold);}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:20px;}
+.viz-controls label{font-size:13.5px; color:var(--muted);}
+.viz-controls input[type=text], .viz-controls input[type=number]{background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:8px 10px; font-family:var(--mono); font-size:13.5px;}
+.viz-controls input[type=text]{width:220px;}
+.viz-controls input[type=number]{width:64px;}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 20px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+.bars-wrap{display:flex; align-items:flex-end; gap:4px; height:180px; margin:20px 0 8px; padding:0 4px;}
+.bar{
+  flex:1; display:flex; align-items:flex-end; justify-content:center; border-radius:5px 5px 2px 2px;
+  background:var(--bg-panel-2); border:1px solid var(--line); position:relative; transition:all .35s ease;
+  min-width:16px;
+}
+.bar span{position:absolute; top:-20px; font-family:var(--mono); font-size:11px; color:var(--ink-dim);}
+.bar.sorted{background:rgba(124,184,143,0.25); border-color:var(--green);}
+.bar.sorted span{color:var(--green);}
+.bar.key{background:rgba(217,166,78,0.3); border-color:var(--gold);}
+.bar.key span{color:var(--gold);}
+.bar.compare{background:rgba(90,194,182,0.25); border-color:var(--teal);}
+.bar.compare span{color:var(--teal);}
+.viz-status{font-family:var(--mono); font-size:13.5px; color:var(--ink-dim); margin-top:16px; min-height:22px;}
+.viz-status strong{color:var(--gold);}
+.viz-note{font-size:13.5px; color:var(--muted); margin-top:14px;}
+
+.merge-bracket{display:flex; align-items:flex-end; gap:4px; height:160px; margin:20px 0 8px; padding:0 4px;}
+.merge-bracket .bar.left-half{border-color:var(--teal);}
+.merge-bracket .bar.right-half{border-color:var(--rose);}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{padding:50px 24px 70px; text-align:center;}
+footer p{font-size:13.5px; color:var(--muted); margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · დალაგება — ლექცია 4</a>
+    <div class="nav-links">
+      <a href="#bridge">ორობითი ძებნიდან დალაგებამდე</a>
+      <a href="#bisection">Bisection Search</a>
+      <a href="#insertion-sort">Insertion Sort</a>
+      <a href="#insertion-viz">ვიზუალიზაცია</a>
+      <a href="#merge-sort">Merge Sort</a>
+      <a href="#merge-viz">Merge ვიზუალიზაცია</a>
+      <a href="#compare">შედარება</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-bars" id="heroBars" viewBox="0 0 600 240"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 4</span>
+  <h1>Insertion Sort და Merge Sort</h1>
+  <p class="hero-sub">ორი სრულიად განსხვავებული ფილოსოფია დალაგებისთვის — ერთი ნაბიჯ-ნაბიჯ „ათავსებს" ელემენტებს სწორ ადგილას, მეორე ყოფს ამოცანას, სანამ არ გახდება ტრივიალური.</p>
+  <div class="hero-terms">
+    <span>Insertion Sort · O(n²)</span><span>Merge Sort · O(n log n)</span><span>divide &amp; conquer</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ BRIDGE ============ -->
+<section id="bridge">
+  <div class="wrap">
+    <span class="section-label">01 — რატომ დალაგება</span>
+    <h2 class="h-section">ორობითი ძებნიდან დალაგებამდე</h2>
+    <p class="lede">ლექცია 3-ში ვნახეთ, რომ ორობითი ძებნა — O(log n) — მუშაობს <strong>მხოლოდ</strong> დალაგებულ სტრუქტურაზე. მაგრამ თუ მონაცემი დაულაგებელი მოვიდა? სანამ ორობითი ძებნის სიჩქარეს ვისარგებლებთ, პირველ ჯერზე ის უნდა დავალაგოთ — და დღეს ვსწავლობთ ორ ურთიერთსაწინააღმდეგო ფილოსოფიას ამისთვის.</p>
+
+    <table class="bigo-table">
+      <tr><th>ალგორითმი</th><th>ძებნის ტიპი</th><th>წინაპირობა</th></tr>
+      <tr><td>წრფივი ძებნა</td><td class="num">O(n)</td><td>არცერთი — მუშაობს დაულაგებელზეც</td></tr>
+      <tr><td>ორობითი ძებნა</td><td class="num">O(log n)</td><td>სტრუქტურა უნდა იყოს დალაგებული</td></tr>
+    </table>
+    <p>სწორედ ეს ბოლო პირობა ხდის დღევანდელ თემას აქტუალურს — <strong>რამდენად ეფექტურად შეგვიძლია დალაგება</strong>, რომ შემდეგ ორობითი ძებნის სისწრაფით ვისარგებლოთ?</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ BISECTION SEARCH ============ -->
+<section id="bisection" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — გვერდითი შენიშვნა</span>
+    <h2 class="h-section">Bisection Search — ორობითი ძებნა უწყვეტ სამყაროში</h2>
+    <p class="lede">ორობითი ძებნის იდეა მასივებს არ ეზღუდება. <strong>Bisection search</strong> იმავე „განახევრების" პრინციპს იყენებს უწყვეტი ფუნქციის ფესვის საპოვნელად — ეფუძნება <em>შუალედური მნიშვნელობის თეორემას</em> (Intermediate Value Theorem): თუ უწყვეტი ფუნქცია <code>f(x)</code> ნიშანს იცვლის <code>[a, b]</code> შუალედზე (ანუ <code>f(a) · f(b) &lt; 0</code>), მაშინ მას აქვს ფესვი ამ შუალედში.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">bisection_search.py</span></div>
+      <pre><code class="language-python">def bisection_search(f, a: float, b: float, tol: float = 1e-6) -> float:
+    if f(a) * f(b) >= 0:
+        raise ValueError("f(a)-სა და f(b)-ს საწინააღმდეგო ნიშანი უნდა ჰქონდეთ.")
+    while (b - a) / 2 > tol:
+        m = (a + b) / 2
+        if f(m) == 0:
+            return m                # ზუსტად ვიპოვეთ ფესვი
+        elif f(a) * f(m) < 0:
+            b = m                   # ფესვი მარცხენა ნახევარშია
+        else:
+            a = m                   # ფესვი მარჯვენა ნახევარშია
+    return (a + b) / 2
+
+# √2-ის მოძებნა: f(x) = x² − 2-ის ფესვი
+print(bisection_search(lambda x: x**2 - 2, 0, 2))   # ≈ 1.4142135...</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">🔎</span>
+      <p><strong>განსხვავება მასივის ორობითი ძებნისგან:</strong> აქ <code>n</code> აღარ არის „ელემენტების რაოდენობა" — არეალი უწყვეტია. სირთულეს განსაზღვრავს არა შესატანი მონაცემის ზომა, არამედ სასურველი სიზუსტე: საჭირო ნაბიჯების რაოდენობაა <code>log₂((b−a)/tol)</code>. მაინც იგივე ლოგარითმული ბუნებაა — ყოველ ნაბიჯზე განუსაზღვრელობის არეალი ნახევრდება.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INSERTION SORT ============ -->
+<section id="insertion-sort">
+  <div class="wrap">
+    <span class="section-label">03 — პირველი დალაგების ალგორითმი</span>
+    <h2 class="h-section">Insertion Sort</h2>
+    <p class="lede">იდეა ბუნებრივია — ზუსტად ისე ალაგებთ სათამაშო ბანქოს ხელში: იღებთ შემდეგ ბარათს და სვამთ უკვე დალაგებულ ნაწილში სწორ ადგილას.</p>
+
+    <ol style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
+      <li style="margin-bottom:8px;">ვიწყებთ მეორე ელემენტიდან (პირველი, ცალკე აღებული, ავტომატურად „დალაგებულია").</li>
+      <li style="margin-bottom:8px;">მიმდინარე ელემენტს (<code>key</code>) ვადარებთ მის მარცხნივ მდგომ, უკვე დალაგებულ ნაწილს.</li>
+      <li style="margin-bottom:8px;">ყველა ელემენტს, რომელიც <code>key</code>-ზე დიდია, ერთი პოზიციით მარჯვნივ ვწევთ.</li>
+      <li>ვსვამთ <code>key</code>-ს გამოთავისუფლებულ ადგილას. ვიმეორებთ მთელი მასივისთვის.</li>
+    </ol>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">insertion_sort.py</span></div>
+      <pre><code class="language-python">def insertion_sort(arr: list) -> list:
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        # ვწევთ დალაგებული ნაწილის ელემენტებს მარჯვნივ,
+        # სანამ არ ვიპოვით key-ს სწორ ადგილას
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+    return arr</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:34px 0 6px;">სირთულის ანალიზი</h3>
+    <table class="bigo-table">
+      <tr><th>შემთხვევა</th><th>რა ხდება</th><th>სირთულე</th></tr>
+      <tr><td>საუკეთესო</td><td>მასივი უკვე დალაგებულია — თითოეულ ელემენტს მხოლოდ ერთხელ ვადარებთ წინამორბედს, გადანაცვლება არ ხდება</td><td class="num">O(n)</td></tr>
+      <tr><td>უარესი</td><td>მასივი კლებადობითაა დალაგებული — თითოეული ელემენტი მთელ დალაგებულ ნაწილს გაივლის</td><td class="num">O(n²)</td></tr>
+    </table>
+
+    <div class="callout math">
+      <span class="icon">∑</span>
+      <p><strong>უარესი შემთხვევის დამტკიცება:</strong> პირველ იტერაციაზე მაქსიმუმ 1 შედარებაა საჭირო, მეორეზე — მაქსიმუმ 2, ..., ბოლოზე — მაქსიმუმ <code>n−1</code>. ჯამი: <code>1 + 2 + ⋯ + (n−1) = n(n−1)/2</code>, რაც არის <code>O(n²)</code>.</p>
+    </div>
+
+    <p><strong>მეხსიერება:</strong> ალგორითმი მუშაობს <strong>ადგილზე</strong> (in-place) — დამატებითი მასივი არ სჭირდება, ამიტომ სივრცითი სირთულეა <code>O(1)</code>.</p>
+  </div>
+</section>
+
+<!-- ============ INSERTION SORT VISUALIZER ============ -->
+<section id="insertion-viz" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">04 — სცადეთ თავად</span>
+    <h2 class="h-section">Insertion Sort ნაბიჯ-ნაბიჯ</h2>
+    <p class="lede">ოქროსფერი — მიმდინარე <code>key</code>. მწვანე — უკვე დალაგებული ნაწილი. დააჭირეთ „შემდეგი ნაბიჯი" და თვალი ადევნეთ, როგორ „იძვრის" თითოეული ელემენტი თავის ადგილას.</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="insArrInput">მასივი:</label>
+        <input type="text" id="insArrInput" value="8,1,5,3,10">
+        <button class="btn" onclick="insInit()">↺ დაწყება</button>
+        <button class="btn ghost" onclick="insStep()">შემდეგი ნაბიჯი →</button>
+      </div>
+      <div class="bars-wrap" id="insBars"></div>
+      <div class="viz-status" id="insStatus"></div>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">✅</span>
+      <p><strong>უპირატესობები:</strong> მარტივი და ადვილად წასაკითხი; <strong>სტაბილურია</strong> (თანაბარი ელემენტების ურთიერთწესრიგი არ ირღვევა); ძალიან ეფექტურია მცირე ან „თითქმის დალაგებულ" მონაცემზე — ე.წ. <em>adaptive</em> თვისება; ადგილზე მუშაობს, დამატებითი მეხსიერების გარეშე.<br><strong>ნაკლი:</strong> არაეფექტურია დიდი, შემთხვევითად დალაგებული მონაცემისთვის — <code>O(n²)</code> სწრაფად ხდება პრობლემა.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ MERGE SORT ============ -->
+<section id="merge-sort">
+  <div class="wrap">
+    <span class="section-label">05 — დაყავი და იბატონე</span>
+    <h2 class="h-section">Merge Sort</h2>
+    <p class="lede">Merge Sort სრულიად განსხვავებული ფილოსოფიით მუშაობს — <strong>divide and conquer</strong>: მასივს ვყოფთ ორ ნახევრად, თითოეულს რეკურსიულად ვალაგებთ, შემდეგ ორ დალაგებულ ნახევარს ვაერთიანებთ (merge) ერთ დალაგებულ მასივში.</p>
+
+    <ol style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
+      <li style="margin-bottom:8px;"><strong>საბაზისო შემთხვევა:</strong> თუ სიის სიგრძეა 0 ან 1 — უკვე დალაგებულია.</li>
+      <li style="margin-bottom:8px;"><strong>გაყოფა:</strong> სიას ვყოფთ ორ თანაბარ ნახევრად და ორივეს რეკურსიულად ვალაგებთ.</li>
+      <li><strong>გაერთიანება:</strong> ვადარებთ ორივე დალაგებული ნახევრის „წამყვან" ელემენტებს — პატარას გადმოვაქვთ შედეგში; როცა ერთი ნახევარი ცარიელდება, მეორის დარჩენილს პირდაპირ ვაკოპირებთ.</li>
+    </ol>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">merge_sort.py</span></div>
+      <pre><code class="language-python">def merge_sort(arr: list) -> list:
+    if len(arr) <= 1:
+        return arr
+
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+
+    merged = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:      # <= (და არა <) — ინარჩუნებს სტაბილურობას
+            merged.append(left[i]); i += 1
+        else:
+            merged.append(right[j]); j += 1
+    merged.extend(left[i:])          # დარჩენილი ელემენტების პირდაპირ დამატება
+    merged.extend(right[j:])
+    return merged</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>დახვეწილი, მაგრამ მნიშვნელოვანი შესწორება:</strong> ორიგინალი მასალის კოდი წერდა <code>if left_half[i] < right_half[j]</code> — მკაცრი <code>&lt;</code>. ეს ერთი სიმბოლო ამტვრევს <strong>სტაბილურობას</strong>: როცა ორივე ნახევარში ტოლი ელემენტებია, <code>&lt;</code> ირჩევს მარჯვენა ნახევრის ელემენტს პირველად — რაც ცვლის თანაბარი ელემენტების საწყის ურთიერთწესრიგს. Merge Sort-ი ცნობილია, როგორც „ბუნებრივად სტაბილური" ალგორითმი — მაგრამ ეს სტაბილურობა <strong>მხოლოდ</strong> მაშინ ვრცელდება, თუ merge-ის შედარებაში ტოლობისას მარცხენა ნახევარს ვანიჭებთ უპირატესობას (<code>&lt;=</code>). შემოწმებული იქნა ორივე ვერსია — ტესტმა ზუსტად დაადასტურა ეს განსხვავება.</p>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">💡</span>
+      <p><strong>რატომ არის სტაბილურობა მნიშვნელოვანი?</strong> წარმოიდგინეთ ცხრილი თანამშრომლების შესახებ, უკვე დალაგებული სახელის მიხედვით ანბანურად. ახლა გინდათ იგივე ცხრილის დალაგება განყოფილების მიხედვით. სტაბილური ალგორითმით, ერთი და იმავე განყოფილების თანამშრომლები კვლავ ანბანურად დარჩება — არასტაბილურით კი ეს წესრიგი დაიკარგება, თითქმის შემთხვევით.</p>
+    </div>
+
+    <h3 style="font-size:19px; margin:34px 0 6px;">სირთულის ანალიზი</h3>
+    <p>რეკურენტული დამოკიდებულება: <code>T(n) = 2·T(n/2) + O(n)</code></p>
+    <ul style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
+      <li style="margin-bottom:8px;"><strong>გაყოფა:</strong> მასივი ნახევრდება, სანამ არ მივიღებთ ერთელემენტიან ქვემასივებს — <code>log n</code> დონე.</li>
+      <li><strong>გაერთიანება:</strong> თითოეულ დონეზე, ყველა merge ოპერაციის ჯამური სამუშაო არის <code>O(n)</code> (ყოველი ელემენტი ერთხელ „გადაინაცვლებს" შედეგში).</li>
+    </ul>
+
+    <table class="bigo-table">
+      <tr><th>მახასიათებელი</th><th>მნიშვნელობა</th></tr>
+      <tr><td>დროითი სირთულე (ყველა შემთხვევაში)</td><td class="num">O(n log n)</td></tr>
+      <tr><td>სივრცითი სირთულე</td><td class="num">O(n)</td></tr>
+    </table>
+    <p><code>log n</code> დონე × <code>O(n)</code> სამუშაო დონეზე = <code>O(n log n)</code>. ეს გარანტირებულია <strong>ყველა</strong> შემთხვევაში — საუკეთესო, საშუალო თუ უარესი — Insertion Sort-ისგან განსხვავებით, სადაც შემავალმა მონაცემმა შეიძლება მკვეთრად შეცვალოს სირთულე.</p>
+
+    <div class="callout warn">
+      <span class="icon">⚠️</span>
+      <p><strong>დამატებითი მეხსიერების წყარო:</strong> ზემოთ მოცემული ვერსია ყოველ რეკურსიულ გამოძახებაზე ქმნის ახალ სიებს (<code>arr[:mid]</code>, <code>arr[mid:]</code> — slicing Python-ში ყოველთვის ასლს აკეთებს). ესაა O(n) დამხმარე მეხსიერების წყარო — რის გამოც Merge Sort <strong>არ</strong> ითვლება in-place ალგორითმად, Insertion Sort-ისგან განსხვავებით.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MERGE SORT VISUALIZER ============ -->
+<section id="merge-viz" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">06 — სცადეთ თავად</span>
+    <h2 class="h-section">Merge Sort ნაბიჯ-ნაბიჯ</h2>
+    <p class="lede">დააჭირეთ „შემდეგი ნაბიჯი" — ნახავთ ყოველ <code>merge</code> ოპერაციას ცალ-ცალკე, იმ თანმიმდევრობით, როგორც რეკურსია რეალურად ასრულებს მათ (ქვემოდან ზემოთ — ჯერ პატარა ნაწილები, შემდეგ დიდი).</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="mrgArrInput">მასივი:</label>
+        <input type="text" id="mrgArrInput" value="38,27,43,10,9,82">
+        <button class="btn" onclick="mrgInit()">↺ დაწყება</button>
+        <button class="btn ghost" onclick="mrgStep()">შემდეგი ნაბიჯი →</button>
+      </div>
+      <div class="bars-wrap" id="mrgBars"></div>
+      <div class="viz-status" id="mrgStatus"></div>
+    </div>
+    <p class="viz-note">მწვანე ზოლები უკვე თავისი საბოლოო, დალაგებული პოზიციისკენ მოძრაობს ამ merge-ის ფარგლებში; ნაცრისფერი — ჯერ არ შეხებია ამ ეტაპს.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ COMPARISON ============ -->
+<section id="compare">
+  <div class="wrap">
+    <span class="section-label">07 — გვერდიგვერდ</span>
+    <h2 class="h-section">Insertion Sort vs Merge Sort</h2>
+
+    <table class="compare-table">
+      <tr><th>მახასიათებელი</th><th>Insertion Sort</th><th>Merge Sort</th></tr>
+      <tr><td>საუკეთესო შემთხვევა</td><td class="num">O(n)</td><td class="num">O(n log n)</td></tr>
+      <tr><td>უარესი შემთხვევა</td><td class="num">O(n²)</td><td class="num">O(n log n)</td></tr>
+      <tr><td>სივრცე</td><td class="num">O(1) — in-place</td><td class="num">O(n) — დამხმარე მასივი</td></tr>
+      <tr><td>სტაბილურობა</td><td>დიახ</td><td>დიახ (თუ <code>&lt;=</code> გამოიყენება)</td></tr>
+      <tr><td>საუკეთესო გამოსაყენებელი</td><td>მცირე ან თითქმის დალაგებული მონაცემი; „online" დალაგება (მონაცემი ეტაპობრივად შემოდის)</td><td>დიდი მოცულობის მონაცემი; გარანტირებული წარმადობა საჭირო შემთხვევაში; ბმული სიები (linked lists — მომდევნო ლექციები)</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">08 — რეალურ სამყაროში</span>
+    <h2 class="h-section">დღეს ნასწავლი ორივე ალგორითმი — ერთად</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🐍</div>
+        <h4>Python-ის Timsort</h4>
+        <p>Python-ის ჩაშენებული <code>sorted()</code> და <code>list.sort()</code> იყენებენ <strong>Timsort</strong>-ს — ჰიბრიდულ ალგორითმს, რომელიც ზუსტად დღეს ნასწავლი ორივე იდეას აერთიანებს: პატარა ქვემონაკვეთებს Insertion Sort-ით ალაგებს (სადაც ის ყველაზე ეფექტურია), შემდეგ მათ Merge Sort-ის პრინციპით აერთიანებს. Java-ს <code>Arrays.sort()</code> ობიექტებისთვის იგივეს აკეთებს.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">💾</div>
+        <h4>გარე დალაგება (External Sorting)</h4>
+        <p>როცა მონაცემი დისკზეა და RAM-ში არ ეტევა, Merge Sort-ის პრინციპი (მცირე ნაწილების დალაგება და თანდათანობითი გაერთიანება) გამოიყენება — ბაზების სისტემებში დიდი ცხრილების დასალაგებლად.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🔗</div>
+        <h4>Merge Sort და ბმული სიები</h4>
+        <p>ბმულ სიაზე (რომელსაც მალე შევისწავლით) Merge Sort განსაკუთრებით ბუნებრივია — O(1)-ში შესაძლებელია სიის შუაზე გაყოფა და ელემენტების „მიბმა" ახალი მიმდევრობით, დამატებითი მასივის გარეშეც.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">📊</div>
+        <h4>სტაბილურობა real-world მონაცემებში</h4>
+        <p>ცხრილების მრავალსვეტიანი დალაგება (მაგ. Excel-ში ჯერ განყოფილებით, მერე სახელით) სწორედ სტაბილურ დალაგებას ეყრდნობა — ამიტომაა, რომ ინდუსტრიაში სტაბილურობის დარღვევა (როგორც დღეს ვნახეთ <code>&lt;</code> vs <code>&lt;=</code>-ში) სერიოზულ ბაგებამდე მიდის.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises">
+  <div class="wrap-wide">
+    <span class="section-label">09 — პრაქტიკა</span>
+    <h2 class="h-section">ინტერაქტიული სავარჯიშოები</h2>
+
+    <h3 style="font-size:20px; margin:36px 0 6px;">საბაზისო სავარჯიშოები</h3>
+
+    <details class="exercise">
+      <summary><span class="ex-num">1.</span> n = 5, arr = [8, 1, 5, 3, 10] — დაალაგეთ Insertion Sort-ით ორი ფუნქციით: <code>insert()</code> და <code>insertionSort()</code></summary>
+      <div class="ex-body">
+        <div class="code-window">
+          <pre><code class="language-python">def insert(arr: list, n: int, i: int) -> None:
+    """ჩასვამს arr[i]-ს დალაგებულ arr[0..i-1]-ში სწორ ადგილას."""
+    key = arr[i]
+    j = i - 1
+    while j >= 0 and arr[j] > key:
+        arr[j + 1] = arr[j]
+        j -= 1
+    arr[j + 1] = key
+
+def insertion_sort(arr: list, n: int) -> None:
+    for i in range(1, n):
+        insert(arr, n, i)</code></pre>
+        </div>
+        <p><strong>სირთულე:</strong> უარესი O(n²), საუკეთესო O(n) — იგივე ანალიზი, რაც ზემოთ.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><span class="ex-num">2.</span> დაწერეთ ორი ფუნქცია: <code>merge(arr, l, m, r)</code> და <code>mergeSort(arr, l, r)</code></summary>
+      <div class="ex-body">
+        <div class="code-window">
+          <pre><code class="language-python">def merge(arr: list, l: int, m: int, r: int) -> None:
+    left = arr[l:m + 1]
+    right = arr[m + 1:r + 1]
+    i = j = 0
+    k = l
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            arr[k] = left[i]; i += 1
+        else:
+            arr[k] = right[j]; j += 1
+        k += 1
+    while i < len(left):
+        arr[k] = left[i]; i += 1; k += 1
+    while j < len(right):
+        arr[k] = right[j]; j += 1; k += 1
+
+def merge_sort(arr: list, l: int, r: int) -> None:
+    if l < r:
+        m = (l + r) // 2
+        merge_sort(arr, l, m)
+        merge_sort(arr, m + 1, r)
+        merge(arr, l, m, r)</code></pre>
+        </div>
+        <p>ეს ვერსია ინდექსებით მუშაობს (<code>l, m, r</code>) ახალი სიების დაბრუნების ნაცვლად — CLRS-ის სახელმძღვანელოში მიღებული კლასიკური ფორმატი. <strong>სირთულე:</strong> O(n log n) დროში, O(n) სივრცეში.</p>
+      </div>
+    </details>
+
+    <h3 style="font-size:20px; margin:44px 0 6px;">LeetCode-ტიპის ამოცანები</h3>
+
+    <details class="exercise">
+      <summary>Merge Sorted Array <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>ორი დალაგებული მასივი გაერთიანდეს ერთში, ადგილზე (LeetCode 88) — <code>merge()</code>-ის იდეის პირდაპირი გამოყენება, უკნიდან წინ.</p>
+        <div class="code-window">
+          <pre><code class="language-python">def merge(nums1: list, m: int, nums2: list, n: int) -> None:
+    i, j, k = m - 1, n - 1, m + n - 1
+    while j >= 0:
+        if i >= 0 and nums1[i] > nums2[j]:
+            nums1[k] = nums1[i]; i -= 1
+        else:
+            nums1[k] = nums2[j]; j -= 1
+        k -= 1</code></pre>
+        </div>
+        <p>ვავსებთ <code>nums1</code>-ს <strong>ბოლოდან</strong>, რომ არ დაგვჭირდეს ჯერ არშედარებული ელემენტების გადაწერა — კლასიკური „ორი მაჩვენებელი ბოლოდან" ხრიკი.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Sort an Array <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>დაწერეთ სრული დალაგების ალგორითმი ნულიდან (LeetCode 912) — ზუსტად დღეს ნასწავლი Merge Sort.</p>
+        <div class="code-window">
+          <pre><code class="language-python">def sort_array(nums: list) -> list:
+    if len(nums) <= 1:
+        return nums
+    mid = len(nums) // 2
+    left = sort_array(nums[:mid])
+    right = sort_array(nums[mid:])
+    merged, i, j = [], 0, 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            merged.append(left[i]); i += 1
+        else:
+            merged.append(right[j]); j += 1
+    return merged + left[i:] + right[j:]</code></pre>
+        </div>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Count of Smaller Numbers After Self <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>თითოეული ელემენტისთვის დაითვალეთ, რამდენი მისგან <strong>მარჯვნივ</strong> მდგომი ელემენტია მასზე პატარა (LeetCode 315) — Merge Sort-ის გაცილებით ღრმა გამოყენება, ვიდრე უბრალო დალაგება.</p>
+        <div class="code-window">
+          <pre><code class="language-python">def count_smaller(nums: list) -> list:
+    n = len(nums)
+    counts = [0] * n
+    indices = list(range(n))       # ვალაგებთ ინდექსებს, არა თავად მნიშვნელობებს
+
+    def sort(lo: int, hi: int) -> None:
+        if hi - lo <= 1:
+            return
+        mid = (lo + hi) // 2
+        sort(lo, mid)
+        sort(mid, hi)
+        merged, i, j = [], lo, mid
+        while i < mid and j < hi:
+            if nums[indices[i]] <= nums[indices[j]]:
+                counts[indices[i]] += j - mid   # j-mid ელემენტი მარჯვნიდან უკვე "გავიდა" წინ
+                merged.append(indices[i]); i += 1
+            else:
+                merged.append(indices[j]); j += 1
+        while i < mid:
+            counts[indices[i]] += j - mid
+            merged.append(indices[i]); i += 1
+        while j < hi:
+            merged.append(indices[j]); j += 1
+        indices[lo:hi] = merged
+
+    sort(0, n)
+    return counts</code></pre>
+        </div>
+        <p><strong>იდეა:</strong> merge-ის დროს, როცა მარჯვენა ნახევრიდან ელემენტი მარცხენაზე ადრე მოხვდება შედეგში, ეს ნიშნავს, რომ ის ყველა დარჩენილ მარცხენა ელემენტზე პატარაა — და ეს ინფორმაცია „უფასოდ" გვეძლევა, ვინაიდან merge უკვე ასრულებს ამ შედარებებს. სირთულე მცირდება <code>O(n²)</code>-დან (ყველა წყვილის პირდაპირი შედარება) <code>O(n log n)</code>-მდე — ზუსტად merge sort-ის ჩარჩოს წყალობით.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 4: Insertion Sort და Merge Sort</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* HERO DECORATIVE BARS */
+(function(){
+  const svg = document.getElementById('heroBars');
+  const vals = [5,2,8,1,9,3,7,4,6,2,8,5];
+  const w = 600, h = 240, bw = w/vals.length;
+  let content = '';
+  vals.forEach((v,i)=>{
+    const bh = (v/9)*h*0.8;
+    const x = i*bw + bw*0.15;
+    const y = h - bh;
+    content += `<rect x="${x}" y="${y}" width="${bw*0.7}" height="${bh}" rx="4" fill="none" stroke="${i%2===0?'#D9A64E':'#5AC2B6'}" stroke-width="1.6"/>`;
+  });
+  svg.innerHTML = content;
+})();
+
+/* ============ INSERTION SORT VISUALIZER ============ */
+let insState = { arr: [], i: 1, j: -1, key: null, sortedUpTo: 0, done: false };
+
+function insInit(){
+  const raw = document.getElementById('insArrInput').value;
+  const arr = raw.split(',').map(s=>parseInt(s.trim(),10)).filter(x=>!isNaN(x));
+  if(arr.length < 2 || arr.length > 10){ alert('შეიყვანეთ 2-10 რიცხვი, მძიმით გამოყოფილი.'); return; }
+  insState = { arr, i: 1, j: null, key: null, phase: 'start-pass', sortedUpTo: 0, done: false };
+  renderIns('დააჭირეთ „შემდეგი ნაბიჯს" დასაწყებად.');
+}
+
+function insStep(){
+  if(insState.arr.length === 0){ insInit(); return; }
+  if(insState.done) return;
+  const s = insState;
+  if(s.i >= s.arr.length){
+    s.done = true;
+    renderIns('მასივი დალაგებულია!');
+    return;
+  }
+  if(s.phase === 'start-pass'){
+    s.key = s.arr[s.i];
+    s.j = s.i - 1;
+    s.phase = 'shifting';
+    renderIns(`key = arr[${s.i}] = <strong>${s.key}</strong> — ვეძებთ მისთვის ადგილს`);
+    return;
+  }
+  if(s.phase === 'shifting'){
+    if(s.j >= 0 && s.arr[s.j] > s.key){
+      s.arr[s.j+1] = s.arr[s.j];
+      renderIns(`arr[${s.j}] = ${s.arr[s.j]} > key (${s.key}) → ვწევთ მარჯვნივ`, s.j);
+      s.j -= 1;
+      return;
+    } else {
+      s.arr[s.j+1] = s.key;
+      s.phase = 'start-pass';
+      s.i += 1;
+      renderIns(`key (${s.key}) ჩაისვა პოზიციაზე ${s.j+1}`);
+      return;
+    }
+  }
+}
+
+function renderIns(statusText, compareIdx){
+  const box = document.getElementById('insBars');
+  const maxVal = Math.max(...insState.arr, 1);
+  box.innerHTML = insState.arr.map((v,idx)=>{
+    let cls = 'bar';
+    if(insState.done) cls += ' sorted';
+    else if(idx < insState.i) cls += ' sorted';
+    if(idx === compareIdx) cls = 'bar compare';
+    const heightPct = 20 + (v/maxVal)*75;
+    return `<div class="${cls}" style="height:${heightPct}%"><span>${v}</span></div>`;
+  }).join('');
+  document.getElementById('insStatus').innerHTML = statusText;
+}
+insInit();
+
+/* ============ MERGE SORT VISUALIZER (snapshot-based) ============ */
+let mrgSnapshots = [];
+let mrgIdx = 0;
+
+function mrgInit(){
+  const raw = document.getElementById('mrgArrInput').value;
+  const arr = raw.split(',').map(s=>parseInt(s.trim(),10)).filter(x=>!isNaN(x));
+  if(arr.length < 2 || arr.length > 12){ alert('შეიყვანეთ 2-12 რიცხვი, მძიმით გამოყოფილი.'); return; }
+  mrgSnapshots = [];
+  const working = [...arr];
+
+  function mergeSortRecord(lo, hi){
+    if(hi - lo <= 1) return;
+    const mid = Math.floor((lo+hi)/2);
+    mergeSortRecord(lo, mid);
+    mergeSortRecord(mid, hi);
+    const left = working.slice(lo, mid);
+    const right = working.slice(mid, hi);
+    let i=0, j=0, k=lo;
+    while(i < left.length && j < right.length){
+      if(left[i] <= right[j]){ working[k] = left[i]; i++; }
+      else { working[k] = right[j]; j++; }
+      k++;
+    }
+    while(i < left.length){ working[k] = left[i]; i++; k++; }
+    while(j < right.length){ working[k] = right[j]; j++; k++; }
+    mrgSnapshots.push({ arr: [...working], lo, hi, label: `merge(arr, ${lo}, ${mid}, ${hi})` });
+  }
+  mergeSortRecord(0, working.length);
+  mrgIdx = 0;
+  renderMrg(arr, null, 'დააჭირეთ „შემდეგი ნაბიჯს" პირველი merge-ის სანახავად.');
+}
+
+function mrgStep(){
+  if(mrgSnapshots.length === 0){ mrgInit(); return; }
+  if(mrgIdx >= mrgSnapshots.length){ return; }
+  const snap = mrgSnapshots[mrgIdx];
+  renderMrg(snap.arr, snap, `${snap.label} → [${snap.arr.slice(snap.lo, snap.hi).join(', ')}] დალაგებულია`);
+  mrgIdx++;
+  if(mrgIdx >= mrgSnapshots.length){
+    setTimeout(()=>{ document.getElementById('mrgStatus').innerHTML += ' — <strong>მთლიანად დალაგებულია!</strong>'; }, 50);
+  }
+}
+
+function renderMrg(arr, snap, statusText){
+  const box = document.getElementById('mrgBars');
+  const maxVal = Math.max(...arr, 1);
+  box.innerHTML = arr.map((v,idx)=>{
+    let cls = 'bar';
+    if(snap && idx >= snap.lo && idx < snap.hi) cls += ' sorted';
+    const heightPct = 20 + (v/maxVal)*75;
+    return `<div class="${cls}" style="height:${heightPct}%"><span>${v}</span></div>`;
+  }).join('');
+  document.getElementById('mrgStatus').innerHTML = statusText;
+}
+mrgInit();
+</script>
+</body>
+</html>

@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 7 — ბმული სია | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A; --line:#232838;
+  --gold:#D9A64E; --gold-dim:#8C7239; --teal:#5AC2B6; --teal-dim:#2F5F5A;
+  --green:#7CB88F; --amber:#D9A64E; --rose:#C97B84; --code-bg:#0d1117;
+  --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-chain{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(640px,100%); opacity:0.3; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(40px,8vw,78px); line-height:1.05; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.compare-table{width:100%; border-collapse:collapse; margin:24px 0;}
+.compare-table th{font-family:var(--serif); font-size:16px; text-align:left; padding:12px 16px; border-bottom:1px solid var(--line); color:var(--ink);}
+.compare-table td{padding:12px 16px; border-bottom:1px solid var(--line); font-size:14.5px; color:var(--ink-dim); vertical-align:top;}
+.compare-table tr:last-child td{border-bottom:none;}
+.compare-table td.num{font-family:var(--mono); color:var(--gold);}
+
+.term-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin:28px 0;}
+@media (max-width:680px){.term-grid{grid-template-columns:1fr;}}
+.term-card{background:var(--bg-panel); border-radius:var(--radius); padding:20px;}
+.term-card h4{font-family:var(--mono); font-size:14.5px; margin-bottom:8px; color:var(--gold);}
+.term-card p{font-size:14px; margin:0; color:var(--ink-dim);}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:20px;}
+.viz-controls label{font-size:13.5px; color:var(--muted);}
+.viz-controls input[type=text], .viz-controls input[type=number]{background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:8px 10px; font-family:var(--mono); font-size:13.5px;}
+.viz-controls input[type=text]{width:180px;}
+.viz-controls input[type=number]{width:60px;}
+.viz-controls select{background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:8px 10px; font-family:var(--mono); font-size:13px;}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 18px; font-family:var(--sans); font-weight:600; font-size:13.5px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+.btn.danger{background:transparent; color:var(--rose); border:1px solid var(--teal-dim);}
+.btn.danger:hover{border-color:var(--rose);}
+
+.ll-track{display:flex; align-items:center; flex-wrap:wrap; gap:0; min-height:110px; padding:10px 4px;}
+.ll-node{display:flex; align-items:center; animation:nodeIn .3s ease;}
+@keyframes nodeIn{from{opacity:0; transform:scale(.85);} to{opacity:1; transform:scale(1);}}
+.ll-node-box{
+  display:flex; border:1.5px solid var(--teal-dim); border-radius:8px; overflow:hidden;
+  background:var(--bg-panel-2); transition:border-color .3s, background .3s;
+}
+.ll-node-box.highlight{border-color:var(--gold); background:rgba(217,166,78,0.12);}
+.ll-node-data{padding:10px 14px; font-family:var(--mono); font-weight:700; color:var(--ink); min-width:36px; text-align:center;}
+.ll-node-next{padding:10px 10px; border-left:1px solid var(--line); color:var(--muted); font-family:var(--mono); font-size:11px; display:flex; align-items:center;}
+.ll-arrow{color:var(--muted); font-family:var(--mono); padding:0 8px; font-size:16px;}
+.ll-null{font-family:var(--mono); color:var(--muted); font-size:13px; padding:0 8px;}
+.ll-head-label{font-family:var(--mono); font-size:11px; color:var(--gold); margin-right:6px; align-self:flex-start; margin-top:-2px;}
+.viz-status{font-family:var(--mono); font-size:13.5px; color:var(--ink-dim); margin-top:16px; min-height:22px;}
+.viz-status strong{color:var(--gold);}
+.viz-note{font-size:13.5px; color:var(--muted); margin-top:14px;}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{padding:50px 24px 70px; text-align:center;}
+footer p{font-size:13.5px; color:var(--muted); margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · ბმული სია — ლექცია 7</a>
+    <div class="nav-links">
+      <a href="#what-is">რა არის</a>
+      <a href="#types">ტიპები</a>
+      <a href="#node">კვანძის სტრუქტურა</a>
+      <a href="#traverse-search">გავლა და ძებნა</a>
+      <a href="#viz">ინტერაქტიული ვიზუალიზატორი</a>
+      <a href="#insertion">ჩასმა</a>
+      <a href="#deletion">წაშლა</a>
+      <a href="#compare">მასივი vs ბმული სია</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-chain" id="heroChain" viewBox="0 0 600 160"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 7</span>
+  <h1>ბმული სია</h1>
+  <p class="hero-sub">პირველი მონაცემთა სტრუქტურა კურსში, სადაც ელემენტები მეხსიერებაში ერთმანეთის გვერდით აღარ დევს — ისინი მხოლოდ „მიმართულებებით" არიან დაკავშირებული.</p>
+  <div class="hero-terms">
+    <span>node</span><span>head</span><span>next</span><span>None / NULL</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ WHAT IS ============ -->
+<section id="what-is">
+  <div class="wrap">
+    <span class="section-label">01 — ახალი კატეგორია</span>
+    <h2 class="h-section">რა არის ბმული სია</h2>
+    <p class="lede">აქამდე ნასწავლი ყველა სტრუქტურა — Python-ის <code>list</code> — მეხსიერებაში ინახავს ელემენტებს <strong>თანმიმდევრულად</strong>, ერთმანეთის გვერდით. ბმული სია სრულიად განსხვავებულ პრინციპზეა აგებული: თითოეული ელემენტი („კვანძი", node) ინახავს (1) საკუთარ მონაცემს და (2) შემდეგი კვანძის მისამართს — ისინი შეიძლება მეხსიერების სრულიად სხვადასხვა ადგილას იყვნენ განთავსებული.</p>
+
+    <p>ბოლო კვანძის „შემდეგი" მისამართი — <code>None</code> (Python-ში) ან <code>NULL</code> — სიის დასასრულს აღნიშნავს. სიაზე წვდომა ხდება მხოლოდ ერთი წერტილიდან — <strong>head</strong>-იდან (პირველი კვანძი) — და ყოველი შემდეგი კვანძი მიიღწევა მხოლოდ წინა კვანძის <code>next</code>-ის მეშვეობით.</p>
+
+    <div class="callout insight">
+      <span class="icon">💡</span>
+      <p><strong>ძირითადი კომპრომისი:</strong> მასივი გვაძლევს <code>O(1)</code> წვდომას ინდექსით, მაგრამ ჩასმა/წაშლა შუაში მოითხოვს ყველა შემდგომი ელემენტის „წევას" — <code>O(n)</code>. ბმული სია პირიქითაა: წვდომა კონკრეტულ პოზიციაზე <code>O(n)</code>-ია (თანმიმდევრული გავლა აუცილებელია), მაგრამ ჩასმა/წაშლა, როცა ადგილი უკვე ვიცით, <code>O(1)</code>-ია — უბრალოდ რამდენიმე მისამართის გადანაცვლება, დანარჩენი მონაცემის შეხების გარეშე.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ TYPES ============ -->
+<section id="types" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — ვარიაციები</span>
+    <h2 class="h-section">ბმული სიების ტიპები</h2>
+
+    <div class="term-grid">
+      <div class="term-card">
+        <h4>ერთმხრივი (Singly)</h4>
+        <p>თითოეული კვანძი მიუთითებს მხოლოდ <strong>შემდეგ</strong> ელემენტზე. ყველაზე მარტივი და ამ ლექციის მთავარი ფოკუსი.</p>
+      </div>
+      <div class="term-card">
+        <h4>ორმხრივი (Doubly)</h4>
+        <p>თითოეული კვანძი მიუთითებს როგორც შემდეგზე, ისე <strong>წინა</strong> ელემენტზეც — შესაძლებელს ხდის უკუმიმართულებითაც გავლას, დამატებითი მეხსიერების ხარჯზე.</p>
+      </div>
+      <div class="term-card">
+        <h4>წრიული (Circular)</h4>
+        <p>ბოლო კვანძი <code>None</code>-ის ნაცვლად პირველ კვანძზე მიუთითებს — ქმნის მარყუჟს. გამოსადეგია „მორიგეობის" ამოცანებში (round-robin).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NODE ============ -->
+<section id="node">
+  <div class="wrap">
+    <span class="section-label">03 — სამშენებლო ბლოკი</span>
+    <h2 class="h-section">კვანძის სტრუქტურა</h2>
+    <p class="lede">ბმული სია იწყება ერთი მარტივი კლასით — <code>Node</code>. ყველაფერი დანარჩენი ამ ერთ იდეაზეა აგებული.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">node.py</span></div>
+      <pre><code class="language-python">class Node:
+    """ერთმხრივი ბმული სიის ერთი კვანძი."""
+    def __init__(self, data):
+        self.data = data   # ნებისმიერი სახის ინფორმაცია
+        self.next = None   # შემდეგი კვანძის მისამართი (თავდაპირველად — არცერთი)</code></pre>
+    </div>
+    <p>თავად „სია" ცალკე კლასის სახით არც კი არის აუცილებელი — საკმარისია ერთი ცვლადი, რომელიც <strong>head</strong> კვანძზე მიუთითებს. მთელი დანარჩენი სია ამ ერთი მისამართიდან „მიიღწევა" <code>next</code>-ების ჯაჭვის გავლით.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ TRAVERSE + SEARCH ============ -->
+<section id="traverse-search" class="section-full">
+  <div class="wrap">
+    <span class="section-label">04 — საბაზისო ოპერაციები</span>
+    <h2 class="h-section">გავლა, ძებნა, სიგრძე</h2>
+    <p class="lede">სამივე ოპერაცია ერთსა და იმავე პატერნს იმეორებს — დავიწყოთ <code>head</code>-იდან, ვიაროთ <code>next</code>-ებით <code>None</code>-მდე:</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">traverse.py</span></div>
+      <pre><code class="language-python">def traverse_linked_list(head: "Node") -> None:
+    current = head
+    while current is not None:
+        print(current.data, end=' ')   # ერთ ხაზზე, სივრცით გამოყოფილი
+        current = current.next
+    print()</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>შესწორება ორიგინალ მასალასთან შედარებით:</strong> საწყისი კოდი წერდა <code>print(current.data),</code> — მიბაძვით Python 2-ის სინტაქსზე, სადაც ბოლო მძიმე ბეჭდვისას ახალ ხაზზე გადასვლას თრგუნავდა. <strong>Python 3-ში ეს აღარ მუშაობს ასე</strong> — მძიმე უბრალოდ ქმნის ერთელემენტიან tuple-ს <code>print()</code>-ის შედეგისგან და არავითარ გავლენას არ ახდენს გამოტანაზე. შედეგად, კომენტარის დაპირების („სივრცით გამოყოფილი") საწინააღმდეგოდ, თითოეული მნიშვნელობა <strong>ცალკე ხაზზე</strong> დაიბეჭდებოდა. სწორი Python 3 იდიომაა <code>print(x, end=' ')</code>.</p>
+    </div>
+
+    <div class="code-pair">
+      <div>
+        <div class="code-pair-label">ძებნა</div>
+        <div class="code-window">
+          <pre><code class="language-python">def search_linked_list(head: "Node", target) -> bool:
+    current = head
+    while current is not None:
+        if current.data == target:
+            return True
+        current = current.next
+    return False</code></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-pair-label">სიგრძე</div>
+        <div class="code-window">
+          <pre><code class="language-python">def find_length(head: "Node") -> int:
+    length = 0
+    current = head
+    while current is not None:
+        length += 1
+        current = current.next
+    return length</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <p><strong>სამივე ოპერაცია:</strong> <code>O(n)</code> დროში, <code>O(1)</code> დამატებით მეხსიერებაში — მასივისგან განსხვავებით, აქ არ არსებობს <code>len()</code>-ის მსგავსი მუდმივი დროის შემოწმება, რადგან სიგრძე არსად ცენტრალურად არ ინახება.</p>
+  </div>
+</section>
+
+<!-- ============ VISUALIZER ============ -->
+<section id="viz">
+  <div class="wrap-wide">
+    <span class="section-label">05 — სცადეთ თავად</span>
+    <h2 class="h-section">ინტერაქტიული ბმული სია</h2>
+    <p class="lede">ააგეთ სია, ჩასვით და წაშალეთ კვანძები — ზუსტად იმ ოპერაციებით, რომლებსაც ქვემოთ კოდშიც ვხედავთ.</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <input type="number" id="llValue" placeholder="მნიშვნელობა" value="7" style="width:90px;">
+        <button class="btn" onclick="llInsertHead()">← ჩასმა თავში</button>
+        <button class="btn" onclick="llInsertTail()">ჩასმა ბოლოში →</button>
+        <label for="llPos">პოზიცია:</label>
+        <input type="number" id="llPos" value="2" min="1">
+        <button class="btn ghost" onclick="llInsertPos()">ჩასმა პოზიციაზე</button>
+      </div>
+      <div class="viz-controls">
+        <button class="btn danger" onclick="llDeleteHead()">წაშლა თავიდან</button>
+        <button class="btn danger" onclick="llDeleteTail()">წაშლა ბოლოდან</button>
+        <label for="llDelPos">პოზიცია:</label>
+        <input type="number" id="llDelPos" value="2" min="1">
+        <button class="btn danger" onclick="llDeletePos()">წაშლა პოზიციიდან</button>
+        <button class="btn ghost" onclick="llReset()">↺ თავიდან</button>
+      </div>
+      <div class="ll-track" id="llTrack"></div>
+      <div class="viz-status" id="llStatus"></div>
+    </div>
+    <p class="viz-note">გაითვალისწინეთ — ჩასმა/წაშლა თავში ყოველთვის ერთი ნაბიჯია, მიუხედავად სიის სიგრძისა (<code>O(1)</code>); ბოლოში ან შუაში კი მოითხოვს იქამდე „მისვლას" (<code>O(n)</code>).</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ INSERTION ============ -->
+<section id="insertion">
+  <div class="wrap">
+    <span class="section-label">06 — ჩასმის ოპერაციები</span>
+    <h2 class="h-section">ჩასმა — სამი ვარიანტი</h2>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">ჩასმა თავში — O(1)</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def insert_at_beginning(head: "Node", value) -> "Node":
+    new_node = Node(value)
+    new_node.next = head    # ახალი კვანძი მიუთითებს ძველ head-ზე
+    head = new_node         # head ახლა ახალ კვანძზე მიუთითებს
+    return head</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">ჩასმა ბოლოში — O(n)</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def insert_at_end(head: "Node", value) -> "Node":
+    new_node = Node(value)
+    if head is None:
+        return new_node
+    current = head
+    while current.next is not None:   # ბოლო კვანძამდე „მისვლა"
+        current = current.next
+    current.next = new_node
+    return head</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">ჩასმა კონკრეტულ პოზიციაზე — O(n)</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def insert_at_position(head: "Node", pos: int, data) -> "Node":
+    if pos < 1:
+        return head
+    if pos == 1:
+        new_node = Node(data)
+        new_node.next = head
+        return new_node
+
+    prev = head
+    count = 1
+    while count < pos - 1 and prev is not None:
+        prev = prev.next
+        count += 1
+    if prev is None:          # პოზიცია სიის სიგრძეს აღემატება
+        return head
+
+    new_node = Node(data)
+    new_node.next = prev.next
+    prev.next = new_node
+    return head</code></pre>
+    </div>
+    <p style="font-size:14.5px;"><strong>თანმიმდევრობას მნიშვნელობა აქვს:</strong> ჯერ <code>new_node.next = prev.next</code>, მერე <code>prev.next = new_node</code> — თუ ეს ორი ხაზი გადავანაცვლოთ, <code>prev.next</code>-ის ძველი მნიშვნელობა დაიკარგება, სანამ ახალ კვანძს მივაბამდეთ, და დარჩენილი სია „მოწყდება".</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ DELETION ============ -->
+<section id="deletion" class="section-full">
+  <div class="wrap">
+    <span class="section-label">07 — წაშლის ოპერაციები</span>
+    <h2 class="h-section">წაშლა — სამი ვარიანტი</h2>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">წაშლა თავიდან — O(1)</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def remove_first_node(head: "Node") -> "Node":
+    if not head:
+        return None
+    head = head.next   # head უბრალოდ "გადახტება" შემდეგ კვანძზე
+    return head</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">წაშლა ბოლოდან — O(n)</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def remove_last_node(head: "Node") -> "Node":
+    if head is None:
+        return None
+    if head.next is None:          # ერთადერთი ელემენტი
+        return None
+
+    second_last = head
+    while second_last.next.next is not None:
+        second_last = second_last.next
+    second_last.next = None        # "მოვწყვიტოთ" ბოლო კვანძი
+    return head</code></pre>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">⚠️</span>
+      <p><strong>ერთმხრივი სიის შეზღუდვა:</strong> ბოლოდან წაშლას სჭირდება <strong>ბოლოს წინა</strong> კვანძის პოვნა — მაგრამ <code>next</code> მხოლოდ წინ მიუთითებს, უკან დაბრუნების გზა არ არსებობს, ამიტომ თავიდანვე გვიწევს მთელი სიის გავლა. ორმხრივ სიაში (<code>prev</code> მაჩვენებლით) ეს ოპერაცია <code>O(1)</code>-ში შესრულდებოდა — ერთ-ერთი მთავარი მიზეზი, რატომაც არსებობს ორმხრივი ვარიანტი.</p>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">წაშლა კონკრეტული პოზიციიდან — O(n)</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def delete_at_position(head: "Node", position: int) -> "Node":
+    if head is None or position < 1:
+        return head
+    if position == 1:
+        return head.next
+
+    current = head
+    for _ in range(position - 2):
+        if current is not None:
+            current = current.next
+    if current is None or current.next is None:
+        return head             # პოზიცია დიაპაზონს გარეთაა
+
+    current.next = current.next.next   # "გვერდი ავუაროთ" წასაშლელ კვანძს
+    return head</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPARISON ============ -->
+<section id="compare">
+  <div class="wrap">
+    <span class="section-label">08 — არჩევანი</span>
+    <h2 class="h-section">მასივი vs ბმული სია</h2>
+
+    <table class="compare-table">
+      <tr><th>ოპერაცია</th><th>მასივი (Python <code>list</code>)</th><th>ბმული სია</th></tr>
+      <tr><td>წვდომა ინდექსით</td><td class="num">O(1)</td><td class="num">O(n)</td></tr>
+      <tr><td>ჩასმა/წაშლა თავში</td><td class="num">O(n)</td><td class="num">O(1)</td></tr>
+      <tr><td>ჩასმა/წაშლა ბოლოში</td><td class="num">O(1) ამორტიზებული</td><td class="num">O(n) (O(1) ორმხრივში, tail-მაჩვენებლით)</td></tr>
+      <tr><td>ძებნა მნიშვნელობით</td><td class="num">O(n)</td><td class="num">O(n)</td></tr>
+      <tr><td>მეხსიერების განლაგება</td><td>თანმიმდევრული — cache-მეგობრული</td><td>მიმოფანტული — დამატებითი მეხსიერება <code>next</code>-ისთვის</td></tr>
+      <tr><td>ზომის ცვლილება</td><td>საჭიროებს ხელახალ გამოყოფას დიდი ზრდისას</td><td>ბუნებრივად დინამიური</td></tr>
+    </table>
+
+    <div class="callout insight">
+      <span class="icon">🎯</span>
+      <p><strong>როდის აირჩიოთ ბმული სია:</strong> როცა ელემენტთა რაოდენობა ხშირად იცვლება და ჩასმა/წაშლა ხდება ცნობილ პოზიციაზე (განსაკუთრებით თავში) — მაშინ ბმული სია მასივს აჯობებს. თუ ძირითადად ინდექსით წვდომა გჭირდებათ, მასივი (ან Python-ის <code>list</code>) თითქმის ყოველთვის სჯობს.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">09 — რეალურ სამყაროში</span>
+    <h2 class="h-section">სად მუშაობს ბმული სია რეალურად</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🎵</div>
+        <h4>Playlist / ბრაუზერის ისტორია</h4>
+        <p>„შემდეგი სიმღერა" და „წინა გვერდი" ღილაკები კონცეპტუალურად ორმხრივი ბმული სიის <code>next</code>/<code>prev</code>-ის ნავიგაციაა.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🧠</div>
+        <h4>LRU Cache</h4>
+        <p>ერთ-ერთი ყველაზე ცნობილი გასაუბრების ამოცანა (LeetCode 146) აგებულია ორმხრივ ბმულ სიაზე + hash map-ზე — სია ინარჩუნებს გამოყენების რიგითობას, ხოლო hash map აძლევს O(1) წვდომას კონკრეტულ კვანძზე.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🖥️</div>
+        <h4>ოპერაციული სისტემები</h4>
+        <p>თავისუფალი მეხსიერების მონაკვეთების მართვა (free list) ხშირად ბმული სიით ხდება — მეხსიერების გამოყოფა/გათავისუფლება დინამიურია, ზუსტად ისე, როგორც ბმული სია იზრდება და იკლებს.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">⛓️</div>
+        <h4>Blockchain</h4>
+        <p>თითოეული ბლოკი შეიცავს წინა ბლოკის hash-ს — კონცეპტუალურად ეს არის ბმული სია (ან უფრო ზუსტად, ერთმხრივი, უკუმიმართებით), სადაც „მისამართის" ნაცვლად კრიპტოგრაფიული hash გამოიყენება.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises">
+  <div class="wrap-wide">
+    <span class="section-label">10 — პრაქტიკა</span>
+    <h2 class="h-section">სავარჯიშოები</h2>
+    <p class="lede">დღეს ნასწავლი ოპერაციები (გავლა, ძებნა) წარმოადგენს საფუძველს სამივე ქვემოთ მოცემული ამოცანისთვის — განსაკუთრებით <strong>„swift/slow" ორმაჩვენებლიანი</strong> ტექნიკა, რომელსაც მომდევნო ლექციაშიც შევხვდებით (ციკლის აღმოჩენისას).</p>
+
+    <details class="exercise">
+      <summary>Middle of the Linked List <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>იპოვეთ სიის შუა კვანძი ერთი გავლით — სიგრძის წინასწარი გამოთვლის გარეშე (LeetCode 876).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def middle_node(head: "Node") -> "Node":
+    slow = fast = head
+    while fast is not None and fast.next is not None:
+        slow = slow.next        # ერთი ნაბიჯით
+        fast = fast.next.next   # ორი ნაბიჯით
+    return slow</code></pre>
+        </div>
+        <p><strong>იდეა — „swift/slow" (კურდღელი და კუ):</strong> ორი მაჩვენებელი მოძრაობს სხვადასხვა სიჩქარით. როცა სწრაფი ბოლოს მიაღწევს, ნელი ზუსტად შუაშია — რადგან ნელმა გაიარა ზუსტად ნახევარი მანძილი, რაც სწრაფმა. სირთულე: <code>O(n)</code> დროში, <code>O(1)</code> სივრცეში — ერთი გავლა, ორი გავლის ნაცვლად (პირველი — სიგრძის დასათვლელად, მეორე — შუამდე მისასვლელად).</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Remove Nth Node From End of List <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>წაშალეთ ბოლოდან <code>n</code>-ური კვანძი, ერთი გავლით (LeetCode 19) — მაშინაც კი, თუ სიის სიგრძე წინასწარ უცნობია.</p>
+        <div class="code-window">
+          <pre><code class="language-python">def remove_nth_from_end(head: "Node", n: int) -> "Node":
+    dummy = Node(0)
+    dummy.next = head
+    fast = slow = dummy
+
+    for _ in range(n):       # fast-ს n ნაბიჯით ვასწრებთ
+        fast = fast.next
+
+    while fast.next is not None:
+        fast = fast.next
+        slow = slow.next
+
+    slow.next = slow.next.next   # slow ახლა წასაშლელის წინაა
+    return dummy.next</code></pre>
+        </div>
+        <p><strong>„დამხმარე" (dummy) კვანძის ტრიუკი:</strong> თუ წასაშლელი ზუსტად <code>head</code>-ია, სპეციალური შემთხვევის აღწერა (if-ით) აღარ გვჭირდება — <code>dummy</code> ყოველთვის იძლევა „კვანძს head-მდე", რაც კოდს ამარტივებს. ეს ძალიან გავრცელებული პატერნია ბმული სიის ამოცანებში.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Intersection of Two Linked Lists <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>ორი ბმული სია შეიძლება ერთხელაც კი „ერწყმოდეს" და საერთო კუდი ჰქონდეს. იპოვეთ ის კვანძი, საიდანაც იწყება ეს გაერთიანება — O(1) დამატებითი მეხსიერებით (LeetCode 160).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def get_intersection_node(headA: "Node", headB: "Node") -> "Node":
+    a, b = headA, headB
+    while a is not b:
+        a = a.next if a is not None else headB
+        b = b.next if b is not None else headA
+    return a   # ან None, თუ საერთო წერტილი არ არსებობს</code></pre>
+        </div>
+        <p><strong>ელეგანტური ხრიკი:</strong> როცა მაჩვენებელი მიაღწევს საკუთარი სიის ბოლოს, „გადახტება" მეორე სიის თავზე. თუ ორივე მაჩვენებელი ერთად გაივლის <code>len(A) + len(B)</code> კვანძს, ისინი აუცილებლად შეხვდებიან — ან გადაკვეთის წერტილში, ან ორივე <code>None</code>-ზე ერთდროულად (თუ გადაკვეთა არ არსებობს). ეს გვერდს უვლის სიგრძეების წინასწარ გამოთვლას და დამატებით <code>set</code>-საც კი არ საჭიროებს.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 7: ბმული სია</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* HERO DECORATIVE CHAIN */
+(function(){
+  const svg = document.getElementById('heroChain');
+  const n = 5, boxW = 90, boxH = 46, gap = 40, startX = 15, y = 57;
+  let content = '';
+  for(let i=0;i<n;i++){
+    const x = startX + i*(boxW+gap);
+    content += `<rect x="${x}" y="${y}" width="${boxW}" height="${boxH}" rx="7" fill="none" stroke="${i%2===0?'#D9A64E':'#5AC2B6'}" stroke-width="1.6"/>`;
+    content += `<line x1="${x+boxW*0.62}" y1="${y}" x2="${x+boxW*0.62}" y2="${y+boxH}" stroke="#3a4256" stroke-width="1.2"/>`;
+    if(i < n-1){
+      content += `<line x1="${x+boxW}" y1="${y+boxH/2}" x2="${x+boxW+gap-6}" y2="${y+boxH/2}" stroke="#7C849A" stroke-width="1.6" marker-end="url(#arrow)"/>`;
+    } else {
+      content += `<text x="${x+boxW+14}" y="${y+boxH/2+4}" font-family="JetBrains Mono" font-size="13" fill="#7C849A">NULL</text>`;
+    }
+  }
+  svg.setAttribute('viewBox', `0 0 ${startX*2 + n*(boxW+gap)} 160`);
+  svg.innerHTML = `<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7C849A"/></marker></defs>` + content;
+})();
+
+/* ============ INTERACTIVE LINKED LIST VISUALIZER ============ */
+let llData = [7, 3, 9];   // simple array backing the visual "linked list"
+let llHighlight = -1;
+
+function llRender(statusText){
+  const track = document.getElementById('llTrack');
+  if(llData.length === 0){
+    track.innerHTML = '<span class="ll-null">head → NULL (სია ცარიელია)</span>';
+  } else {
+    let html = '<span class="ll-head-label">head</span>';
+    llData.forEach((val, idx) => {
+      html += `<div class="ll-node">
+        <div class="ll-node-box${idx===llHighlight ? ' highlight' : ''}">
+          <div class="ll-node-data">${val}</div>
+          <div class="ll-node-next">•</div>
+        </div>
+        ${idx < llData.length-1 ? '<span class="ll-arrow">→</span>' : '<span class="ll-null">→ NULL</span>'}
+      </div>`;
+    });
+    track.innerHTML = html;
+  }
+  if(statusText) document.getElementById('llStatus').innerHTML = statusText;
+}
+
+function llInsertHead(){
+  const v = document.getElementById('llValue').value;
+  if(v === '') return;
+  llData.unshift(parseInt(v,10));
+  llHighlight = 0;
+  llRender(`insert_at_beginning(head, ${v}) — O(1), ახალი head`);
+}
+
+function llInsertTail(){
+  const v = document.getElementById('llValue').value;
+  if(v === '') return;
+  llData.push(parseInt(v,10));
+  llHighlight = llData.length-1;
+  llRender(`insert_at_end(head, ${v}) — O(n), საჭირო იყო ბოლომდე „მისვლა"`);
+}
+
+function llInsertPos(){
+  const v = document.getElementById('llValue').value;
+  const pos = parseInt(document.getElementById('llPos').value, 10);
+  if(v === '' || isNaN(pos) || pos < 1 || pos > llData.length+1){
+    llRender('არასწორი პოზიცია.');
+    return;
+  }
+  llData.splice(pos-1, 0, parseInt(v,10));
+  llHighlight = pos-1;
+  llRender(`insert_at_position(head, ${pos}, ${v}) — O(n), ${pos-1} ნაბიჯი გავიარეთ`);
+}
+
+function llDeleteHead(){
+  if(llData.length === 0){ llRender('სია უკვე ცარიელია.'); return; }
+  const removed = llData.shift();
+  llHighlight = -1;
+  llRender(`remove_first_node(head) — წაიშალა ${removed}, O(1)`);
+}
+
+function llDeleteTail(){
+  if(llData.length === 0){ llRender('სია უკვე ცარიელია.'); return; }
+  const removed = llData.pop();
+  llHighlight = -1;
+  llRender(`remove_last_node(head) — წაიშალა ${removed}, O(n) — საჭირო იყო ბოლოს-წინა კვანძის პოვნა`);
+}
+
+function llDeletePos(){
+  const pos = parseInt(document.getElementById('llDelPos').value, 10);
+  if(isNaN(pos) || pos < 1 || pos > llData.length){
+    llRender('არასწორი პოზიცია.');
+    return;
+  }
+  const removed = llData.splice(pos-1, 1)[0];
+  llHighlight = -1;
+  llRender(`delete_at_position(head, ${pos}) — წაიშალა ${removed}, O(n)`);
+}
+
+function llReset(){
+  llData = [7, 3, 9];
+  llHighlight = -1;
+  llRender('სია საწყის მდგომარეობას დაუბრუნდა.');
+}
+
+llRender('სცადეთ ღილაკები ზემოთ — ააგეთ და შეცვალეთ სია.');
+</script>
+</body>
+</html>

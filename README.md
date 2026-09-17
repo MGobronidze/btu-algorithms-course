@@ -26,10 +26,21 @@ btu-algorithms-course/
     │   └── index.html                  # ლექცია 1: რეკურსია
     ├── lecture-02-complexity/
     │   └── index.html                  # ლექცია 2: ალგორითმის სირთულის ანალიზი
-    └── lecture-03-binary-search/
-        └── index.html                  # ლექცია 3: ორობითი ძებნა და Power Set
+    ├── lecture-03-binary-search/
+    │   └── index.html                  # ლექცია 3: ორობითი ძებნა და Power Set
+    ├── lecture-04-sorting/
+    │   └── index.html                  # ლექცია 4: Insertion Sort და Merge Sort
+    ├── lecture-05-quick-sort/
+    │   └── index.html                  # ლექცია 5: Quick Sort
+    ├── lecture-06-search-sort-applications/
+    │   └── index.html                  # ლექცია 6: ამოცანები ძებნისა და დალაგების გამოყენებით
+    ├── lecture-07-linked-list/
+    │   └── index.html                  # ლექცია 7: ბმული სია
+    └── lecture-09-linked-list-problems/
+        └── index.html                  # ლექცია 9: ამოცანები ბმულ სიებზე
+    # ლექცია 8 — შუალედური გამოცდა (გვერდი არ არის საჭირო)
     # შემდეგი ლექციები დაემატება ამავე პატერნით:
-    # lecture-04-insertion-merge-sort/index.html
+    # lecture-10-binary-tree/index.html
     # ...
 ```
 
