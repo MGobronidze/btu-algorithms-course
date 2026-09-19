@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 10 — ორობითი ხე და შემოვლის ალგორითმები | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A; --line:#232838;
+  --gold:#D9A64E; --gold-dim:#8C7239; --teal:#5AC2B6; --teal-dim:#2F5F5A;
+  --green:#7CB88F; --amber:#D9A64E; --rose:#C97B84; --code-bg:#0d1117;
+  --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-tree{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(420px,100%); opacity:0.3; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(32px,6.5vw,58px); line-height:1.1; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.compare-table{width:100%; border-collapse:collapse; margin:24px 0;}
+.compare-table th{font-family:var(--serif); font-size:15.5px; text-align:left; padding:12px 14px; border-bottom:1px solid var(--line); color:var(--ink);}
+.compare-table td{padding:12px 14px; border-bottom:1px solid var(--line); font-size:14px; color:var(--ink-dim); vertical-align:top;}
+.compare-table tr:last-child td{border-bottom:none;}
+
+.term-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:28px 0;}
+@media (max-width:680px){.term-grid{grid-template-columns:1fr;}}
+.term-card{background:var(--bg-panel); border-radius:var(--radius); padding:20px;}
+.term-card h4{font-family:var(--mono); font-size:14.5px; margin-bottom:8px; color:var(--gold);}
+.term-card p{font-size:14px; margin:0; color:var(--ink-dim);}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:20px;}
+.viz-controls label{font-size:13.5px; color:var(--muted);}
+.viz-controls select{background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:8px 12px; font-family:var(--mono); font-size:13.5px;}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 20px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+.tree-svg-wrap{background:var(--bg); border-radius:var(--radius); padding:10px;}
+.tree-svg-wrap svg .edge{stroke:var(--line); stroke-width:1.6;}
+.tree-svg-wrap svg .node-circle{fill:var(--bg-panel-2); stroke:var(--line); stroke-width:1.6; transition:all .3s ease;}
+.tree-svg-wrap svg .node-circle.exploring{stroke:var(--teal); stroke-dasharray:4 3;}
+.tree-svg-wrap svg .node-circle.visited{fill:rgba(217,166,78,0.22); stroke:var(--gold);}
+.tree-svg-wrap svg text{font-family:var(--mono); font-size:15px; fill:var(--ink); text-anchor:middle;}
+
+.output-seq{display:flex; gap:8px; flex-wrap:wrap; margin-top:18px; min-height:36px; justify-content:center;}
+.output-chip{
+  font-family:var(--mono); font-size:14px; padding:6px 12px; border-radius:8px;
+  background:rgba(217,166,78,0.15); border:1px solid var(--gold-dim); color:var(--gold);
+  opacity:0; transform:translateY(6px); animation:chipIn .3s ease forwards;
+}
+@keyframes chipIn{to{opacity:1; transform:translateY(0);}}
+.viz-status{font-family:var(--mono); font-size:13.5px; color:var(--ink-dim); margin-top:16px; text-align:center; min-height:22px;}
+.viz-status strong{color:var(--gold);}
+.viz-note{font-size:13.5px; color:var(--muted); margin-top:14px;}
+
+.ascii-tree{
+  font-family:var(--mono); font-size:13px; color:var(--ink-dim); background:var(--code-bg);
+  border-radius:var(--radius); border:1px solid var(--line); padding:20px; overflow-x:auto;
+  white-space:pre; line-height:1.5;
+}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · ორობითი ხე — ლექცია 10</a>
+    <div class="nav-links">
+      <a href="#what-is">რა არის</a>
+      <a href="#terms">ტერმინოლოგია</a>
+      <a href="#node">კვანძის სტრუქტურა</a>
+      <a href="#inorder">Inorder</a>
+      <a href="#preorder">Preorder</a>
+      <a href="#postorder">Postorder</a>
+      <a href="#viz">ვიზუალიზატორი</a>
+      <a href="#compare">შედარება</a>
+      <a href="#practice">სავარჯიშო</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">დამატებითი ამოცანები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-tree" id="heroTree" viewBox="0 0 400 240"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 10</span>
+  <h1>ორობითი ხე და შემოვლა</h1>
+  <p class="hero-sub">პირველი არაწრფივი მონაცემთა სტრუქტურა კურსში — და სამი განსხვავებული გზა, რომლითაც შეგვიძლია მისი „წაკითხვა".</p>
+  <div class="hero-terms">
+    <span>root</span><span>left / right</span><span>Inorder</span><span>Preorder</span><span>Postorder</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ WHAT IS ============ -->
+<section id="what-is">
+  <div class="wrap">
+    <span class="section-label">01 — ახალი კატეგორია</span>
+    <h2 class="h-section">რა არის ორობითი ხე</h2>
+    <p class="lede">ბმული სია (ლექცია 7-9) <strong>წრფივი</strong> სტრუქტურაა — ყოველ კვანძს ერთი „შემდეგი" ჰყავს. ორობითი ხე ამის საპირისპიროა: <strong>იერარქიული, არაწრფივი</strong> სტრუქტურა, სადაც თითოეულ კვანძს შეიძლება ჰყავდეს <strong>მაქსიმუმ ორი</strong> „შვილი" — მარცხენა და მარჯვენა.</p>
+
+    <p>ხის ყველაზე ზედა კვანძს — <strong>root</strong> (ფესვი) — ეწოდება, და მისგან იწყება ყველა გზა ხის დანარჩენ ნაწილამდე. კვანძები, რომლებსაც შვილი არ ჰყავთ, <strong>ფოთლებია</strong> (leaves).</p>
+
+    <div class="callout insight">
+      <span class="icon">💡</span>
+      <p><strong>რატომ „არაწრფივი":</strong> ბმულ სიაში ერთადერთი გზაა წინ სვლა. ხეში კი, ყოველ კვანძზე, გზა <strong>იშლება</strong> — შეგვიძლია წავიდეთ მარცხნივ ან მარჯვნივ. ეს განშტოება ხდის შესაძლებელს იმას, რასაც ხეები ისე კარგად აკეთებენ — იერარქიების, გადაწყვეტილებების და დალაგებული მონაცემების ბუნებრივად წარმოდგენას.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ TERMS ============ -->
+<section id="terms" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — ლექსიკონი</span>
+    <h2 class="h-section">ძირითადი ტერმინოლოგია</h2>
+
+    <div class="term-grid">
+      <div class="term-card">
+        <h4>root (ფესვი)</h4>
+        <p>ხის ყველაზე ზედა კვანძი. მშობელი არ ჰყავს — ის არის ამოსავალი წერტილი ყველა შემოვლისთვის.</p>
+      </div>
+      <div class="term-card">
+        <h4>parent / child</h4>
+        <p>კვანძი, რომელსაც აქვს ერთი ან ორი შვილობილი კვანძი — <strong>მშობელია</strong>; შვილობილი კვანძები მისი <strong>შვილები</strong> არიან.</p>
+      </div>
+      <div class="term-card">
+        <h4>leaf (ფოთოლი)</h4>
+        <p>კვანძი, რომელსაც არცერთი შვილი არ ჰყავს — ორივე <code>left</code> და <code>right</code> არის <code>None</code>.</p>
+      </div>
+      <div class="term-card">
+        <h4>internal node (შიდა კვანძი)</h4>
+        <p>კვანძი მინიმუმ ერთი შვილით — ეს არის ყველა კვანძი, გარდა root-ისა და ფოთლებისა.</p>
+      </div>
+      <div class="term-card">
+        <h4>depth (სიღრმე)</h4>
+        <p>წიბოების რაოდენობა კონკრეტული კვანძიდან root-მდე. Root-ის სიღრმე — 0.</p>
+      </div>
+      <div class="term-card">
+        <h4>height (სიმაღლე)</h4>
+        <p>კვანძების რაოდენობა ყველაზე ღრმა ფოთლიდან root-მდე — გვხვდება Big-O ანალიზში ხშირად, როგორც <code>h</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NODE STRUCTURE ============ -->
+<section id="node">
+  <div class="wrap">
+    <span class="section-label">03 — სამშენებლო ბლოკი</span>
+    <h2 class="h-section">კვანძის სტრუქტურა</h2>
+    <p class="lede">ბმული სიის <code>Node</code>-ს (ერთი <code>next</code>-ით) ემატება მეორე მაჩვენებელი — <code>left</code> და <code>right</code> ერთი <code>next</code>-ის ნაცვლად:</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">binary_tree.py</span></div>
+      <pre><code class="language-python">class Node:
+    def __init__(self, d):
+        self.data = d
+        self.left = None
+        self.right = None
+
+# ხელით ავაგოთ პატარა ხე:
+#         1
+#       /   \
+#      2     3
+#       \
+#        4
+first_node = Node(2)
+second_node = Node(3)
+third_node = Node(4)
+root = Node(1)
+
+root.left = first_node
+root.right = second_node
+first_node.right = third_node</code></pre>
+    </div>
+    <p>ორობითი ხის აგება, ისევე როგორც ბმული სიის, ხდება მხოლოდ მაჩვენებლების დაკავშირებით — არა რაიმე ცალკე „კონტეინერის" კლასით.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ TRAVERSAL INTRO ============ -->
+<section id="traversal-intro" class="section-full">
+  <div class="wrap">
+    <span class="section-label">04 — სამი გზა</span>
+    <h2 class="h-section">ორობითი ხის შემოვლის ალგორითმები</h2>
+    <p class="lede">„შემოვლა" (traversal) — ხის ყველა კვანძის სისტემატური მონახულების პროცესია. სამივე ძირითადი ვარიანტი ეყრდნობა ერთსა და იმავე რეკურსიულ ჩონჩხს — განსხვავება მხოლოდ იმაშია, <strong>როდის</strong> ვკითხულობთ მიმდინარე კვანძის მონაცემს, მარცხენა და მარჯვენა ქვეხეების შემოვლასთან შედარებით.</p>
+
+    <p>მაგალითისთვის გამოვიყენებთ ერთსა და იმავე პატარა ხეს მთელი ამ სექციის განმავლობაში:</p>
+    <div class="ascii-tree">        1
+       / \
+      2   3
+     / \   \
+    4   5   6</div>
+  </div>
+</section>
+
+<!-- ============ INORDER ============ -->
+<section id="inorder">
+  <div class="wrap">
+    <span class="section-label">05 — Inorder</span>
+    <h2 class="h-section">Inorder Traversal</h2>
+    <p class="lede"><strong>თანმიმდევრობა: მარცხენა → root → მარჯვენა</strong></p>
+
+    <div class="code-window">
+      <pre><code class="language-python">def print_inorder(node: "Node") -> None:
+    if node is None:
+        return
+    print_inorder(node.left)          # 1. მარცხენა ქვეხე
+    print(node.data, end=' ')         # 2. root
+    print_inorder(node.right)         # 3. მარჯვენა ქვეხე</code></pre>
+    </div>
+
+    <p style="font-size:14.5px;"><strong>ჩვენს მაგალითზე:</strong> შემოვლა იწყება 1-დან, ეშვება 2-ში, შემდეგ 4-ში — 4-ს არც მარცხენა და არც მარჯვენა ქვეხე არ აქვს, ამიტომ ვკითხულობთ მას პირველად. ვბრუნდებით 2-ში (მარცხენა ქვეხე დასრულებულია) — ვკითხულობთ 2-ს, შემდეგ ვშედივართ მის მარჯვენა ქვეხეში (5), ვკითხულობთ 5-ს. ვბრუნდებით 1-ში, ვკითხულობთ მას, შემდეგ ვშედივართ მარჯვენა ქვეხეში (3 → 6).</p>
+
+    <table class="bigo-table">
+      <tr><th>დროითი სირთულე</th><th>მეხსიერებითი სირთულე</th></tr>
+      <tr><td class="num">O(n)</td><td class="num">O(h) — რეკურსიული call stack</td></tr>
+    </table>
+
+    <div class="callout insight">
+      <span class="icon">🎯</span>
+      <p><strong>ყველაზე მნიშვნელოვანი გამოყენება:</strong> ორობითი ძებნის ხეზე (Binary Search Tree — ლექცია 13-ში), Inorder Traversal ყოველთვის აბრუნებს მონაცემებს <strong>ზრდადობით დალაგებული</strong> თანმიმდევრობით — ეს არაა დამთხვევა, არამედ BST-ის განმსაზღვრელი თვისება.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ PREORDER ============ -->
+<section id="preorder" class="section-full">
+  <div class="wrap">
+    <span class="section-label">06 — Preorder</span>
+    <h2 class="h-section">Preorder Traversal</h2>
+    <p class="lede"><strong>თანმიმდევრობა: root → მარცხენა → მარჯვენა</strong></p>
+
+    <div class="code-window">
+      <pre><code class="language-python">def print_preorder(node: "Node") -> None:
+    if node is None:
+        return
+    print(node.data, end=' ')         # 1. root
+    print_preorder(node.left)         # 2. მარცხენა ქვეხე
+    print_preorder(node.right)        # 3. მარჯვენა ქვეხე</code></pre>
+    </div>
+
+    <p style="font-size:14.5px;"><strong>ჩვენს მაგალითზე:</strong> ვკითხულობთ 1-ს დაუყოვნებლივ, შემდეგ ვშედივართ მარცხენა ქვეხეში — ვკითხულობთ 2-ს, ვშედივართ მის მარცხენაში — ვკითხულობთ 4-ს. ვბრუნდებით და ვკითხულობთ 5-ს. ვბრუნდებით root-ში, ვშედივართ მარჯვენა ქვეხეში — ვკითხულობთ 3-ს, შემდეგ 6-ს. შედეგი: <code>1, 2, 4, 5, 3, 6</code>.</p>
+
+    <table class="bigo-table">
+      <tr><th>დროითი სირთულე</th><th>მეხსიერებითი სირთულე</th></tr>
+      <tr><td class="num">O(n)</td><td class="num">O(1) დამატებითი — ან O(h), თუ call stack-საც ჩავთვლით</td></tr>
+    </table>
+
+    <div class="callout insight">
+      <span class="icon">🏗️</span>
+      <p><strong>გამოყენება:</strong> Preorder საუკეთესოა ხის <strong>ხელახლა აგებისთვის</strong> ან <strong>კლონირებისთვის</strong> — რადგან root ყოველთვის პირველია, თანმიმდევრობის წაკითხვისას პირველ ელემენტს ახალი ქვეხის root-ად ავიღებთ ცალსახად.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ POSTORDER ============ -->
+<section id="postorder">
+  <div class="wrap">
+    <span class="section-label">07 — Postorder</span>
+    <h2 class="h-section">Postorder Traversal</h2>
+    <p class="lede"><strong>თანმიმდევრობა: მარცხენა → მარჯვენა → root</strong></p>
+
+    <div class="code-window">
+      <pre><code class="language-python">def print_postorder(node: "Node") -> None:
+    if node is None:
+        return
+    print_postorder(node.left)        # 1. მარცხენა ქვეხე
+    print_postorder(node.right)       # 2. მარჯვენა ქვეხე
+    print(node.data, end=' ')         # 3. root</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>შესწორება ორიგინალ მასალასთან შედარებით:</strong> საწყისი კოდი წერდა <code>if node == None:</code> — მაშინ როცა იმავე ლექციის Inorder და Preorder ფუნქციები სწორად იყენებდნენ <code>is None</code>-ს. <code>== None</code> ხშირად „მუშაობს", რადგან უმეტეს კლასებს საკუთარი <code>__eq__</code> არ აქვთ განსაზღვრული — მაგრამ PEP 8 (Python-ის ოფიციალური სტილის სახელმძღვანელო) ცალსახად მოითხოვს <code>is None</code>-ს <code>None</code>-თან შედარებისას: ის ყოველთვის სწორია, მიუხედავად იმისა, აქვს თუ არა კლასს მორგებული <code>__eq__</code> (მაგ. NumPy მასივებს, სადაც <code>== None</code> მთლიანად სხვა რამეს აკეთებს). სამივე ფუნქცია ახლა თანმიმდევრულია.</p>
+    </div>
+
+    <p style="font-size:14.5px;"><strong>ჩვენს მაგალითზე:</strong> ჯერ სრულად ვშემოივლით მარცხენა ქვეხეს (4, შემდეგ 5, შემდეგ 2), მერე მარჯვენას (6, შემდეგ 3), და ბოლოს — root-ს (1). შედეგი: <code>4, 5, 2, 6, 3, 1</code>.</p>
+
+    <table class="bigo-table">
+      <tr><th>დროითი სირთულე</th><th>მეხსიერებითი სირთულე</th></tr>
+      <tr><td class="num">O(n)</td><td class="num">O(1) დამატებითი — ან O(h) call stack-ით</td></tr>
+    </table>
+
+    <div class="callout insight">
+      <span class="icon">🗑️</span>
+      <p><strong>გამოყენება:</strong> Postorder საუკეთესოა კვანძების <strong>წაშლისთვის</strong> — ლოგიკურია, რომ ჯერ ვშლით შვილებს, მერე მშობელს, არა პირიქით (წინააღმდეგ შემთხვევაში დაკარგავდით მითითებას შვილებზე).</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ VISUALIZER ============ -->
+<section id="viz" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">08 — სცადეთ თავად</span>
+    <h2 class="h-section">შემოვლის ინტერაქტიული ვიზუალიზაცია</h2>
+    <p class="lede">აირჩიეთ შემოვლის ტიპი და თვალი ადევნეთ, როგორ მოძრაობს რეკურსია ხეზე — ლურჯი, წყვეტილი ჩარჩო ნიშნავს „ვსტუმრობთ ამ კვანძს" (რეკურსიაში შესვლა), ხოლო ოქროსფერი შევსება — „ვკითხულობთ მონაცემს" (გამოტანა შედეგში).</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="treeTraversalType">შემოვლის ტიპი:</label>
+        <select id="treeTraversalType" onchange="treeVizInit()">
+          <option value="inorder">Inorder</option>
+          <option value="preorder">Preorder</option>
+          <option value="postorder">Postorder</option>
+        </select>
+        <button class="btn" onclick="treeVizInit()">↺ დაწყება</button>
+        <button class="btn ghost" onclick="treeVizStep()">შემდეგი ნაბიჯი →</button>
+      </div>
+      <div class="tree-svg-wrap"><svg id="treeVizSvg" viewBox="0 0 480 220" style="width:100%; max-width:480px; display:block; margin:0 auto;"></svg></div>
+      <div class="output-seq" id="treeVizOutput"></div>
+      <div class="viz-status" id="treeVizStatus"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPARE ============ -->
+<section id="compare">
+  <div class="wrap">
+    <span class="section-label">09 — შედარება</span>
+    <h2 class="h-section">სამივე ალგორითმი — გვერდიგვერდ</h2>
+
+    <table class="compare-table">
+      <tr><th>მახასიათებელი</th><th>Inorder</th><th>Preorder</th><th>Postorder</th></tr>
+      <tr><td>Root-ის მონახულების დრო</td><td>ქვეხეებს შორის</td><td>ქვეხეების მონახულებამდე</td><td>ქვეხეების მონახულების შემდეგ</td></tr>
+      <tr><td>ტიპური გამოყენება</td><td>BST-დან დალაგებული თანმიმდევრობა</td><td>ხის აგება/კლონირება</td><td>კვანძების წაშლა</td></tr>
+      <tr><td>დროითი სირთულე</td><td>O(n)</td><td>O(n)</td><td>O(n)</td></tr>
+      <tr><td>მეხსიერება (call stack)</td><td>O(h)</td><td>O(h)</td><td>O(h)</td></tr>
+    </table>
+
+    <div class="callout insight">
+      <span class="icon">💭</span>
+      <p><strong>ერთი წესი სამივესთვის:</strong> სამივე ალგორითმი სინამდვილეში ერთი და იგივე რეკურსიული სტრუქტურაა — მხოლოდ <code>print(node.data)</code>-ის ადგილი იცვლება. ეს კარგი მაგალითია იმისა, თუ რამდენად მოქნილია რეკურსია: ერთი ჩონჩხიდან, ერთი ხაზის გადანაცვლებით, სამი განსხვავებული, სასარგებლო ქცევა მივიღეთ.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ PRACTICE ============ -->
+<section id="practice" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">10 — გამოწვევა</span>
+    <h2 class="h-section">სავარჯიშო — უფრო დიდი ხე</h2>
+    <p class="lede">განიხილეთ 15-კვანძიანი სრული ორობითი ხე. გამოთვალეთ სამივე შემოვლის შედეგი — მერე გახსენით პასუხი შესამოწმებლად.</p>
+
+    <div class="ascii-tree">               1
+           /       \
+          2          3
+        /   \      /   \
+       4     5    6     7
+      / \   / \  / \   / \
+     8   9 10 11 12 13 14 15</div>
+
+    <details class="exercise">
+      <summary>პასუხი — სამივე შემოვლის შედეგი</summary>
+      <div class="ex-body">
+        <p><strong>Preorder:</strong> <code>1, 2, 4, 8, 9, 5, 10, 11, 3, 6, 12, 13, 7, 14, 15</code></p>
+        <p><strong>Inorder:</strong> <code>8, 4, 9, 2, 10, 5, 11, 1, 12, 6, 13, 3, 14, 7, 15</code></p>
+        <p><strong>Postorder:</strong> <code>8, 9, 4, 10, 11, 5, 2, 12, 13, 6, 14, 15, 7, 3, 1</code></p>
+        <p style="margin-top:12px;">შეამჩნევთ, რომ Inorder-ის შედეგი ამ სრულ ხეზეც ზრდადობითაა დალაგებული (1-დან 15-მდე) — რადგან თითოეული კვანძის ინდექსი ისეა შერჩეული, რომ ხე ერთდროულად BST-ის თვისებასაც აკმაყოფილებდეს.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry">
+  <div class="wrap-wide">
+    <span class="section-label">11 — რეალურ სამყაროში</span>
+    <h2 class="h-section">სად მუშაობს ხის შემოვლა რეალურად</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🌐</div>
+        <h4>DOM და HTML</h4>
+        <p>ბრაუზერის Document Object Model იერარქიული ხეა — JavaScript-ის <code>querySelectorAll</code> და მსგავსი ფუნქციები შიგნით ხის შემოვლას იყენებენ (ლექცია 1-ის industry insight-ის პირდაპირი გაგრძელება).</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">📐</div>
+        <h4>გამონათქვამების ხეები (Expression Trees)</h4>
+        <p>კომპილატორები მათემატიკურ გამონათქვამებს (<code>(a+b)*c</code>) ხის სახით წარმოადგენენ — Postorder შემოვლა პირდაპირ იძლევა გამოთვლის სწორ თანმიმდევრობას.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🗂️</div>
+        <h4>ფაილური სისტემები</h4>
+        <p>საქაღალდეების იერარქია ხეა — ფაილების სრული ჩამონათვალი (მაგ. <code>find</code> ბრძანება) კონცეპტუალურად Preorder შემოვლაა.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🔧</div>
+        <h4>Syntax Trees კომპილატორებში</h4>
+        <p>პროგრამის კოდი კომპილაციისას გარდაიქმნება Abstract Syntax Tree-ად (AST) — კოდის ანალიზი, ოპტიმიზაცია და გენერაცია ყველა ეყრდნობა ხის სხვადასხვა ტიპის შემოვლას.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">12 — დამატებითი ამოცანები</span>
+    <h2 class="h-section">გაფართოებული პრაქტიკა</h2>
+    <p class="lede">დღეს ნასწავლი შემოვლის ტექნიკების ბუნებრივი გაგრძელება — <em>„ხის ამოცანებს" კურსში მომდევნო ლექციაზე უფრო ღრმად შევეხებით</em>, აქ კი ვამყარებთ თავად შემოვლის კონცეფციას.</p>
+
+    <details class="exercise">
+      <summary>Binary Tree Level Order Traversal <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>დღეს ნასწავლი სამივე ალგორითმი — Inorder, Preorder, Postorder — <strong>სიღრმეზე დაფუძნებულია</strong> (depth-first): ჯერ ღრმად ჩავდივართ, მერე ვბრუნდებით. არსებობს მეოთხე, სრულიად განსხვავებული მიდგომაც — <strong>სიგანეზე დაფუძნებული</strong> (breadth-first): ჯერ ყველა კვანძი ერთ დონეზე, მერე შემდეგ დონეზე. დააბრუნეთ ხის კვანძების მნიშვნელობები დონეების მიხედვით (LeetCode 102).</p>
+        <div class="code-window">
+          <pre><code class="language-python">from collections import deque
+
+def level_order(root: "Node") -> list:
+    if root is None:
+        return []
+    result = []
+    queue = deque([root])
+    while queue:
+        level = []
+        for _ in range(len(queue)):
+            node = queue.popleft()
+            level.append(node.data)
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+        result.append(level)
+    return result</code></pre>
+        </div>
+        <p><strong>საკვანძო განსხვავება:</strong> Inorder/Preorder/Postorder რეკურსიას (და შიგნით — call stack-ს, ანუ <em>stack</em>-ის ლოგიკას) იყენებენ. Level Order კი <strong>queue</strong>-ს (რიგს) იყენებს — პირველი შემოსული კვანძი, პირველივე მუშავდება. სირთულე: <code>O(n)</code> დროში, <code>O(n)</code> სივრცეში (უარეს შემთხვევაში ბოლო დონეს შეუძლია შეიცავდეს <code>n/2</code>-მდე კვანძი).</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Validate Binary Search Tree <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>დაადგინეთ, აკმაყოფილებს თუ არა მოცემული ორობითი ხე BST-ის თვისებას — თითოეული კვანძისთვის, მისი მარცხენა ქვეხის ყველა მნიშვნელობა მასზე ნაკლები უნდა იყოს, მარჯვენას კი — მეტი (LeetCode 98).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def is_valid_bst(root: "Node") -> bool:
+    def validate(node, low, high) -> bool:
+        if node is None:
+            return True
+        if not (low < node.data < high):
+            return False
+        return (validate(node.left, low, node.data) and
+                validate(node.right, node.data, high))
+    return validate(root, float('-inf'), float('inf'))</code></pre>
+        </div>
+        <p><strong>ხშირი შეცდომა, რომლისგანაც ეს ამონახსნი იცავს:</strong> არასაკმარისია მხოლოდ პირდაპირი შვილების შემოწმება (<code>node.left.data &lt; node.data</code>) — BST-ის პირობა ვრცელდება <strong>მთელ</strong> ქვეხეზე, არა მხოლოდ უშუალო შვილებზე. ამიტომ თითოეულ რეკურსიულ გამოძახებაში „ვავიწროებთ" დასაშვებ დიაპაზონს (<code>low</code>, <code>high</code>) — ეს პირდაპირ უკავშირდება დღეს ნასწავლ Inorder-ის თვისებას (BST-ის Inorder = დალაგებული თანმიმდევრობა).</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Construct Binary Tree from Preorder and Inorder Traversal <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>მოცემულია ერთი და იმავე ხის Preorder და Inorder შემოვლის შედეგები — აღადგინეთ თავად ხე (LeetCode 105).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def build_tree(preorder: list, inorder: list) -> "Node":
+    if not preorder or not inorder:
+        return None
+
+    root_val = preorder[0]          # Preorder-ის პირველი ელემენტი — ყოველთვის root
+    root = Node(root_val)
+
+    mid = inorder.index(root_val)   # root-ის პოზიცია Inorder-ში ყოფს ხეს ორად
+
+    root.left = build_tree(preorder[1:mid + 1], inorder[:mid])
+    root.right = build_tree(preorder[mid + 1:], inorder[mid + 1:])
+    return root</code></pre>
+        </div>
+        <p><strong>რატომ საკმარისია ეს ორი შემოვლა (და არა, მაგალითად, Preorder მარტო):</strong> Preorder-ის პირველი ელემენტი ყოველთვის root-ია — მაგრამ მარტო ამით ვერ ვიტყვით, სად მთავრდება მარცხენა ქვეხე და სად იწყება მარჯვენა. Inorder კი, სადაც root ყოველთვის ქვეხეებს <em>შორის</em> დგას (დღეს ნასწავლი პირველი ფაქტი!), ზუსტად ამ ინფორმაციას გვაძლევს — ყველაფერი root-მდე მარცხენა ქვეხეა, ყველაფერი მის შემდეგ — მარჯვენა. ეს ამოცანა პირდაპირ გამოხატავს, რატომ აქვს თითოეულ შემოვლის ტიპს საკუთარი, უნიკალური „ხელწერა".</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 10: ორობითი ხე და შემოვლის ალგორითმები</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* ============ SHARED TREE DEFINITION ============ */
+const treeData = {
+  1: {left:2, right:3, x:240, y:36},
+  2: {left:4, right:5, x:140, y:116},
+  3: {left:null, right:6, x:360, y:116},
+  4: {left:null, right:null, x:80,  y:196},
+  5: {left:null, right:null, x:200, y:196},
+  6: {left:null, right:null, x:420, y:196},
+};
+const treeEdges = [[1,2],[1,3],[2,4],[2,5],[3,6]];
+
+/* HERO DECORATIVE TREE (static, smaller viewBox) */
+(function(){
+  const svg = document.getElementById('heroTree');
+  let content = '';
+  treeEdges.forEach(([a,b])=>{
+    const pa = treeData[a], pb = treeData[b];
+    content += `<line x1="${pa.x*0.9+20}" y1="${pa.y}" x2="${pb.x*0.9+20}" y2="${pb.y}" stroke="#3a4256" stroke-width="1.6"/>`;
+  });
+  Object.entries(treeData).forEach(([id,n])=>{
+    content += `<circle cx="${n.x*0.9+20}" cy="${n.y}" r="16" fill="none" stroke="${id==1?'#D9A64E':'#5AC2B6'}" stroke-width="1.6"/>`;
+  });
+  svg.innerHTML = content;
+})();
+
+/* ============ INTERACTIVE TRAVERSAL VISUALIZER ============ */
+let treeVizEvents = [];
+let treeVizIdx = 0;
+let treeVizOutputVals = [];
+
+function buildTraversalEvents(type){
+  const events = [];
+  function recur(id){
+    if(id === null) return;
+    events.push({op:'enter', id});
+    if(type === 'preorder') events.push({op:'visit', id});
+    recur(treeData[id].left);
+    if(type === 'inorder') events.push({op:'visit', id});
+    recur(treeData[id].right);
+    if(type === 'postorder') events.push({op:'visit', id});
+    events.push({op:'exit', id});
+  }
+  recur(1);
+  return events;
+}
+
+function treeVizInit(){
+  const type = document.getElementById('treeTraversalType').value;
+  treeVizEvents = buildTraversalEvents(type);
+  treeVizIdx = 0;
+  treeVizOutputVals = [];
+  renderTreeSvg({});
+  document.getElementById('treeVizOutput').innerHTML = '';
+  document.getElementById('treeVizStatus').innerHTML = `${type} არჩეულია — დააჭირეთ „შემდეგი ნაბიჯს".`;
+}
+
+function treeVizStep(){
+  if(treeVizEvents.length === 0){ treeVizInit(); return; }
+  if(treeVizIdx >= treeVizEvents.length){
+    document.getElementById('treeVizStatus').innerHTML = 'შემოვლა დასრულებულია!';
+    return;
+  }
+  const ev = treeVizEvents[treeVizIdx];
+  treeVizIdx++;
+
+  // determine current visual state: which nodes are "visited" (gold) vs "exploring" (dashed teal)
+  const visited = new Set();
+  const exploringStack = [];
+  for(let i=0;i<treeVizIdx;i++){
+    const e = treeVizEvents[i];
+    if(e.op === 'enter') exploringStack.push(e.id);
+    if(e.op === 'exit') exploringStack.pop();
+    if(e.op === 'visit') visited.add(e.id);
+  }
+  renderTreeSvg({visited, exploring: new Set(exploringStack)});
+
+  if(ev.op === 'enter'){
+    document.getElementById('treeVizStatus').innerHTML = `ვსტუმრობთ კვანძს <strong>${ev.id}</strong> (რეკურსიაში შესვლა)`;
+  } else if(ev.op === 'visit'){
+    treeVizOutputVals.push(ev.id);
+    const wrap = document.getElementById('treeVizOutput');
+    const chip = document.createElement('span');
+    chip.className = 'output-chip';
+    chip.textContent = ev.id;
+    wrap.appendChild(chip);
+    document.getElementById('treeVizStatus').innerHTML = `ვკითხულობთ კვანძს <strong>${ev.id}</strong> → დაემატა შედეგს`;
+  } else if(ev.op === 'exit'){
+    document.getElementById('treeVizStatus').innerHTML = `კვანძი <strong>${ev.id}</strong> სრულად დამუშავდა`;
+  }
+}
+
+function renderTreeSvg(state){
+  const svg = document.getElementById('treeVizSvg');
+  const visited = state.visited || new Set();
+  const exploring = state.exploring || new Set();
+  let content = '';
+  treeEdges.forEach(([a,b])=>{
+    const pa = treeData[a], pb = treeData[b];
+    content += `<line class="edge" x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}"/>`;
+  });
+  Object.entries(treeData).forEach(([idStr,n])=>{
+    const id = parseInt(idStr,10);
+    let cls = 'node-circle';
+    if(visited.has(id)) cls += ' visited';
+    else if(exploring.has(id)) cls += ' exploring';
+    content += `<circle class="${cls}" cx="${n.x}" cy="${n.y}" r="19"/>`;
+    content += `<text x="${n.x}" y="${n.y+5}">${id}</text>`;
+  });
+  svg.innerHTML = content;
+}
+
+treeVizInit();
+</script>
+</body>
+</html>

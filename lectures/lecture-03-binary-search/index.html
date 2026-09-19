@@ -171,13 +171,12 @@ footer p{font-size:13px; margin:0;}
 
 <!-- ============ FORMAL BIG-O ============ -->
 <section id="formal-o">
-  <div class="wrap">
+  <div class="wrap"> 
     <span class="section-label">01 — ფორმალიზაცია</span>
     <h2 class="h-section">Big-O-ს მათემატიკური განმარტება</h2>
     <p class="lede">წინა ლექციაზე O-დიდი ინტუიციურად განვსაზღვრეთ — „ვინარჩუნებთ ყველაზე სწრაფად მზარდ წევრს, ვუგულებელყოფთ მუდმივებს". დროა ამას ზუსტი მათემატიკური ფორმა მივცეთ.</p>
 
-    <div class="callout math">
-      <span class="icon">∑</span>
+    <div class="callout math" style="display:flex; flex-direction: column; justify-content: center; align-items: center;">
       <p><strong>განმარტება:</strong> ფუნქცია <code>f(n)</code> არის <code>O(g(n))</code>, თუ არსებობს დადებითი მუდმივები <code>c &gt; 0</code> და <code>n₀ ≥ 0</code>, ისეთები, რომ ყოველი <code>n ≥ n₀</code>-სთვის:</p>
       <p style="text-align:center; font-family:var(--mono); font-size:16px; color:var(--ink); margin-top:10px;">f(n) ≤ c · g(n)</p>
     </div>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 11 — ამოცანები ორობით ხეებზე | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A; --line:#232838;
+  --gold:#D9A64E; --gold-dim:#8C7239; --teal:#5AC2B6; --teal-dim:#2F5F5A;
+  --green:#7CB88F; --amber:#D9A64E; --rose:#C97B84; --code-bg:#0d1117;
+  --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-tree{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(420px,100%); opacity:0.3; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(30px,6.5vw,54px); line-height:1.1; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.compare-table{width:100%; border-collapse:collapse; margin:24px 0;}
+.compare-table th{font-family:var(--serif); font-size:15.5px; text-align:left; padding:12px 14px; border-bottom:1px solid var(--line); color:var(--ink);}
+.compare-table td{padding:12px 14px; border-bottom:1px solid var(--line); font-size:14px; color:var(--ink-dim); vertical-align:top;}
+.compare-table tr:last-child td{border-bottom:none;}
+
+.ascii-tree{
+  font-family:var(--mono); font-size:13px; color:var(--ink-dim); background:var(--code-bg);
+  border-radius:var(--radius); border:1px solid var(--line); padding:20px; overflow-x:auto;
+  white-space:pre; line-height:1.5; text-align:center;
+}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:20px; justify-content:center;}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 20px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+.mirror-stage{display:flex; align-items:center; justify-content:center; gap:24px; flex-wrap:wrap; padding:10px 4px;}
+.mirror-half{display:flex; flex-direction:column; align-items:center;}
+.mirror-label{font-family:var(--mono); font-size:12px; color:var(--muted); margin-bottom:8px;}
+.mirror-divider{font-size:22px; color:var(--line);}
+.tree-svg-wrap svg .edge{stroke:var(--line); stroke-width:1.6;}
+.tree-svg-wrap svg .node-circle{fill:var(--bg-panel-2); stroke:var(--teal); stroke-width:1.6; transition:all .4s ease;}
+.tree-svg-wrap svg text{font-family:var(--mono); font-size:14px; fill:var(--ink); text-anchor:middle; transition:all .4s ease;}
+.viz-status{font-family:var(--mono); font-size:13.5px; color:var(--ink-dim); margin-top:20px; text-align:center; min-height:22px;}
+.viz-status strong{color:var(--gold);}
+.viz-note{font-size:13.5px; color:var(--muted); margin-top:14px;}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · ხის ამოცანები — ლექცია 11</a>
+    <div class="nav-links">
+      <a href="#same-tree">Same Tree</a>
+      <a href="#max-depth">Maximum Depth</a>
+      <a href="#path-sum">Path Sum</a>
+      <a href="#recap-iter">რეკურსია vs იტერაცია</a>
+      <a href="#invert">Invert Binary Tree</a>
+      <a href="#viz">ვიზუალიზატორი</a>
+      <a href="#morris">Morris Traversal</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">დამატებითი ამოცანები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-tree" id="heroTree" viewBox="0 0 400 240"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 11</span>
+  <h1>ამოცანები ორობით ხეებზე</h1>
+  <p class="hero-sub">ოთხი კლასიკური ამოცანა, რომლებიც ლექცია 10-ის შემოვლის პრინციპებზეა აგებული — ყველა DFS-ის ერთი და იმავე ჩონჩხის მცირე ვარიაციაა.</p>
+  <div class="hero-terms">
+    <span>Same Tree</span><span>Maximum Depth</span><span>Path Sum</span><span>Invert Binary Tree</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ SAME TREE ============ -->
+<section id="same-tree">
+  <div class="wrap">
+    <span class="section-label">01 — ამოცანა 1</span>
+    <h2 class="h-section">Same Tree</h2>
+    <p class="lede"><strong>ამოცანა:</strong> მოცემულია ორი ორობითი ხის root, დაადგინეთ, სტრუქტურულად იდენტურია თუ არა ისინი — იგივე კვანძების განლაგება და იგივე მნიშვნელობები.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">same_tree.py</span></div>
+      <pre><code class="language-python">def is_identical(r1: "Node", r2: "Node") -> bool:
+    # ორივე ცარიელია — იდენტურია
+    if r1 is None and r2 is None:
+        return True
+    # მხოლოდ ერთი ცარიელია — ვერ იქნება იდენტური
+    if r1 is None or r2 is None:
+        return False
+    # მონაცემიც უნდა ემთხვეოდეს, და ორივე ქვეხეც რეკურსიულად
+    return (r1.data == r2.data and
+            is_identical(r1.left, r2.left) and
+            is_identical(r1.right, r2.right))</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">💡</span>
+      <p><strong>ეს არის DFS, ჩვეული ჩონჩხის მცირე ვარიაცია:</strong> ლექცია 10-ის სამივე შემოვლის ალგორითმის მსგავსად, აქაც ვამოწმებთ საბაზისო შემთხვევას და შემდეგ რეკურსიულად ვამუშავებთ ორივე ქვეხეს — უბრალოდ ერთი ხის ნაცვლად, <strong>ორ</strong> ხეს ერთდროულად ვშემოივლით, ნაბიჯ-ნაბიჯ პარალელურად.</p>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>დროითი სირთულე</th><th>მეხსიერებითი სირთულე</th></tr>
+      <tr><td class="num">O(n)</td><td class="num">O(h) — call stack</td></tr>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ MAX DEPTH ============ -->
+<section id="max-depth" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — ამოცანა 2</span>
+    <h2 class="h-section">Maximum Depth of Binary Tree</h2>
+    <p class="lede"><strong>ამოცანა:</strong> გამოთვალეთ ხის სიმაღლე — ყველაზე გრძელი გზა root-იდან ფოთლამდე.</p>
+
+    <div class="code-window">
+      <pre><code class="language-python">def height(root: "Node") -> int:
+    if root is None:
+        return -1
+    left_height = height(root.left)
+    right_height = height(root.right)
+    return max(left_height, right_height) + 1</code></pre>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">⚠️</span>
+      <p><strong>ყურადღება — ორი განსხვავებული კონვენცია:</strong> ზემოთ მოცემული ვერსია იყენებს <em>edge-height</em>-ს — ცარიელი ხისთვის აბრუნებს <code>-1</code>-ს, ერთელემენტიანისთვის <code>0</code>-ს (წიბოების რაოდენობა). LeetCode-ის „Maximum Depth of Binary Tree" (LeetCode 104) კი მოითხოვს <em>node-count</em> კონვენციას — ცარიელი ხე → <code>0</code>, ერთელემენტიანი → <code>1</code> (კვანძების რაოდენობა). ორივე მართებულია, უბრალოდ ერთმანეთისგან 1-ით განსხვავდება — თუ LeetCode-ის ფორმატი გჭირდებათ, უბრალოდ შეცვალეთ საბაზისო შემთხვევა <code>return -1</code>-დან <code>return 0</code>-მდე.</p>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>დროითი სირთულე</th><th>მეხსიერებითი სირთულე</th></tr>
+      <tr><td class="num">O(n)</td><td class="num">O(h)</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ PATH SUM ============ -->
+<section id="path-sum">
+  <div class="wrap">
+    <span class="section-label">03 — ამოცანა 3</span>
+    <h2 class="h-section">Path Sum</h2>
+    <p class="lede"><strong>ამოცანა:</strong> დაადგინეთ, არსებობს თუ არა root-დან ფოთლამდე გზა, რომლის ყველა კვანძის ჯამი ზუსტად უდრის მოცემულ რიცხვს.</p>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">რეკურსიული ამონახსნი</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def has_path_sum(root: "Node", target_sum: int) -> bool:
+    if root is None:
+        return False
+
+    remaining = target_sum - root.data
+
+    # თუ ფოთოლს მივაღწიეთ და ჯამი ზუსტად ამოიწურა — ვიპოვეთ
+    if remaining == 0 and root.left is None and root.right is None:
+        return True
+
+    left = has_path_sum(root.left, remaining) if root.left else False
+    right = has_path_sum(root.right, remaining) if root.right else False
+    return left or right</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>შესწორება ორიგინალ მასალასთან შედარებით:</strong> საწყისი კოდის რეკურსიულ ვერსიაში პარამეტრს <code>sum</code> ერქვა — ეს <strong>Python-ის ჩაშენებული ფუნქციის სახელს გადაფარავს</strong> (<code>sum()</code>). ამ კონკრეტულ ფუნქციაში ბაგას არ იწვევს (რადგან <code>sum()</code> შიგნით არ გამოიძახება), მაგრამ ეს საშიში პატერნია: თუ ვინმე მომავალში იმავე ფუნქციაში <code>sum()</code>-ის გამოძახება დასჭირდება, უცნაური და გაუგებარი შეცდომა გამოვა. საინტერესოა, რომ იმავე დეკის <strong>იტერაციული</strong> ვერსია (ქვემოთ) უკვე სწორად იყენებს <code>targetSum</code>-ს — გავაერთგვაროვნეთ ორივე ვერსია ამ სწორი სახელით.</p>
+    </div>
+
+    <h3 style="font-size:19px; margin:34px 0 6px;">იტერაციული ამონახსნი</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def has_path_sum_iter(root: "Node", target_sum: int) -> bool:
+    if root is None:
+        return False
+
+    stack = [root]
+    sums = [root.data]
+
+    while stack:
+        node = stack.pop()
+        current_sum = sums.pop()
+
+        if node.left is None and node.right is None and current_sum == target_sum:
+            return True
+
+        if node.left:
+            stack.append(node.left)
+            sums.append(current_sum + node.left.data)
+        if node.right:
+            stack.append(node.right)
+            sums.append(current_sum + node.right.data)
+
+    return False</code></pre>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>მიდგომა</th><th>დროითი სირთულე</th><th>მეხსიერებითი სირთულე</th></tr>
+      <tr><td>რეკურსიული</td><td class="num">O(n)</td><td class="num">O(h) — call stack</td></tr>
+      <tr><td>იტერაციული</td><td class="num">O(n)</td><td class="num">O(h) — მკაფიო stack</td></tr>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ RECURSIVE VS ITERATIVE ============ -->
+<section id="recap-iter" class="section-full">
+  <div class="wrap">
+    <span class="section-label">04 — არჩევანი</span>
+    <h2 class="h-section">რეკურსია vs იტერაცია — როდის რომელი</h2>
+    <p class="lede">ორივე მიდგომას ერთი და იგივე ასიმპტოტური სირთულე აქვს — არჩევანი პრაქტიკული მოსაზრებებზეა დამოკიდებული:</p>
+
+    <table class="compare-table">
+      <tr><th>მახასიათებელი</th><th>რეკურსიული</th><th>იტერაციული</th></tr>
+      <tr><td>იმპლემენტაცია</td><td>უფრო მარტივი და სუფთა</td><td>უფრო რთული, საჭიროებს მკაფიო stack-ს</td></tr>
+      <tr><td>მეხსიერება</td><td>O(h) — call stack</td><td>O(h) — მკაფიო stack</td></tr>
+      <tr><td>დრო</td><td>O(n)</td><td>O(n)</td></tr>
+      <tr><td>რეკურსიის ლიმიტი</td><td>შეზღუდული (Python-ის ნაგულისხმევი ~1000)</td><td>ლიმიტი არ არსებობს</td></tr>
+      <tr><td>საუკეთესოა</td><td>მცირე/საშუალო ზომის ხეებისთვის</td><td>დიდი ან არადაბალანსებული ხეებისთვის</td></tr>
+    </table>
+
+    <div class="callout insight">
+      <span class="icon">⚖️</span>
+      <p><strong>რატომ არის ეს რეალური, არა თეორიული საზრუნავი:</strong> Python-ის ნაგულისხმევი რეკურსიის ლიმიტი (<code>sys.getrecursionlimit()</code>) დაახლოებით <strong>1000</strong>-ია. ძალიან „გრძელ", არადაბალანსებულ ხეზე (მაგ. თანმიმდევრულად ჩასმული, უკვე დალაგებული მონაცემებით შექმნილი BST — ლექცია 13-ში ვნახავთ) რეკურსიული ამონახსანი <code>RecursionError</code>-ს გამოიწვევს, სადაც იტერაციული ვერსია პრობლემის გარეშე იმუშავებს.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INVERT ============ -->
+<section id="invert">
+  <div class="wrap">
+    <span class="section-label">05 — ამოცანა 4</span>
+    <h2 class="h-section">Invert Binary Tree</h2>
+    <p class="lede"><strong>ამოცანა:</strong> გარდაქმენით ხე მის სარკისებურ ანარეკლად — გაცვალეთ თითოეული კვანძის მარცხენა და მარჯვენა ქვეხეები.</p>
+
+    <div class="code-window">
+      <pre><code class="language-python">def mirror(root: "Node") -> "Node":
+    if root is None:
+        return None
+
+    left = mirror(root.left)
+    right = mirror(root.right)
+
+    root.left = right
+    root.right = left
+    return root</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">🪞</span>
+      <p><strong>ეს არის Postorder-ის ლოგიკური გამოყენება:</strong> ჯერ ვასრულებთ ორივე ქვეხის ინვერსიას (რეკურსია), <strong>მერე</strong> ვცვლით root-ის მითითებებს — ზუსტად ისე, როგორც ლექცია 10-ში Postorder-ს ვახასიათებდით, როგორც „საუკეთესოს კვანძების წაშლისთვის": ჯერ ბავშვები, მერე მშობელი.</p>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>დროითი სირთულე</th><th>მეხსიერებითი სირთულე</th></tr>
+      <tr><td class="num">O(n)</td><td class="num">O(h)</td></tr>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ VISUALIZER ============ -->
+<section id="viz" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">06 — სცადეთ თავად</span>
+    <h2 class="h-section">Invert Binary Tree — ვიზუალურად</h2>
+    <p class="lede">დააჭირეთ ღილაკს — ნახავთ, როგორ „ირეკლება" ხე საკუთარ სარკისებურ ვერსიაში, კვანძების პოზიციების ცვლილებით.</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <button class="btn" onclick="mirrorToggle()" id="mirrorBtn">🪞 შებრუნება</button>
+        <button class="btn ghost" onclick="mirrorReset()">↺ თავიდან</button>
+      </div>
+      <div class="mirror-stage tree-svg-wrap">
+        <svg id="mirrorSvg" viewBox="0 0 260 200" style="width:280px; height:auto;"></svg>
+      </div>
+      <div class="viz-status" id="mirrorStatus">ორიგინალი ხე — დააჭირეთ „შებრუნებას"</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MORRIS ============ -->
+<section id="morris">
+  <div class="wrap">
+    <span class="section-label">07 — მოწინავე ტექნიკა</span>
+    <h2 class="h-section">Morris Traversal — O(1) სივრცეში შემოვლა</h2>
+    <p class="lede">დღეს არაერთხელ ვნახეთ <code>O(h)</code> მეხსიერების ხარჯი — თუნდაც იტერაციულ ვერსიებში, მკაფიო stack მაინც <code>O(h)</code>-ს მოითხოვს. არსებობს ტექნიკა, რომელიც <strong>საერთოდ</strong> გვერდს უვლის დამატებით მეხსიერებას.</p>
+
+    <div class="callout insight">
+      <span class="icon">🧵</span>
+      <p><strong>იდეა:</strong> Morris Traversal დროებით იყენებს ხის <strong>საკუთარ, უკვე არსებულ</strong> <code>None</code> მაჩვენებლებს — კონკრეტულად, ფოთლების „თავისუფალ" <code>right</code> მაჩვენებლებს — რომ დროებით შექმნას „ძაფი" (thread) უკან, inorder-ის წინამორბედისკენ. ეს შესაძლებელს ხდის ხის შემოვლას stack-ის ან რეკურსიის გარეშე — <code>O(1)</code> დამატებით სივრცეში, <code>O(n)</code> დროში — შემოვლის ბოლოს კი ეს დროებითი „ძაფები" საწყის მდგომარეობას უბრუნდება, ისე რომ ხის სტრუქტურა უცვლელი რჩება.</p>
+    </div>
+
+    <p style="font-size:14.5px;">ეს სცილდება დღევანდელი ლექციის ძირითად ფარგლებს, მაგრამ კარგი მაგალითია იმისა, რომ <code>O(h)</code> სულაც არაა აუცილებელი მინიმუმი — უბრალოდ საკმარისად ჭკვიანური ტრიუკებით შესაძლებელია მისი კიდევ უფრო შემცირებაც.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">08 — რეალურ სამყაროში</span>
+    <h2 class="h-section">სად მუშაობს ეს რეალურად</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🧪</div>
+        <h4>Same Tree — ტესტირება და diff</h4>
+        <p>სტრუქტურული შედარება საფუძვლად უდევს React-ის მსგავს ბიბლიოთეკებში ხის (virtual DOM) ცვლილებების დადგენას — ზუსტად ის ლოგიკა, რასაც დღეს ვისწავლეთ.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">📏</div>
+        <h4>Maximum Depth — ბალანსის შემოწმება</h4>
+        <p>სიმაღლის გამოთვლა საფუძველია იმისა, თუ რამდენად „დაბალანსებულია" ხე — რასაც პირდაპირ გამოვიყენებთ AVL ხეებზე (ლექცია 15) მსჯელობისას.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">💰</div>
+        <h4>Path Sum — გადაწყვეტილების ხეები</h4>
+        <p>ფინანსურ მოდელირებასა და თამაშების AI-ში (decision trees, game trees) ხშირად საჭიროა კონკრეტული „გზის" ჯამური ღირებულების პოვნა — იგივე ალგორითმული პატერნი.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🎮</div>
+        <h4>Invert Tree — ეს კითხვა Google-ს „გაუთქვამს"</h4>
+        <p>Invert Binary Tree ცნობილი გახდა მას შემდეგ, რაც ჰომბრუ ბლოგერმა (Max Howell, Homebrew-ს შემქმნელმა) აღნიშნა, ვერ ამოხსნა Google-ის გასაუბრებაზე — მას შემდეგ ეს ერთ-ერთი ყველაზე ციტირებადი interview-ამოცანაა ინდუსტრიაში.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises">
+  <div class="wrap-wide">
+    <span class="section-label">09 — დამატებითი ამოცანები</span>
+    <h2 class="h-section">გაფართოებული პრაქტიკა</h2>
+    <p class="lede">დღეს ნასწავლი ტექნიკების ბუნებრივი გაგრძელება.</p>
+
+    <details class="exercise">
+      <summary>Balanced Binary Tree <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>დაადგინეთ, არის თუ არა ხე სიმაღლით-დაბალანსებული — ანუ ნებისმიერი კვანძისთვის, მისი ორი ქვეხის სიმაღლეები არაუმეტეს 1-ით განსხვავდება (LeetCode 110).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def is_balanced(root: "Node") -> bool:
+    def check(node) -> int:
+        if node is None:
+            return 0
+        left_h = check(node.left)
+        if left_h == -1:
+            return -1                # უკვე დაუბალანსებელია ქვემოთ
+        right_h = check(node.right)
+        if right_h == -1:
+            return -1
+        if abs(left_h - right_h) > 1:
+            return -1                # -1 = "დაუბალანსებელია" სიგნალი
+        return max(left_h, right_h) + 1
+
+    return check(root) != -1</code></pre>
+        </div>
+        <p><strong>ჭკვიანური ხრიკი:</strong> <code>-1</code> გამოიყენება, როგორც „უკვე დავადგინეთ დისბალანსი" სიგნალი — ამის წყალობით საკმარისია ხის <strong>ერთი</strong> გავლა (<code>O(n)</code>), იმის ნაცვლად, რომ თითოეულ კვანძზე ცალკე გამოვთვალოთ სიმაღლე (რაც <code>O(n²)</code>-ს გამოიღებდა).</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Lowest Common Ancestor of a Binary Tree <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>ორი კვანძისთვის იპოვეთ მათი ყველაზე „ახლო" საერთო წინაპარი ხეში (LeetCode 236).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def lowest_common_ancestor(root: "Node", p: "Node", q: "Node") -> "Node":
+    if root is None or root is p or root is q:
+        return root
+
+    left = lowest_common_ancestor(root.left, p, q)
+    right = lowest_common_ancestor(root.right, p, q)
+
+    if left and right:
+        return root      # p და q სხვადასხვა ქვეხეშია — root არის LCA
+    return left if left else right</code></pre>
+        </div>
+        <p><strong>ეს არის Same Tree-ს ლოგიკის ბუნებრივი გაფართოება:</strong> ისევ ორი ქვეხის პარალელური რეკურსია, უბრალოდ ახლა ვეძებთ არა ტოლობას, არამედ წერტილს, სადაც ორი „ძებნის გზა" იყოფა.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Binary Tree Maximum Path Sum <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>დღევანდელი Path Sum ამოწმებდა კონკრეტულ ჯამს root-დან ფოთლამდე. ეს ვერსია გაცილებით ზოგადია — იპოვეთ <strong>ნებისმიერი</strong> გზის მაქსიმალური ჯამი ხეში (გზა შეიძლება დაიწყოს და დასრულდეს ნებისმიერ კვანძში, root-ის ან ფოთლის გავლის გარეშეც) (LeetCode 124).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def max_path_sum(root: "Node") -> int:
+    best = float('-inf')
+
+    def gain(node) -> int:
+        nonlocal best
+        if node is None:
+            return 0
+        # უარყოფითი წვლილი უბრალოდ არ ავიღოთ (0-ით ჩავანაცვლოთ)
+        left_gain = max(gain(node.left), 0)
+        right_gain = max(gain(node.right), 0)
+
+        # გზა, რომელიც ამ კვანძში "იხრება" (orost node-ს ორივე შვილს იყენებს)
+        price = node.data + left_gain + right_gain
+        best = max(best, price)
+
+        # მაგრამ მშობლისთვის შეიძლება დავუბრუნოთ მხოლოდ ერთი მხარე
+        return node.data + max(left_gain, right_gain)
+
+    gain(root)
+    return best</code></pre>
+        </div>
+        <p><strong>საკვანძო დაკვირვება:</strong> თითოეულ კვანძში ორი განსხვავებული რამ გვაინტერესებს — (1) საუკეთესო გზა, რომელიც <strong>ამ კვანძში იხრება</strong> (იყენებს ორივე ქვეხეს — ეს კანდიდატია გლობალური მაქსიმუმისთვის) და (2) საუკეთესო გზა, რომლის <strong>გაგრძელებაც</strong> შესაძლებელია მშობელში (მხოლოდ ერთი ქვეხე, რადგან გზა არ შეიძლება განიტოტვოს). ეს განსხვავება — რას ვაბრუნებთ vs რას ვინახავთ გლობალურად — ხშირად გვხვდება ხეების უფრო რთულ ამოცანებში.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 11: ამოცანები ორობით ხეებზე</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* HERO DECORATIVE TREE */
+(function(){
+  const svg = document.getElementById('heroTree');
+  const nodes = {1:{x:200,y:36},2:{x:120,y:116},3:{x:280,y:116},4:{x:80,y:196},5:{x:160,y:196}};
+  const edges = [[1,2],[1,3],[2,4],[2,5]];
+  let content = '';
+  edges.forEach(([a,b])=>{
+    content += `<line x1="${nodes[a].x}" y1="${nodes[a].y}" x2="${nodes[b].x}" y2="${nodes[b].y}" stroke="#3a4256" stroke-width="1.6"/>`;
+  });
+  Object.entries(nodes).forEach(([id,n])=>{
+    content += `<circle cx="${n.x}" cy="${n.y}" r="16" fill="none" stroke="${id==1?'#D9A64E':'#5AC2B6'}" stroke-width="1.6"/>`;
+  });
+  svg.innerHTML = content;
+})();
+
+/* ============ MIRROR / INVERT VISUALIZER ============ */
+const mirrorNodes = {
+  1:{val:1, x:130, y:30},
+  2:{val:2, x:70,  y:100},
+  3:{val:3, x:190, y:100},
+  4:{val:4, x:190, y:170},
+};
+const mirrorEdges = [[1,2],[1,3],[3,4]]; // node 3 has a right child 4 (matches deck's Example 1 shape)
+let mirrored = false;
+
+function renderMirrorSvg(){
+  const svg = document.getElementById('mirrorSvg');
+  // when mirrored, swap left/right children by mirroring x-coordinate around the tree's horizontal center
+  const centerX = 130;
+  let content = '';
+  function displayX(nodeId){
+    const n = mirrorNodes[nodeId];
+    return mirrored ? (2*centerX - n.x) : n.x;
+  }
+  mirrorEdges.forEach(([a,b])=>{
+    content += `<line class="edge" x1="${displayX(a)}" y1="${mirrorNodes[a].y}" x2="${displayX(b)}" y2="${mirrorNodes[b].y}"/>`;
+  });
+  Object.entries(mirrorNodes).forEach(([id,n])=>{
+    content += `<circle class="node-circle" cx="${displayX(id)}" cy="${n.y}" r="18"/>`;
+    content += `<text x="${displayX(id)}" y="${n.y+5}">${n.val}</text>`;
+  });
+  svg.innerHTML = content;
+}
+
+function mirrorToggle(){
+  mirrored = !mirrored;
+  renderMirrorSvg();
+  const btn = document.getElementById('mirrorBtn');
+  const status = document.getElementById('mirrorStatus');
+  if(mirrored){
+    status.innerHTML = '<strong>შებრუნებულია</strong> — ყოველი კვანძის left/right გაცვლილია';
+    btn.textContent = '🪞 დაბრუნება ორიგინალზე';
+  } else {
+    status.innerHTML = 'ორიგინალი ხე — დააჭირეთ „შებრუნებას"';
+    btn.textContent = '🪞 შებრუნება';
+  }
+}
+
+function mirrorReset(){
+  mirrored = false;
+  renderMirrorSvg();
+  document.getElementById('mirrorStatus').innerHTML = 'ორიგინალი ხე — დააჭირეთ „შებრუნებას"';
+  document.getElementById('mirrorBtn').textContent = '🪞 შებრუნება';
+}
+
+renderMirrorSvg();
+</script>
+</body>
+</html>
