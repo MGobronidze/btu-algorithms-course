@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 12 — გროვა (Heap) და Heap Sort | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A; --line:#232838;
+  --gold:#D9A64E; --gold-dim:#8C7239; --teal:#5AC2B6; --teal-dim:#2F5F5A;
+  --green:#7CB88F; --amber:#D9A64E; --rose:#C97B84; --code-bg:#0d1117;
+  --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-heap{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(460px,100%); opacity:0.3; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(34px,7vw,62px); line-height:1.1; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.tree-svg-wrap{background:var(--bg); border-radius:var(--radius); padding:14px;}
+.tree-svg-wrap svg .edge{stroke:var(--line); stroke-width:1.6;}
+.tree-svg-wrap svg .node-circle{fill:var(--bg-panel-2); stroke:var(--teal); stroke-width:1.6;}
+.tree-svg-wrap svg text{font-family:var(--mono); font-size:14px; fill:var(--ink); text-anchor:middle;}
+.array-map{display:flex; justify-content:center; gap:4px; margin-top:16px; flex-wrap:wrap;}
+.array-map .cell{display:flex; flex-direction:column; align-items:center;}
+.array-map .idx{font-family:var(--mono); font-size:10.5px; color:var(--muted); margin-bottom:3px;}
+.array-map .val{width:38px; height:34px; display:flex; align-items:center; justify-content:center; background:var(--bg-panel-2); border:1px solid var(--line); border-radius:6px; font-family:var(--mono); font-weight:700; color:var(--ink); font-size:13px;}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:20px;}
+.viz-controls input[type=text]{background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:8px 10px; font-family:var(--mono); font-size:13.5px; width:220px;}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 20px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+.bars-wrap{display:flex; align-items:flex-end; gap:4px; height:180px; margin:20px 0 8px; padding:0 4px;}
+.bar{
+  flex:1; display:flex; align-items:flex-end; justify-content:center; border-radius:5px 5px 2px 2px;
+  background:var(--bg-panel-2); border:1px solid var(--line); position:relative; transition:all .35s ease;
+  min-width:16px;
+}
+.bar span{position:absolute; top:-20px; font-family:var(--mono); font-size:11px; color:var(--ink-dim);}
+.bar.sorted{background:rgba(124,184,143,0.25); border-color:var(--green);}
+.bar.sorted span{color:var(--green);}
+.bar.active{background:rgba(217,166,78,0.3); border-color:var(--gold);}
+.bar.active span{color:var(--gold);}
+.bar.swap{background:rgba(90,194,182,0.25); border-color:var(--teal);}
+.bar.swap span{color:var(--teal);}
+.viz-status{font-family:var(--mono); font-size:13.5px; color:var(--ink-dim); margin-top:16px; min-height:22px;}
+.viz-status strong{color:var(--gold);}
+.viz-note{font-size:13.5px; color:var(--muted); margin-top:14px;}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · გროვა — ლექცია 12</a>
+    <div class="nav-links">
+      <a href="#what-is">რა არის გროვა</a>
+      <a href="#properties">თვისებები</a>
+      <a href="#heapify">Heapify</a>
+      <a href="#class">MaxHeap კლასი</a>
+      <a href="#heapsort">Heap Sort</a>
+      <a href="#viz">ვიზუალიზატორი</a>
+      <a href="#complexity">სირთულე</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-heap" id="heroHeap" viewBox="0 0 400 220"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 12</span>
+  <h1>გროვა (Heap) და Heap Sort</h1>
+  <p class="hero-sub">ხე, რომელიც მასივშია „დამალული" — და დალაგების ალგორითმი, რომელსაც არასდროს სჭირდება დამატებითი მეხსიერება.</p>
+  <div class="hero-terms">
+    <span>Complete Binary Tree</span><span>Max-Heap</span><span>Heapify · O(log n)</span><span>Heap Sort · O(n log n)</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ WHAT IS ============ -->
+<section id="what-is">
+  <div class="wrap-wide">
+    <span class="section-label">01 — ახალი კონცეფცია</span>
+    <h2 class="h-section">რა არის გროვა</h2>
+    <p class="lede">გროვა (heap) სპეციალური ხის ტიპის მონაცემთა სტრუქტურაა ორი განმსაზღვრელი თვისებით: (1) ის <strong>სრული ორობითი ხეა</strong> (Complete Binary Tree) და (2) ის მიჰყვება ან <strong>Max-Heap</strong>-ის, ან <strong>Min-Heap</strong>-ის წესს.</p>
+
+    <div class="code-pair">
+      <div>
+        <div class="code-pair-label">Max-Heap</div>
+        <p style="font-size:14.5px;">root-ის მნიშვნელობა ყოველთვის <strong>≥</strong> ორივე შვილისა — და ეს წესი მოქმედებს რეკურსიულად ყველა ქვეხეზეც.</p>
+      </div>
+      <div>
+        <div class="code-pair-label">Min-Heap</div>
+        <p style="font-size:14.5px;">root-ის მნიშვნელობა ყოველთვის <strong>≤</strong> ორივე შვილისა — იგივე რეკურსიული წესი, საწინააღმდეგო მიმართულებით.</p>
+      </div>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">🌳</span>
+      <p><strong>„Complete" — არა „Full":</strong> სრული ორობითი ხე ნიშნავს, რომ ყველა დონე შევსებულია, გარდა შესაძლოა ბოლოსი — და ბოლო დონეც მარცხნიდან მარჯვნივ, უფსკრულების გარეშე ივსება. ეს ზუსტად ის თვისებაა, რაც გროვას საშუალებას აძლევს იცხოვროს <strong>უბრალო მასივში</strong>, საჩვენებლების (<code>left</code>/<code>right</code>) გარეშეც — ლექცია 10-ის ხის კვანძებისგან განსხვავებით.</p>
+    </div>
+
+    <h3 style="font-size:19px; margin:34px 0 6px;">მასივი, როგორც ხე</h3>
+    <p>თუ ხის კვანძებს ინდექსით 0-დან დავნომრავთ, ორი მარტივი ფორმულა გვაძლევს მთელ სტრუქტურას — მაჩვენებლების საჭიროების გარეშე:</p>
+    <ul style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
+      <li style="margin-bottom:6px;">მარცხენა შვილი: <code>2·i + 1</code></li>
+      <li style="margin-bottom:6px;">მარჯვენა შვილი: <code>2·i + 2</code></li>
+      <li>მშობელი: <code>(i − 1) // 2</code></li>
+    </ul>
+
+    <div class="tree-svg-wrap"><svg id="heapMapSvg" viewBox="0 0 480 200" style="width:100%; max-width:480px; display:block; margin:0 auto;"></svg></div>
+    <div class="array-map" id="heapMapArray"></div>
+    <p class="viz-note" style="text-align:center;">ეს არის ვალიდური Max-Heap — root (16) ყველაზე დიდია, და თითოეული მშობელი ≥ თავისი შვილებისა.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ PROPERTIES ============ -->
+<section id="properties" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — რატომ არის ეს სასარგებლო</span>
+    <h2 class="h-section">გროვის თვისებები</h2>
+
+    <div class="callout insight">
+      <span class="icon">⚡</span>
+      <p><strong>უმთავრესი უპირატესობა:</strong> მინიმალური (ან მაქსიმალური) ელემენტი ყოველთვის root-შია — რაც წვდომას მასზე <code>O(1)</code>-ში ხდის შესაძლებელს. ეს არის მთავარი მიზეზი, რატომაც არჩევენ heap-ს, როცა ხშირად გჭირდებათ „ამჟამინდელი უდიდესი/უმცირესი" ელემენტის სწრაფად პოვნა — priority queue-ს კლასიკური გამოყენების შემთხვევა.</p>
+    </div>
+
+    <p><strong>ჩასმისას:</strong> ახალი ელემენტი თავსდება მასივის ბოლოს (სრული ხის შემდეგი თავისუფალი პოზიცია), შემდეგ „ადის ზემოთ" (sift up), სანამ heap-ის თვისება არ აღდგება.</p>
+    <p><strong>წაშლისას:</strong> root იცვლება ბოლო ელემენტით, ეს ელემენტი „ეშვება ქვემოთ" (sift down / heapify), სანამ heap-ის თვისება არ აღდგება.</p>
+  </div>
+</section>
+
+<!-- ============ HEAPIFY ============ -->
+<section id="heapify">
+  <div class="wrap">
+    <span class="section-label">03 — ცენტრალური ოპერაცია</span>
+    <h2 class="h-section">Heapify</h2>
+    <p class="lede">Heapify — პროცესია, რომელიც კვანძების გადანაწილებით აღადგენს heap-ის თვისებას, მას შემდეგ რაც რაიმე ცვლილება მოხდება (ჩასმა, წაშლა, ან საწყისი აგება).</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">max_heapify.py</span></div>
+      <pre><code class="language-python">def MaxHeapify(self, i: int) -> None:
+    l = self.lChild(i)
+    r = self.rChild(i)
+    largest = i
+
+    if l < self.heapSize and self.arr[l] > self.arr[i]:
+        largest = l
+    if r < self.heapSize and self.arr[r] > self.arr[largest]:
+        largest = r
+
+    if largest != i:
+        self.arr[i], self.arr[largest] = self.arr[largest], self.arr[i]
+        self.MaxHeapify(largest)   # რეკურსიულად ვაგრძელებთ ქვემოთ</code></pre>
+    </div>
+
+    <p style="font-size:14.5px;"><strong>ინტუიცია:</strong> ვამოწმებთ, არის თუ არა i-ური კვანძის რომელიმე შვილი მასზე დიდი. თუ კი — ვცვლით ადგილებს უდიდეს შვილთან და ვიმეორებთ იმ პოზიციაზე, სადაც ელემენტი ახლა აღმოჩნდა. ეს გრძელდება, სანამ ელემენტი „არ ჩერდება" თავის სწორ ადგილას.</p>
+
+    <table class="bigo-table">
+      <tr><th>დროითი სირთულე</th><th>რატომ</th></tr>
+      <tr><td class="num">O(log n)</td><td>თითოეულ ნაბიჯზე მაქსიმუმ ერთი დონით ვეშვებით ქვემოთ — ხის სიმაღლეა <code>log n</code></td></tr>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ CLASS ============ -->
+<section id="class" class="section-full">
+  <div class="wrap">
+    <span class="section-label">04 — სრული იმპლემენტაცია</span>
+    <h2 class="h-section">MaxHeap კლასი</h2>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">max_heap.py</span></div>
+      <pre><code class="language-python">class MaxHeap:
+    def __init__(self, max_size: int):
+        self.maxSize = max_size
+        self.arr = [0] * max_size
+        self.heapSize = 0
+
+    def parent(self, i: int) -> int:
+        return (i - 1) // 2
+
+    def lChild(self, i: int) -> int:
+        return 2 * i + 1
+
+    def rChild(self, i: int) -> int:
+        return 2 * i + 2</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">insertKey — ჩასმა</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def insertKey(self, x) -> None:
+    if self.heapSize == self.maxSize:
+        print("Overflow: Could not insertKey")
+        return
+    self.heapSize += 1
+    i = self.heapSize - 1
+    self.arr[i] = x
+    # ავდივართ ზემოთ, სანამ heap-ის თვისება არ აღდგება
+    while i != 0 and self.arr[self.parent(i)] < self.arr[i]:
+        self.arr[i], self.arr[self.parent(i)] = self.arr[self.parent(i)], self.arr[i]
+        i = self.parent(i)</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">removeMax — root-ის ამოღება</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def removeMax(self):
+    if self.heapSize <= 0:
+        return None
+    if self.heapSize == 1:
+        self.heapSize -= 1
+        return self.arr[0]
+
+    root = self.arr[0]
+    self.arr[0] = self.arr[self.heapSize - 1]   # ბოლო ელემენტი root-ის ადგილას
+    self.heapSize -= 1
+    self.MaxHeapify(0)                          # თვისების აღდგენა
+    return root</code></pre>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">increaseKey, getMax, curSize, deleteKey</h3>
+    <div class="code-window">
+      <pre><code class="language-python">def increaseKey(self, i: int, newVal) -> None:
+    if newVal < self.arr[i]:
+        raise ValueError("newVal არ შეიძლება იყოს მიმდინარე მნიშვნელობაზე ნაკლები")
+    self.arr[i] = newVal
+    while i != 0 and self.arr[self.parent(i)] < self.arr[i]:
+        self.arr[i], self.arr[self.parent(i)] = self.arr[self.parent(i)], self.arr[i]
+        i = self.parent(i)
+
+def getMax(self):
+    return self.arr[0]                # O(1) — root ყოველთვის მაქსიმუმია
+
+def curSize(self) -> int:
+    return self.heapSize
+
+def deleteKey(self, i: int) -> None:
+    # ვზრდით უსასრულობამდე, რომ root-ში "ავიდეს", მერე ვშლით root-ს
+    self.increaseKey(i, float("inf"))
+    self.removeMax()</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>დამატება ორიგინალ მასალასთან შედარებით:</strong> საწყისი <code>increaseKey</code> არ ამოწმებდა, რომ <code>newVal</code> მართლაც <strong>მეტია</strong> მიმდინარე მნიშვნელობაზე. სახელწოდება „increase" ცალსახად გულისხმობს მხოლოდ ზრდას — მაგრამ თუ ვინმე შემთხვევით უფრო პატარა მნიშვნელობას გადასცემდა, ფუნქცია მაინც შეასრულებდა „ავდივართ ზემოთ" ციკლს (რომელიც არაფერს იზამდა), თუმცა <strong>arr</strong>-ში დარჩებოდა არასწორად ჩასმული, ნაკლები მნიშვნელობა, რომელიც <strong>ქვემოთ</strong> აღარ შემოწმდებოდა — რღვევს heap-ის თვისებას მდუმარედ, შეცდომის გარეშე. დავამატეთ ვალიდაცია, რომელიც ამ საშიშ სცენარს თავიდანვე ხმამაღლა (<code>ValueError</code>-ით) აღკვეთს.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HEAP SORT ============ -->
+<section id="heapsort">
+  <div class="wrap">
+    <span class="section-label">05 — გამოყენება</span>
+    <h2 class="h-section">დალაგება გროვის საშუალებით (Heap Sort)</h2>
+    <p class="lede">Heap Sort შედარებაზე დაფუძნებული დალაგების ტექნიკაა, რომელიც პირდაპირ იყენებს heap-ის სტრუქტურას — <strong>თავად მასივის შიგნით</strong>, დამატებითი მასივის გარეშე.</p>
+
+    <ol style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
+      <li style="margin-bottom:10px;"><strong>Build heap:</strong> მთელი მასივი გარდაიქმნება max-heap-ად — <code>heapify</code> გამოიძახება ბოლოდან-პირველი შიდა კვანძიდან root-მდე.</li>
+      <li style="margin-bottom:10px;"><strong>ამოღება:</strong> root (ამჟამინდელი მაქსიმუმი) იცვლება heap-ის ბოლო ელემენტთან — ეს ათავსებს მაქსიმუმს მის საბოლოო, სწორ პოზიციაზე.</li>
+      <li style="margin-bottom:10px;"><strong>შემცირება:</strong> heap-ის „ზომა" მცირდება 1-ით (ბოლო ელემენტი — უკვე დალაგებული — აღარ ითვლება heap-ის ნაწილად, თუმცა ფიზიკურად მასივშივე რჩება).</li>
+      <li><strong>გამეორება:</strong> ვიძახებთ <code>heapify</code>-ს ახალ root-ზე და ვიმეორებთ, სანამ heap-ში ერთი ელემენტი აღარ დარჩება.</li>
+    </ol>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">heap_sort.py</span></div>
+      <pre><code class="language-python">def heapify(arr: list, n: int, i: int) -> None:
+    """i-ური კვანძის ქვეხეს heap-ის თვისებას უბრუნებს — arr[:n] ფარგლებში."""
+    largest = i
+    l, r = 2 * i + 1, 2 * i + 2
+
+    if l < n and arr[l] > arr[largest]:
+        largest = l
+    if r < n and arr[r] > arr[largest]:
+        largest = r
+
+    if largest != i:
+        arr[i], arr[largest] = arr[largest], arr[i]
+        heapify(arr, n, largest)
+
+def heap_sort(arr: list) -> None:
+    n = len(arr)
+
+    # 1. მთელი მასივის გარდაქმნა max-heap-ად
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+
+    # 2. ერთი-ერთზე ამოვიღოთ მაქსიმუმი და ჩავსვათ საბოლოო ადგილას
+    for i in range(n - 1, 0, -1):
+        arr[0], arr[i] = arr[i], arr[0]   # root → i-ურ (ამჟამინდელი ბოლო) პოზიციაზე
+        heapify(arr, i, 0)                 # heap-ის თვისების აღდგენა შემცირებულ ზომაზე</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">💡</span>
+      <p><strong>ეს არის <code>MaxHeapify</code>-ის იგივე ლოგიკა, უბრალოდ <code>self</code>-ის გარეშე:</strong> <code>heap_sort</code> ცალკე, კლასის-გარეშე ფუნქციად იყენებს იგივე heapify იდეას — <code>n</code> პარამეტრი აქ თამაშობს <code>self.heapSize</code>-ის როლს, ხელოვნურად „ამცირებს" heap-ის ხილულ ზომას, მასივის ფაქტობრივი შემცირების გარეშე.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VISUALIZER ============ -->
+<section id="viz" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">06 — სცადეთ თავად</span>
+    <h2 class="h-section">Heap Sort ნაბიჯ-ნაბიჯ</h2>
+    <p class="lede">დააჭირეთ „შემდეგი ნაბიჯს" — ჯერ ნახავთ Build Heap ფაზას (მასივი გარდაიქმნება max-heap-ად), შემდეგ ამოღების ფაზას (თითოეული მაქსიმუმი გადადის თავის საბოლოო, დალაგებულ პოზიციაზე).</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="heapSortInput">მასივი:</label>
+        <input type="text" id="heapSortInput" value="9,4,3,8,10,2,5">
+        <button class="btn" onclick="heapSortInit()">↺ დაწყება</button>
+        <button class="btn ghost" onclick="heapSortStep()">შემდეგი ნაბიჯი →</button>
+      </div>
+      <div class="bars-wrap" id="heapSortBars"></div>
+      <div class="viz-status" id="heapSortStatus"></div>
+    </div>
+    <p class="viz-note">მწვანე — უკვე თავის საბოლოო, დალაგებულ პოზიციაზე მდგომი ელემენტები. ოქროსფერი — heapify-ის მიმდინარე root. ლურჯი — swap-ის მონაწილე წყვილი.</p>
+  </div>
+</section>
+
+<!-- ============ COMPLEXITY ============ -->
+<section id="complexity">
+  <div class="wrap">
+    <span class="section-label">07 — შეჯამება</span>
+    <h2 class="h-section">სირთულის ცხრილი</h2>
+
+    <table class="bigo-table">
+      <tr><th>ოპერაცია</th><th>დროითი სირთულე</th></tr>
+      <tr><td>getMax / getMin</td><td class="num">O(1)</td></tr>
+      <tr><td>insertKey</td><td class="num">O(log n)</td></tr>
+      <tr><td>removeMax / removeMin</td><td class="num">O(log n)</td></tr>
+      <tr><td>increaseKey / deleteKey</td><td class="num">O(log n)</td></tr>
+      <tr><td>Build Heap (n ელემენტიდან)</td><td class="num">O(n)</td></tr>
+      <tr><td>Heap Sort (მთლიანად)</td><td class="num">O(n log n)</td></tr>
+    </table>
+
+    <p style="font-size:14.5px;"><strong>სივრცითი სირთულე Heap Sort-ისთვის: O(log n)</strong> (რეკურსიული <code>heapify</code>-ს call stack) — Merge Sort-ის <code>O(n)</code>-ისგან განსხვავებით, Heap Sort <strong>in-place</strong> მუშაობს, დამატებითი მასივის გარეშე.</p>
+
+    <div class="callout insight">
+      <span class="icon">🤔</span>
+      <p><strong>საინტერესო დაკვირვება — Build Heap არის O(n), არა O(n log n):</strong> თუმცა ერთი <code>heapify</code>-ის გამოძახება <code>O(log n)</code>-ია და მას <code>n/2</code>-ჯერ ვიძახებთ (რაც პირველი შეხედვით <code>O(n log n)</code>-ს მოგვცემდა), მკაცრი მათემატიკური ანალიზი აჩვენებს, რომ ჯამური სირთულეა სინამდვილეში <code>O(n)</code> — რადგან ხის ქვედა დონეებზე (სადაც ყველაზე მეტი კვანძია) <code>heapify</code>-ს ძალიან მცირე სამუშაოს აკეთებინებთ, და მხოლოდ ცოტა კვანძს root-თან ახლოს სჭირდება ბევრი ნაბიჯი.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">08 — რეალურ სამყაროში</span>
+    <h2 class="h-section">სად მუშაობს გროვა რეალურად</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🐍</div>
+        <h4>Python-ის <code>heapq</code></h4>
+        <p>Python-ის ჩაშენებული <code>heapq</code> მოდული ზუსტად დღეს ნასწავლ ალგორითმებს ახორციელებს — <code>heapq.heappush</code>/<code>heappop</code> — უბრალო, დინამიურ სიაზე მუშაობს, <code>maxSize</code>-ის წინასწარი განსაზღვრის გარეშე. Production კოდში თითქმის არასდროს წერთ საკუთარ heap-ს ნულიდან — იყენებთ ამ მოდულს.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">⏱️</div>
+        <h4>Priority Queue — დავალებების დაგეგმვა</h4>
+        <p>ოპერაციული სისტემების პროცესების დაგეგმვა (process scheduling), ღონისძიებების სიმულაცია (event-driven simulation) — ყველგან, სადაც „შემდეგი, ყველაზე პრიორიტეტული დავალება" სწრაფად უნდა მოიძებნოს, heap დგას საფუძვლად.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🗺️</div>
+        <h4>Dijkstra-ს ალგორითმი</h4>
+        <p>უმოკლესი გზის პოვნის კლასიკური ალგორითმი (გრაფებზე, კურსის მომდევნო ეტაპებში) იყენებს min-heap-ს, რომ ყოველთვის სწრაფად აირჩიოს შემდეგი, „ყველაზე ახლოს" მდგომი წვერო.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🔀</div>
+        <h4>K-way Merge</h4>
+        <p>რამდენიმე უკვე დალაგებული ნაკადის (მაგ. სხვადასხვა სერვერიდან მიღებული შედეგების) გაერთიანება ერთ დალაგებულ თანმიმდევრობად — heap საშუალებას გვაძლევს ყოველთვის სწრაფად ვიპოვოთ შემდეგი უმცირესი ელემენტი ყველა ნაკადს შორის.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises">
+  <div class="wrap-wide">
+    <span class="section-label">09 — პრაქტიკა</span>
+    <h2 class="h-section">სავარჯიშოები — Python-ის <code>heapq</code>-ით</h2>
+    <p class="lede">დღეს ნასწავლი პრინციპები Python-ის ჩაშენებული მოდულით.</p>
+
+    <details class="exercise">
+      <summary>Kth Largest Element in a Stream <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>შექმენით სტრუქტურა, რომელიც მუდმივად აბრუნებს k-ურ უდიდეს ელემენტს, მაშინაც კი, როცა ახალი რიცხვები მუდმივად „მოედინება" (LeetCode 703).</p>
+        <div class="code-window">
+          <pre><code class="language-python">import heapq
+
+class KthLargest:
+    def __init__(self, k: int, nums: list):
+        self.k = k
+        self.heap = nums[:]
+        heapq.heapify(self.heap)
+        while len(self.heap) > k:
+            heapq.heappop(self.heap)
+
+    def add(self, val: int) -> int:
+        heapq.heappush(self.heap, val)
+        if len(self.heap) > self.k:
+            heapq.heappop(self.heap)
+        return self.heap[0]</code></pre>
+        </div>
+        <p><strong>ხრიკი:</strong> Python-ის <code>heapq</code> ნაგულისხმევად <strong>min-heap</strong>-ია. თუ ზომაზე <code>k</code>-ით შემოვსაზღვრავთ (ზედმეტს ვშლით), მინ-heap-ის root ყოველთვის იქნება k-ური <strong>უდიდესი</strong> ელემენტი — ელეგანტური გზა max-ის მოსაძებნად min-heap-ით.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Top K Frequent Elements <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>დააბრუნეთ k ყველაზე ხშირად განმეორებადი ელემენტი მასივში (LeetCode 347).</p>
+        <div class="code-window">
+          <pre><code class="language-python">import heapq
+from collections import Counter
+
+def top_k_frequent(nums: list, k: int) -> list:
+    counts = Counter(nums)
+    return [item for item, _ in heapq.nlargest(k, counts.items(), key=lambda pair: pair[1])]</code></pre>
+        </div>
+        <p><code>heapq.nlargest(k, ...)</code> შიგნით სწორედ heap-ს იყენებს — ინახავს მხოლოდ <code>k</code> ზომის heap-ს მთელი მონაცემის ნაცვლად, რაც <code>O(n log k)</code>-ს იძლევა სრული დალაგების <code>O(n log n)</code>-ის ნაცვლად.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Merge K Sorted Lists <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>მოცემულია <code>k</code> დალაგებული ბმული სია (ლექცია 7-9-ის თემა!) — გააერთიანეთ ერთ დალაგებულ სიად (LeetCode 23).</p>
+        <div class="code-window">
+          <pre><code class="language-python">import heapq
+
+def merge_k_lists(lists: list) -> "Node":
+    heap = []
+    for i, node in enumerate(lists):
+        if node:
+            heapq.heappush(heap, (node.data, i, node))
+
+    dummy = Node(0)
+    tail = dummy
+    while heap:
+        val, i, node = heapq.heappop(heap)
+        tail.next = node
+        tail = tail.next
+        if node.next:
+            heapq.heappush(heap, (node.next.data, i, node.next))
+
+    return dummy.next</code></pre>
+        </div>
+        <p><strong>ეს ამოცანა აერთიანებს სამ ლექციას:</strong> ბმული სია (ლექცია 7), Merge Sort-ის ორნაკადიანი შერწყმის იდეა (ლექცია 4) — ახლა <code>k</code> ნაკადამდე გაფართოებული — და დღევანდელი heap. თითოეულ ნაბიჯზე heap-ში ვინახავთ <code>k</code> სიის ამჟამინდელ „წამყვან" კვანძებს, ვიღებთ უმცირესს (<code>O(log k)</code>), და მის ადგილას იმავე სიის შემდეგ კვანძს ვამატებთ. სირთულე: <code>O(N log k)</code>, სადაც <code>N</code> — ყველა ელემენტის საერთო რაოდენობა — ბევრად სწრაფია, ვიდრე ყველა წყვილის ცალ-ცალკე შერწყმა (<code>O(N·k)</code>).</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 12: გროვა (Heap) და Heap Sort</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* HERO DECORATIVE HEAP TREE */
+(function(){
+  const svg = document.getElementById('heroHeap');
+  const nodes = {0:{x:200,y:30},1:{x:110,y:100},2:{x:290,y:100},3:{x:60,y:170},4:{x:160,y:170},5:{x:240,y:170},6:{x:320,y:170}};
+  const edges = [[0,1],[0,2],[1,3],[1,4],[2,5],[2,6]];
+  let content = '';
+  edges.forEach(([a,b])=>{
+    content += `<line x1="${nodes[a].x}" y1="${nodes[a].y}" x2="${nodes[b].x}" y2="${nodes[b].y}" stroke="#3a4256" stroke-width="1.6"/>`;
+  });
+  Object.entries(nodes).forEach(([id,n])=>{
+    content += `<circle cx="${n.x}" cy="${n.y}" r="15" fill="none" stroke="${id==0?'#D9A64E':'#5AC2B6'}" stroke-width="1.6"/>`;
+  });
+  svg.innerHTML = content;
+})();
+
+/* ============ ARRAY-AS-TREE MAPPING (static illustration) ============ */
+(function(){
+  const arr = [16,14,10,8,7,9,3,2,4,1];
+  const n = arr.length;
+  // build layout using same recursive leaf-order algorithm as lecture 10
+  const nodesInfo = [];
+  function layout(i, depth, counter){
+    if(i >= n) return null;
+    const id = nodesInfo.length;
+    const node = {id, val:arr[i], depth};
+    nodesInfo.push(node);
+    const leftId = layout(2*i+1, depth+1, counter);
+    const rightId = layout(2*i+2, depth+1, counter);
+    if(leftId === null && rightId === null){
+      node.x = counter.next++;
+    } else {
+      const xs = [];
+      if(leftId !== null) xs.push(nodesInfo[leftId].x);
+      if(rightId !== null) xs.push(nodesInfo[rightId].x);
+      node.x = xs.reduce((a,b)=>a+b,0)/xs.length;
+    }
+    node.leftId = leftId; node.rightId = rightId;
+    return id;
+  }
+  layout(0, 0, {next:0});
+
+  const spacingX = 48, spacingY = 46, pad = 30;
+  const maxLeafX = Math.max(...nodesInfo.map(nd=>nd.x));
+  const maxDepth = Math.max(...nodesInfo.map(nd=>nd.depth));
+  const width = (maxLeafX+1)*spacingX + pad*2;
+  const height = (maxDepth+1)*spacingY + pad*2;
+  const svg = document.getElementById('heapMapSvg');
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  function pos(nd){ return {x: pad + nd.x*spacingX, y: pad + nd.depth*spacingY}; }
+  let content = '';
+  nodesInfo.forEach(nd=>{
+    const p = pos(nd);
+    if(nd.leftId !== null) content += `<line class="edge" x1="${p.x}" y1="${p.y}" x2="${pos(nodesInfo[nd.leftId]).x}" y2="${pos(nodesInfo[nd.leftId]).y}"/>`;
+    if(nd.rightId !== null) content += `<line class="edge" x1="${p.x}" y1="${p.y}" x2="${pos(nodesInfo[nd.rightId]).x}" y2="${pos(nodesInfo[nd.rightId]).y}"/>`;
+  });
+  nodesInfo.forEach(nd=>{
+    const p = pos(nd);
+    content += `<circle class="node-circle" cx="${p.x}" cy="${p.y}" r="16"/>`;
+    content += `<text x="${p.x}" y="${p.y+5}">${nd.val}</text>`;
+  });
+  svg.innerHTML = content;
+
+  const arrayWrap = document.getElementById('heapMapArray');
+  arrayWrap.innerHTML = arr.map((v,i)=>`<div class="cell"><span class="idx">${i}</span><div class="val">${v}</div></div>`).join('');
+})();
+
+/* ============ HEAP SORT VISUALIZER ============ */
+let heapSortSnapshots = [];
+let heapSortIdx = 0;
+
+function hsHeapify(arr, n, i){
+  let largest = i, l = 2*i+1, r = 2*i+2;
+  if(l < n && arr[l] > arr[largest]) largest = l;
+  if(r < n && arr[r] > arr[largest]) largest = r;
+  if(largest !== i){
+    [arr[i], arr[largest]] = [arr[largest], arr[i]];
+    hsHeapify(arr, n, largest);
+  }
+}
+
+function heapSortInit(){
+  const raw = document.getElementById('heapSortInput').value;
+  const inputArr = raw.split(',').map(s=>parseInt(s.trim(),10)).filter(x=>!isNaN(x));
+  if(inputArr.length < 2 || inputArr.length > 12){ alert('შეიყვანეთ 2-12 რიცხვი, მძიმით გამოყოფილი.'); return; }
+
+  const arr = [...inputArr];
+  const n = arr.length;
+  const snapshots = [];
+  snapshots.push({arr:[...arr], sortedFrom:n, label:'საწყისი მასივი — დავიწყოთ Build Heap ფაზით'});
+
+  for(let i = Math.floor(n/2)-1; i>=0; i--){
+    hsHeapify(arr, n, i);
+    snapshots.push({arr:[...arr], activeIdx:i, sortedFrom:n, label:`Build Heap: heapify(arr, ${n}, ${i})`});
+  }
+  snapshots.push({arr:[...arr], sortedFrom:n, label:'Heap აგებულია! ახლა ვიწყებთ ამოღების ფაზას.'});
+
+  for(let i = n-1; i>0; i--){
+    [arr[0], arr[i]] = [arr[i], arr[0]];
+    snapshots.push({arr:[...arr], swapIdx:[0,i], sortedFrom:i, label:`გავცვალეთ root (მაქსიმუმი) და arr[${i}] — ${arr[i]} თავის საბოლოო ადგილზეა`});
+    hsHeapify(arr, i, 0);
+    snapshots.push({arr:[...arr], activeIdx:0, sortedFrom:i, label:`heapify(arr, ${i}, 0) — heap-ის თვისება აღდგა`});
+  }
+  snapshots.push({arr:[...arr], sortedFrom:0, label:'მასივი სრულად დალაგებულია!'});
+
+  heapSortSnapshots = snapshots;
+  heapSortIdx = 0;
+  renderHeapSort(snapshots[0]);
+}
+
+function heapSortStep(){
+  if(heapSortSnapshots.length === 0){ heapSortInit(); return; }
+  if(heapSortIdx >= heapSortSnapshots.length - 1) return;
+  heapSortIdx++;
+  renderHeapSort(heapSortSnapshots[heapSortIdx]);
+}
+
+function renderHeapSort(snap){
+  const box = document.getElementById('heapSortBars');
+  const maxVal = Math.max(...snap.arr.map(Math.abs), 1);
+  box.innerHTML = snap.arr.map((v,idx)=>{
+    let cls = 'bar';
+    if(idx >= snap.sortedFrom) cls += ' sorted';
+    else if(snap.swapIdx && snap.swapIdx.includes(idx)) cls += ' swap';
+    else if(snap.activeIdx === idx) cls += ' active';
+    const heightPct = 20 + (Math.abs(v)/maxVal)*75;
+    return `<div class="${cls}" style="height:${heightPct}%"><span>${v}</span></div>`;
+  }).join('');
+  document.getElementById('heapSortStatus').innerHTML = snap.label;
+}
+
+heapSortInit();
+</script>
+</body>
+</html>
