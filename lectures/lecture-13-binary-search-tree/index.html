@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 13 — ორობითი ძებნის ხე (BST) | მონაცემთა სტრუქტურები და ალგორითმები I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@400;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A; --line:#232838;
+  --gold:#D9A64E; --gold-dim:#8C7239; --teal:#5AC2B6; --teal-dim:#2F5F5A;
+  --green:#7CB88F; --amber:#D9A64E; --rose:#C97B84; --code-bg:#0d1117;
+  --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.7; -webkit-font-smoothing:antialiased;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;} }
+h1,h2,h3,h4{font-family:var(--serif); font-weight:700; color:var(--ink); margin:0 0 0.5em;}
+p{margin:0 0 1.1em; color:var(--ink-dim); max-width:70ch;}
+a{color:var(--teal);}
+strong{color:var(--ink); font-weight:600;}
+::selection{background:var(--gold-dim); color:var(--ink);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:920px; margin:0 auto; padding:0 24px;}
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+.hero-bst{position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); width:min(440px,100%); opacity:0.3; pointer-events:none;}
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px; position:relative; z-index:1;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{position:relative; z-index:1; font-size:clamp(32px,6.5vw,56px); line-height:1.1; margin-bottom:20px;}
+.hero-sub{position:relative; z-index:1; font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{position:relative; z-index:1; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+section{padding:64px 0;}
+.section-label{font-family:var(--mono); font-size:12.5px; color:var(--gold); margin-bottom:10px; display:block;}
+h2.h-section{font-size:clamp(28px,4vw,38px); margin-bottom:0.4em;}
+.lede{font-size:19px; color:var(--ink-dim); margin-bottom:1.6em;}
+hr.divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+.callout{background:var(--bg-panel); border-radius:var(--radius); padding:20px 24px; margin:24px 0; display:flex; gap:14px; align-items:flex-start;}
+.callout .icon{font-size:20px; line-height:1; margin-top:2px; flex-shrink:0;}
+.callout p{margin:0; color:var(--ink-dim); font-size:15.5px;}
+.callout p + p{margin-top:8px;}
+.callout strong{color:var(--ink);}
+.callout.fix{background:linear-gradient(135deg, rgba(217,166,78,0.10), rgba(217,166,78,0.03));}
+.callout.insight{background:linear-gradient(135deg, rgba(90,194,182,0.10), rgba(90,194,182,0.03));}
+.callout.warn{background:linear-gradient(135deg, rgba(201,123,132,0.12), rgba(201,123,132,0.03));}
+
+.code-window{background:var(--code-bg); border-radius:var(--radius); overflow:hidden; margin:22px 0; border:1px solid var(--line);}
+.code-titlebar{display:flex; align-items:center; gap:8px; padding:10px 16px; background:#11151d; border-bottom:1px solid var(--line);}
+.code-dot{width:9px; height:9px; border-radius:50%; background:#3a3f4d;}
+.code-filename{margin-left:8px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:14px; line-height:1.65;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:22px 0;}
+@media (max-width:760px){.code-pair{grid-template-columns:1fr;}}
+.code-pair .code-window{margin:0;}
+.code-pair-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-bottom:8px;}
+
+.bigo-table{width:100%; border-collapse:collapse; margin:22px 0; font-size:14.5px;}
+.bigo-table th, .bigo-table td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line);}
+.bigo-table th{color:var(--muted); font-weight:500; font-family:var(--mono); font-size:12.5px;}
+.bigo-table td.num{font-family:var(--mono); color:var(--gold);}
+.bigo-table tr:last-child td{border-bottom:none;}
+
+.term-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:28px 0;}
+@media (max-width:680px){.term-grid{grid-template-columns:1fr;}}
+.term-card{background:var(--bg-panel); border-radius:var(--radius); padding:20px;}
+.term-card h4{font-family:var(--mono); font-size:14.5px; margin-bottom:8px; color:var(--gold);}
+.term-card p{font-size:14px; margin:0; color:var(--ink-dim);}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:28px 0;}
+@media (max-width:680px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg-panel); border-radius:var(--radius); padding:22px;}
+.insight-card .em{font-size:22px; margin-bottom:10px;}
+.insight-card h4{font-size:16px; margin-bottom:8px;}
+.insight-card p{font-size:14.5px; margin:0;}
+
+.viz-panel{background:var(--bg-panel); border-radius:var(--radius); padding:26px; margin:26px 0;}
+.viz-controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+.viz-controls label{font-size:13.5px; color:var(--muted);}
+.viz-controls input[type=text], .viz-controls input[type=number]{background:var(--bg); border:1px solid var(--line); border-radius:8px; color:var(--ink); padding:8px 10px; font-family:var(--mono); font-size:13.5px;}
+.viz-controls input[type=text]{width:220px;}
+.viz-controls input[type=number]{width:70px;}
+.btn{background:var(--gold); color:#1a1305; border:none; border-radius:999px; padding:9px 18px; font-family:var(--sans); font-weight:600; font-size:13.5px; cursor:pointer; transition:transform .15s, background .15s;}
+.btn:hover{background:#e8b761; transform:translateY(-1px);}
+.btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line);}
+.btn.ghost:hover{border-color:var(--teal); color:var(--teal);}
+
+.tree-svg-wrap{background:var(--bg); border-radius:var(--radius); padding:14px; margin-top:6px;}
+.tree-svg-wrap svg .edge{stroke:var(--line); stroke-width:1.6;}
+.tree-svg-wrap svg .node-circle{fill:var(--bg-panel-2); stroke:var(--teal); stroke-width:1.6; transition:all .3s ease;}
+.tree-svg-wrap svg .node-circle.path{stroke:var(--gold); stroke-dasharray:4 3;}
+.tree-svg-wrap svg .node-circle.found{fill:rgba(124,184,143,0.25); stroke:var(--green);}
+.tree-svg-wrap svg .node-circle.absent{stroke:var(--rose);}
+.tree-svg-wrap svg text{font-family:var(--mono); font-size:14px; fill:var(--ink); text-anchor:middle;}
+.viz-status{font-family:var(--mono); font-size:13.5px; color:var(--ink-dim); margin-top:16px; text-align:center; min-height:22px;}
+.viz-status strong{color:var(--gold);}
+.viz-note{font-size:13.5px; color:var(--muted); margin-top:14px;}
+
+.badge{display:inline-block; font-size:12px; font-family:var(--mono); padding:3px 10px; border-radius:999px; margin-left:10px; vertical-align:middle;}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--amber);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose);}
+
+details.exercise{background:var(--bg-panel); border-radius:var(--radius); margin:14px 0; overflow:hidden;}
+details.exercise summary{list-style:none; cursor:pointer; padding:18px 22px; display:flex; align-items:center; gap:6px; font-size:15.5px; color:var(--ink);}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::before{content:'+'; font-family:var(--mono); color:var(--muted); font-size:18px; width:20px; flex-shrink:0; transition:transform .2s;}
+details.exercise[open] summary::before{content:'–';}
+.ex-num{font-family:var(--mono); color:var(--muted); margin-right:2px;}
+.ex-body{padding:0 22px 22px;}
+.ex-body p{font-size:14.5px;}
+
+footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · BST — ლექცია 13</a>
+    <div class="nav-links">
+      <a href="#what-is">რა არის BST</a>
+      <a href="#pros-cons">დადებითი/უარყოფითი</a>
+      <a href="#insert">ჩასმა</a>
+      <a href="#search">ძებნა</a>
+      <a href="#viz">ინტერაქტიული BST</a>
+      <a href="#delete">წაშლა</a>
+      <a href="#treesort">Tree Sort</a>
+      <a href="#industry">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-bst" id="heroBst" viewBox="0 0 400 220"></svg>
+  <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 13</span>
+  <h1>ორობითი ძებნის ხე (BST)</h1>
+  <p class="hero-sub">ორობითი ხე (ლექცია 10) ერთი დამატებითი წესით — და უცებ ძებნა, ჩასმა და წაშლა ხდება ლოგარითმულად სწრაფი.</p>
+  <div class="hero-terms">
+    <span>left &lt; node &lt; right</span><span>O(h) ძებნა</span><span>Inorder = დალაგებული</span><span>Tree Sort</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ WHAT IS ============ -->
+<section id="what-is">
+  <div class="wrap">
+    <span class="section-label">01 — ერთი წესი, დიდი შედეგი</span>
+    <h2 class="h-section">რა არის ორობითი ძებნის ხე</h2>
+    <p class="lede">ორობითი ძებნის ხე (BST) — ჩვეულებრივი ორობითი ხეა (ლექცია 10) ერთადერთი, მაგრამ გადამწყვეტი დამატებითი წესით: თითოეული კვანძისთვის, მისი <strong>მარცხენა</strong> ქვეხის ყველა მნიშვნელობა მასზე <strong>ნაკლებია</strong>, მარჯვენა ქვეხის ყველა მნიშვნელობა კი — <strong>მეტია</strong>. ეს წესი რეკურსიულად მოქმედებს ყოველ ქვეხეზეც.</p>
+
+    <div class="term-grid">
+      <div class="term-card">
+        <h4>BST-ის თვისება</h4>
+        <p>ნებისმიერი კვანძისთვის: <code>ყველა მარცხენა &lt; კვანძი &lt; ყველა მარჯვენა</code>. სტანდარტულად, დუბლიკატები არ დაიშვება.</p>
+      </div>
+      <div class="term-card">
+        <h4>რატომ არის ეს ძლიერი</h4>
+        <p>ეს ერთი წესი გვაძლევს ორობითი ძებნის (ლექცია 3) იმავე „განახევრების" ლოგიკას — უბრალოდ მასივის ნაცვლად, ხის სტრუქტურაზე.</p>
+      </div>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">🔗</span>
+      <p><strong>პირდაპირი კავშირი ლექცია 10-თან:</strong> გახსოვთ, რომ Inorder Traversal-ს BST-ზე განსაკუთრებული მნიშვნელობა მივანიჭეთ? ახლა ვხედავთ რატომ — BST-ის განსაზღვრება <strong>თავად</strong> უზრუნველყოფს, რომ Inorder შემოვლა ყოველთვის დააბრუნებს მონაცემებს ზრდადობით დალაგებული თანმიმდევრობით. ეს არაა დამთხვევა — ეს BST-ის განმსაზღვრელი შედეგია.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ PROS CONS ============ -->
+<section id="pros-cons" class="section-full">
+  <div class="wrap">
+    <span class="section-label">02 — შეჯამება</span>
+    <h2 class="h-section">დადებითი და უარყოფითი მხარეები</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">✅</div>
+        <h4>დადებითი</h4>
+        <p>ეფექტური ძებნა — <code>O(log n)</code> საშუალო შემთხვევაში; მონაცემი ბუნებრივად დალაგებულია (Inorder-ით ადვილად მისაწვდომი); დინამიური ჩასმა/წაშლა ეფექტურია; დაბალანსებულ BST-ებს ლოგარითმული სიმაღლე აქვთ.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">⚠️</div>
+        <h4>უარყოფითი</h4>
+        <p>უარეს შემთხვევაში (თანმიმდევრულად ჩასმული მონაცემი) სირთულე ხდება <code>O(n)</code> — ხე „გადაგრძელდება" ერთ მიმართულებაში, ფაქტობრივად ბმულ სიად გადაიქცევა; დამატებითი მეხსიერება მაჩვენებლებისთვის; ფუნქციონალი შეზღუდულია ძებნა/ჩასმა/წაშლაზე.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">⚠️</span>
+      <p><strong>უარესი შემთხვევის კონკრეტული მაგალითი:</strong> თუ მონაცემი ქრონოლოგიურად, უკვე დალაგებული სახით ჩაისმევა (მაგ. <code>1, 2, 3, 4, 5</code> თანმიმდევრობით), თითოეული ახალი კვანძი ხდება წინას მარჯვენა შვილი — ხე იქცევა სრულიად „გადახრილ", ერთმხრივ ჯაჭვად, სიმაღლით <code>n</code>. ეს ზუსტად ის პრობლემაა, რასაც <strong>AVL ხეები</strong> (ლექცია 15) აგვარებენ — თვითდაბალანსების მექანიზმით.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INSERT ============ -->
+<section id="insert">
+  <div class="wrap">
+    <span class="section-label">03 — ჩასმა</span>
+    <h2 class="h-section">ჩასმა BST-ში</h2>
+    <p class="lede">ახალი კვანძი ყოველთვის ისმევა <strong>ფოთლის</strong> პოზიციაზე — ვიწყებთ root-იდან და ვადარებთ მნიშვნელობებს, სანამ ცარიელ ადგილს არ მივაღწევთ.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">bst_insert.py</span></div>
+      <pre><code class="language-python">def insert(root: "Node", key) -> "Node":
+    if root is None:
+        return Node(key)
+    if root.data == key:
+        return root                          # დუბლიკატები არ დაიშვება
+    if key < root.data:
+        root.left = insert(root.left, key)
+    else:
+        root.right = insert(root.right, key)
+    return root</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>შესწორება ორიგინალ მასალასთან შედარებით:</strong> ორიგინალ სლაიდებში ჩასმის ფუნქცია იყენებდა ატრიბუტს <code>root.val</code>, ხოლო წაშლისა და Tree Sort-ის ფუნქციები — <code>root.key</code>-ს. ეს <strong>შეუსაბამობაა</strong> — ერთი და იგივე <code>Node</code> კლასის ორი განსხვავებული ატრიბუტის სახელი ერთმანეთს ეწინააღმდეგება, რაც კოდს გაუშვებადს გახდიდა, ერთად რომ გამოგვეყენებინა. გავაერთგვაროვნეთ ყველა ფუნქცია <code>data</code>-ზე — ლექცია 10-12-ის <code>Node</code> კლასის იმავე კონვენციით.</p>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>შემთხვევა</th><th>სირთულე</th></tr>
+      <tr><td>საშუალო (დაბალანსებული ხე)</td><td class="num">O(log n)</td></tr>
+      <tr><td>უარესი (გადახრილი ხე)</td><td class="num">O(n)</td></tr>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ SEARCH ============ -->
+<section id="search" class="section-full">
+  <div class="wrap">
+    <span class="section-label">04 — BST-ის მთავარი უპირატესობა</span>
+    <h2 class="h-section">ძებნა BST-ში</h2>
+    <p class="lede">ზუსტად იგივე „შედარება და გადაწყვეტილება" ლოგიკა, რაც ჩასმაში — უბრალოდ ახალი კვანძის დამატების ნაცვლად, ვეძებთ არსებულს.</p>
+
+    <div class="code-window">
+      <pre><code class="language-python">def search(root: "Node", key):
+    if root is None or root.data == key:
+        return root
+    if key < root.data:
+        return search(root.left, key)
+    return search(root.right, key)</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">🎯</span>
+      <p><strong>ეს არის ორობითი ძებნის (ლექცია 3) ხის ვერსია:</strong> დალაგებულ მასივში ორობითი ძებნა ყოველ ნაბიჯზე შუა ელემენტს ამოწმებს და ნახევარს გამორიცხავს. BST-ში იგივე ხდება — უბრალოდ „შუა ელემენტი" უკვე ცალკე კვანძადაა შენახული, და მარცხენა/მარჯვენა „ნახევრები" უკვე ცალკე ქვეხეებადაა ორგანიზებული. ამიტომაცაა სირთულე იგივე — <code>O(log n)</code> დაბალანსებულ ხეზე.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VISUALIZER ============ -->
+<section id="viz">
+  <div class="wrap-wide">
+    <span class="section-label">05 — სცადეთ თავად</span>
+    <h2 class="h-section">ააგეთ და მოძებნეთ საკუთარი BST</h2>
+    <p class="lede">ჩაწერეთ რიცხვები — თანმიმდევრულად ჩაისმევა BST-ის წესის დაცვით. შემდეგ სცადეთ ძებნა და ნახეთ, რომელი გზა გაივლის ალგორითმმა root-იდან.</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label for="bstInput">ჩასასმელი მიმდევრობა:</label>
+        <input type="text" id="bstInput" value="50,30,70,20,40,60,80,10,45">
+        <button class="btn" onclick="bstInit()">↺ ხის აგება</button>
+      </div>
+      <div class="viz-controls">
+        <label for="bstSearchVal">საძიებელი:</label>
+        <input type="number" id="bstSearchVal" value="45">
+        <button class="btn ghost" onclick="bstSearchInit()">ძებნის დაწყება</button>
+        <button class="btn ghost" onclick="bstSearchStep()">შემდეგი ნაბიჯი →</button>
+      </div>
+      <div class="tree-svg-wrap"><svg id="bstSvg" viewBox="0 0 480 220" style="width:100%; max-width:520px; display:block; margin:0 auto;"></svg></div>
+      <div class="viz-status" id="bstStatus"></div>
+    </div>
+    <p class="viz-note">ოქროსფერი, წყვეტილი ჩარჩო — ძებნის გზაზე მდგომი კვანძი. მწვანე — ნაპოვნია. წითელი — იქ, სადაც ძებნამ დაადგინა, რომ ელემენტი არ არსებობს.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ DELETE ============ -->
+<section id="delete" class="section-full">
+  <div class="wrap">
+    <span class="section-label">06 — ყველაზე რთული ოპერაცია</span>
+    <h2 class="h-section">წაშლა BST-დან</h2>
+    <p class="lede">წაშლა სამ ცალკეულ შემთხვევად იყოფა:</p>
+
+    <div class="term-grid">
+      <div class="term-card">
+        <h4>1. ფოთლოვანი კვანძი</h4>
+        <p>არცერთი შვილი არ ჰყავს — უბრალოდ ვშლით, მშობლის შესაბამის <code>left</code>/<code>right</code>-ს <code>None</code>-ზე ვაყენებთ.</p>
+      </div>
+      <div class="term-card">
+        <h4>2. ერთი შვილი</h4>
+        <p>წასაშლელი კვანძის ადგილს იკავებს მისი ერთადერთი შვილი.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:19px; margin:30px 0 6px;">3. ორი შვილი — ყველაზე რთული შემთხვევა</h3>
+    <p>თუ წასაშლელ კვანძს ორივე შვილი ჰყავს, პირდაპირი წაშლა შეუძლებელია — ხე „დაიშლებოდა" ორ ცალკე ნაწილად. ამის ნაცვლად:</p>
+    <ol style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
+      <li style="margin-bottom:8px;">ვპოულობთ <strong>inorder successor</strong>-ს — უმცირეს მნიშვნელობას წასაშლელი კვანძის <strong>მარჯვენა</strong> ქვეხეში (ანუ, უკიდურესად მარცხენა კვანძი იმ ქვეხეში).</li>
+      <li style="margin-bottom:8px;">ამ successor-ის მონაცემს ვაკოპირებთ წასაშლელი კვანძის ადგილას.</li>
+      <li>ვშლით საწყის successor-ს მისი თავდაპირველი პოზიციიდან — ეს უკვე უფრო მარტივი შემთხვევაა (successor-ს არასდროს აქვს მარცხენა შვილი).</li>
+    </ol>
+
+    <div class="code-window">
+      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">bst_delete.py</span></div>
+      <pre><code class="language-python">def get_successor(root: "Node") -> "Node":
+    """უმცირესი მნიშვნელობის კვანძი root-ის მარჯვენა ქვეხეში."""
+    curr = root.right
+    while curr and curr.left:
+        curr = curr.left
+    return curr
+
+def delete_node(root: "Node", key) -> "Node":
+    if root is None:
+        return root
+
+    if root.data > key:
+        root.left = delete_node(root.left, key)
+    elif root.data < key:
+        root.right = delete_node(root.right, key)
+    else:
+        # ვიპოვეთ წასაშლელი კვანძი
+        if root.left is None:
+            return root.right          # 0 ან მხოლოდ მარჯვენა შვილი
+        if root.right is None:
+            return root.left           # მხოლოდ მარცხენა შვილი
+
+        # ორი შვილი — ვცვლით inorder successor-ის მონაცემით
+        succ = get_successor(root)
+        root.data = succ.data
+        root.right = delete_node(root.right, succ.data)
+
+    return root</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>დამატებითი შესწორება:</strong> ორიგინალი Tree Sort-ის ჩასმის კოდი იყენებდა <code>if (root == None):</code>-ს — ზუსტად იგივე <code>==</code> vs <code>is</code> საკითხი, რასაც ლექცია 10-ში Postorder-ის მაგალითზე შევხვდით. ყველა ფუნქცია აქ თანმიმდევრულად იყენებს <code>is None</code>-ს.</p>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>დროითი სირთულე</th><th>მეხსიერებითი სირთულე</th></tr>
+      <tr><td class="num">O(h)</td><td class="num">O(h)</td></tr>
+    </table>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ============ TREE SORT ============ -->
+<section id="treesort">
+  <div class="wrap">
+    <span class="section-label">07 — გამოყენება</span>
+    <h2 class="h-section">დალაგება BST-ის საშუალებით (Tree Sort)</h2>
+    <p class="lede">Tree Sort პირდაპირ იყენებს BST-ის მთავარ თვისებას: (1) ავაშენოთ BST მასივის ელემენტებისგან, (2) შევასრულოთ Inorder Traversal — შედეგი ავტომატურად დალაგებულია.</p>
+
+    <div class="code-window">
+      <pre><code class="language-python">def inorder(root: "Node", result: list) -> None:
+    if root is not None:
+        inorder(root.left, result)
+        result.append(root.data)
+        inorder(root.right, result)
+
+def tree_sort(arr: list) -> list:
+    root = None
+    for value in arr:
+        root = insert(root, value)
+
+    result = []
+    inorder(root, result)
+    return result</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <p><strong>დამატებითი გაწმენდა:</strong> ორიგინალი <code>treeins</code>/<code>insert</code> ფუნქციები იყენებდნენ <code>global root</code>-ს — გლობალურ, ფუნქციის გარეთ არსებულ ცვლადს, რომელსაც ფუნქცია მდუმარედ ცვლიდა. ეს არღვევს კურსის განმავლობაში დამკვიდრებულ პატერნს (ბმული სია, ხე — ყველგან ახალ root/head-ს ვაბრუნებდით, გლობალურ მდგომარეობას ვერიდებოდით): გლობალური ცვლადები ართულებენ ტესტირებას და შეცდომების პოვნას დიდ პროგრამებში. ზემოთ მოცემული ვერსია <code>root</code>-ს ლოკალურად, ცალსახად აბრუნებს — ისევე, როგორც ამას ვაკეთებდით ლექცია 7-9-ის ბმული სიის ფუნქციებში.</p>
+    </div>
+
+    <table class="bigo-table">
+      <tr><th>შემთხვევა</th><th>დროითი სირთულე</th></tr>
+      <tr><td>საშუალო</td><td class="num">O(n log n)</td></tr>
+      <tr><td>უარესი (თანმიმდევრული შემავალი)</td><td class="num">O(n²)</td></tr>
+    </table>
+    <p style="font-size:14.5px;"><strong>სივრცითი სირთულე: O(n)</strong> — თავად BST-ის აგებას სჭირდება ეს სივრცე. ეს განასხვავებს Tree Sort-ს Heap Sort-ისგან (ლექცია 12), რომელიც <code>O(log n)</code>-ში, თითქმის in-place მუშაობდა.</p>
+  </div>
+</section>
+
+<!-- ============ INDUSTRY ============ -->
+<section id="industry" class="section-full">
+  <div class="wrap-wide">
+    <span class="section-label">08 — რეალურ სამყაროში</span>
+    <h2 class="h-section">სად მუშაობს BST რეალურად</h2>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="em">🗄️</div>
+        <h4>მონაცემთა ბაზის ინდექსები</h4>
+        <p>B-Tree და B+Tree ინდექსები (MySQL, PostgreSQL) BST-ის განზოგადებაა — თითოეულ კვანძს ერთზე მეტი გასაღები აქვს, რაც დისკზე წვდომას ამცირებს, მაგრამ ძირითადი პრინციპი იგივეა.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">📚</div>
+        <h4>TreeMap / TreeSet</h4>
+        <p>Java-ს <code>TreeMap</code>/<code>TreeSet</code> და C++-ის <code>std::map</code>/<code>std::set</code> დაბალანსებულ BST-ებზეა აგებული (წითელ-შავი ხეები) — გვაძლევენ დალაგებულ, ეფექტურ key-value საცავს.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">📁</div>
+        <h4>ფაილური სისტემები</h4>
+        <p>ზოგიერთი ფაილური სისტემა BST-ის მსგავს სტრუქტურებს იყენებს ფაილების სწრაფი მოძიებისთვის სახელის მიხედვით.</p>
+      </div>
+      <div class="insight-card">
+        <div class="em">🎮</div>
+        <h4>თამაშების დეველოპმენტი</h4>
+        <p>სივრცითი ინდექსაცია (obiექტების სწრაფად პოვნა კოორდინატის მიხედვით) ხშირად იყენებს BST-ის იდეებზე დაფუძნებულ სტრუქტურებს (მაგ. k-d ხეები).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises">
+  <div class="wrap-wide">
+    <span class="section-label">09 — სავარჯიშოები</span>
+    <h2 class="h-section">დამატებითი პრაქტიკა</h2>
+    <p class="lede">დღეს ნასწავლი ტექნიკების ბუნებრივი გაგრძელება — <em>BST-ზე დამატებით ამოცანებს კურსის მომდევნო ეტაპზე ღრმად შევეხებით</em>.</p>
+
+    <details class="exercise">
+      <summary>Range Sum of BST <span class="badge badge-easy">მარტივი</span></summary>
+      <div class="ex-body">
+        <p>დააბრუნეთ ყველა იმ კვანძის მონაცემის ჯამი, რომლებიც <code>[low, high]</code> დიაპაზონშია (LeetCode 938).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def range_sum_bst(root: "Node", low: int, high: int) -> int:
+    if root is None:
+        return 0
+    if root.data < low:                      # მთელი მარცხენა ქვეხე ძალიან პატარაა
+        return range_sum_bst(root.right, low, high)
+    if root.data > high:                      # მთელი მარჯვენა ქვეხე ძალიან დიდია
+        return range_sum_bst(root.left, low, high)
+    return (root.data
+            + range_sum_bst(root.left, low, high)
+            + range_sum_bst(root.right, low, high))</code></pre>
+        </div>
+        <p><strong>BST-ის თვისების პირდაპირი გამოყენება:</strong> თუ მიმდინარე კვანძი დიაპაზონს გარეთაა, BST-ის წესის წყალობით ზუსტად ვიცით, რომელი მთელი ქვეხე შეგვიძლია სრულად გამოვტოვოთ — ჩვეულებრივ ორობით ხეზე ეს შეუძლებელი იქნებოდა.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Kth Smallest Element in a BST <span class="badge badge-medium">საშუალო</span></summary>
+      <div class="ex-body">
+        <p>იპოვეთ k-ურად უმცირესი მნიშვნელობა BST-ში (LeetCode 230).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def kth_smallest(root: "Node", k: int):
+    stack = []
+    curr = root
+    count = 0
+    while stack or curr:
+        while curr:
+            stack.append(curr)
+            curr = curr.left
+        curr = stack.pop()
+        count += 1
+        if count == k:
+            return curr.data
+        curr = curr.right
+    return None</code></pre>
+        </div>
+        <p><strong>დღევანდელი Inorder-ის თვისების პირდაპირი გამოყენება:</strong> ვინაიდან Inorder Traversal ყოველთვის აბრუნებს დალაგებულ თანმიმდევრობას, k-ურად უმცირესი უბრალოდ Inorder-ის <code>k</code>-ური ელემენტია. აქ გამოყენებულია იტერაციული Inorder (მკაფიო stack-ით, ლექცია 11-ის „რეკურსია vs იტერაცია" თემის გაგრძელება) — შეგვიძლია <strong>ადრე</strong> შევჩერდეთ, როგორც კი <code>k</code>-ურ ელემენტს მივაღწევთ, სრული შემოვლის დასრულების მოლოდინის გარეშე.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary>Recover Binary Search Tree <span class="badge badge-hard">რთული</span></summary>
+      <div class="ex-body">
+        <p>BST-ში ორი კვანძის მონაცემი შემთხვევით არის გაცვლილი, რის გამოც ხე აღარ არის ვალიდური BST. გამოასწორეთ ხე <strong>ადგილზევე</strong> (in-place), O(1) დამატებითი სივრცით (LeetCode 99).</p>
+        <div class="code-window">
+          <pre><code class="language-python">def recover_tree(root: "Node") -> None:
+    first = second = prev = None
+    stack = []
+    curr = root
+
+    while stack or curr:
+        while curr:
+            stack.append(curr)
+            curr = curr.left
+        curr = stack.pop()
+
+        # ვალიდურ BST-ში, Inorder-ისას ყოველი შემდეგი მნიშვნელობა
+        # წინაზე მეტი უნდა იყოს — დარღვევა ავლენს "ეჭვმიტანილ" კვანძებს
+        if prev and prev.data > curr.data:
+            if first is None:
+                first = prev
+            second = curr
+
+        prev = curr
+        curr = curr.right
+
+    first.data, second.data = second.data, first.data</code></pre>
+        </div>
+        <p><strong>საკვანძო დაკვირვება:</strong> ვალიდურ BST-ში Inorder თანმიმდევრობა მკაცრად ზრდადია — ორი გაცვლილი კვანძი ამ თანმიმდევრობაში ან ერთ, ან ორ ადგილას შექმნის „დარღვევას" (წინა ელემენტი > შემდეგი). პირველი დარღვევისას ვინახავთ „საეჭვო" წყვილის პირველ წევრს (<code>first</code>); ნებისმიერ შემდეგ დარღვევაში ვაახლებთ მეორეს (<code>second</code>) — ეს ორი შემთხვევა ფარავს როგორც მეზობელი, ისე შორეული კვანძების გაცვლას.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>მონაცემთა სტრუქტურები და ალგორითმები I · BIT-08.2022.G · ლექცია 13: ორობითი ძებნის ხე (BST)</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+hljs.highlightAll();
+
+/* SCROLLSPY */
+const sections = document.querySelectorAll('main section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const spy = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      const link = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+sections.forEach(s=>spy.observe(s));
+
+/* HERO DECORATIVE BST */
+(function(){
+  const svg = document.getElementById('heroBst');
+  const nodes = {50:{x:200,y:30},30:{x:120,y:100},70:{x:280,y:100},20:{x:70,y:170},40:{x:160,y:170},60:{x:240,y:170},80:{x:320,y:170}};
+  const edges = [[50,30],[50,70],[30,20],[30,40],[70,60],[70,80]];
+  let content = '';
+  edges.forEach(([a,b])=>{
+    content += `<line x1="${nodes[a].x}" y1="${nodes[a].y}" x2="${nodes[b].x}" y2="${nodes[b].y}" stroke="#3a4256" stroke-width="1.6"/>`;
+  });
+  Object.entries(nodes).forEach(([val,n])=>{
+    content += `<circle cx="${n.x}" cy="${n.y}" r="16" fill="none" stroke="${val==50?'#D9A64E':'#5AC2B6'}" stroke-width="1.6"/>`;
+  });
+  svg.innerHTML = content;
+})();
+
+/* ============ INTERACTIVE BST ============ */
+let bstNodes = {};
+let bstNextId = 0;
+let bstRootId = null;
+let bstSearchPath = [];
+let bstSearchIdx = 0;
+
+function bstInsert(id, val){
+  if(id === null){
+    const newId = bstNextId++;
+    bstNodes[newId] = {val, left:null, right:null};
+    return newId;
+  }
+  if(val < bstNodes[id].val) bstNodes[id].left = bstInsert(bstNodes[id].left, val);
+  else if(val > bstNodes[id].val) bstNodes[id].right = bstInsert(bstNodes[id].right, val);
+  return id;
+}
+
+function bstInit(){
+  const raw = document.getElementById('bstInput').value;
+  const vals = raw.split(',').map(s=>parseInt(s.trim(),10)).filter(x=>!isNaN(x));
+  if(vals.length < 1 || vals.length > 20){ alert('შეიყვანეთ 1-20 რიცხვი, მძიმით გამოყოფილი.'); return; }
+  bstNodes = {}; bstNextId = 0; bstRootId = null;
+  vals.forEach(v => { bstRootId = bstInsert(bstRootId, v); });
+  bstSearchPath = []; bstSearchIdx = 0;
+  renderBstSvg(new Set(), null);
+  document.getElementById('bstStatus').innerHTML = `ხე აგებულია ${vals.length} მნიშვნელობით. ახლა სცადეთ ძებნა.`;
+}
+
+function bstSearchInit(){
+  const target = parseInt(document.getElementById('bstSearchVal').value, 10);
+  if(isNaN(target)){ return; }
+  bstSearchPath = [];
+  let curId = bstRootId;
+  while(curId !== null){
+    bstSearchPath.push(curId);
+    if(target === bstNodes[curId].val) break;
+    curId = target < bstNodes[curId].val ? bstNodes[curId].left : bstNodes[curId].right;
+  }
+  bstSearchIdx = 0;
+  renderBstSvg(new Set(), null);
+  document.getElementById('bstStatus').innerHTML = `მზადაა ${target}-ის ძებნისთვის — დააჭირეთ „შემდეგი ნაბიჯს".`;
+}
+
+function bstSearchStep(){
+  if(bstSearchPath.length === 0){ bstSearchInit(); return; }
+  if(bstSearchIdx >= bstSearchPath.length) return;
+  const target = parseInt(document.getElementById('bstSearchVal').value, 10);
+  const visitedIds = new Set(bstSearchPath.slice(0, bstSearchIdx+1));
+  const curId = bstSearchPath[bstSearchIdx];
+  const isLast = bstSearchIdx === bstSearchPath.length - 1;
+  const found = isLast && bstNodes[curId].val === target;
+
+  let statusText;
+  if(found){
+    statusText = `ნაპოვნია! ${target} === ${bstNodes[curId].val}`;
+    renderBstSvg(visitedIds, curId, found ? 'found' : null);
+  } else if(isLast){
+    statusText = `ძებნა დასრულდა ${bstNodes[curId].val}-ზე — ${target} ხეში არ არსებობს.`;
+    renderBstSvg(visitedIds, curId, 'absent');
+  } else {
+    const dir = target < bstNodes[curId].val ? 'მარცხნივ' : 'მარჯვნივ';
+    statusText = `მიმდინარე კვანძი: ${bstNodes[curId].val}. ${target} ${target < bstNodes[curId].val ? '<' : '>'} ${bstNodes[curId].val} → ვაგრძელებთ ${dir}.`;
+    renderBstSvg(visitedIds, curId, null);
+  }
+  document.getElementById('bstStatus').innerHTML = statusText;
+  bstSearchIdx++;
+}
+
+function renderBstSvg(pathIds, currentId, currentState){
+  if(bstRootId === null){
+    document.getElementById('bstSvg').innerHTML = '';
+    return;
+  }
+  const laidOut = [];
+  function layout(id, depth, counter){
+    if(id === null) return null;
+    const nodeIdx = laidOut.length;
+    laidOut.push({id, val:bstNodes[id].val, depth});
+    const leftIdx = layout(bstNodes[id].left, depth+1, counter);
+    const rightIdx = layout(bstNodes[id].right, depth+1, counter);
+    if(leftIdx === null && rightIdx === null){
+      laidOut[nodeIdx].x = counter.next++;
+    } else {
+      const xs = [];
+      if(leftIdx !== null) xs.push(laidOut[leftIdx].x);
+      if(rightIdx !== null) xs.push(laidOut[rightIdx].x);
+      laidOut[nodeIdx].x = xs.reduce((a,b)=>a+b,0)/xs.length;
+    }
+    laidOut[nodeIdx].leftIdx = leftIdx;
+    laidOut[nodeIdx].rightIdx = rightIdx;
+    return nodeIdx;
+  }
+  layout(bstRootId, 0, {next:0});
+
+  const spacingX = 42, spacingY = 42, pad = 26;
+  const maxX = Math.max(...laidOut.map(nd=>nd.x));
+  const maxDepth = Math.max(...laidOut.map(nd=>nd.depth));
+  const width = (maxX+1)*spacingX + pad*2;
+  const height = (maxDepth+1)*spacingY + pad*2;
+  const svg = document.getElementById('bstSvg');
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+  function pos(nd){ return {x: pad + nd.x*spacingX, y: pad + nd.depth*spacingY}; }
+  let content = '';
+  laidOut.forEach(nd=>{
+    const p = pos(nd);
+    if(nd.leftIdx !== null) content += `<line class="edge" x1="${p.x}" y1="${p.y}" x2="${pos(laidOut[nd.leftIdx]).x}" y2="${pos(laidOut[nd.leftIdx]).y}"/>`;
+    if(nd.rightIdx !== null) content += `<line class="edge" x1="${p.x}" y1="${p.y}" x2="${pos(laidOut[nd.rightIdx]).x}" y2="${pos(laidOut[nd.rightIdx]).y}"/>`;
+  });
+  laidOut.forEach(nd=>{
+    const p = pos(nd);
+    let cls = 'node-circle';
+    if(pathIds.has(nd.id)) cls += ' path';
+    if(nd.id === currentId && currentState === 'found') cls = 'node-circle found';
+    if(nd.id === currentId && currentState === 'absent') cls = 'node-circle absent';
+    content += `<circle class="${cls}" cx="${p.x}" cy="${p.y}" r="15"/>`;
+    content += `<text x="${p.x}" y="${p.y+5}">${nd.val}</text>`;
+  });
+  svg.innerHTML = content;
+}
+
+bstInit();
+</script>
+</body>
+</html>
