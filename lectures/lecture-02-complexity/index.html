@@ -208,11 +208,6 @@ elapsed = time.perf_counter() - start
 print(f"დრო: {elapsed:.8f} წამი")</code></pre>
     </div>
 
-    <div class="callout fix">
-      <span class="icon">🔍</span>
-      <p><strong>შესწორება ორიგინალი მასალიდან:</strong> საწყისი კოდი იყენებდა <code>time.clock()</code>-ს — ეს ფუნქცია Python 3.3-დან მოძველებულად იყო გამოცხადებული და <strong>საბოლოოდ წაშლილია Python 3.8-დან</strong>. თანამედროვე სტანდარტული ალტერნატივაა <code>time.perf_counter()</code> (ყველაზე ზუსტი, wall-clock დროისთვის) ან <code>time.process_time()</code> (მხოლოდ CPU-ს დროისთვის, I/O ლოდინის გარეშე).</p>
-    </div>
-
     <p>მაგრამ დროის გაზომვას რამდენიმე ფუნდამენტური პრობლემა აქვს, როცა მიზანი <strong>ალგორითმის</strong> (და არა კონკრეტული პროგრამის) შეფასებაა:</p>
 
     <table class="bigo-table">
@@ -304,11 +299,11 @@ print(f"დრო: {elapsed:.8f} წამი")</code></pre>
     <h2 class="h-section">O-დიდი</h2>
     <p class="lede"><strong>O-დიდი</strong> — ასიმპტოტური აღნიშვნაა, რომელიც აღწერს ფუნქციის ყოფაქცევას ზღვარში, როცა არგუმენტი (შემავალი მონაცემის ზომა) მიისწრაფვის უსასრულობისკენ. ის გვაძლევს მოხერხებულ კლასიფიკაციას ფუნქციებისთვის მათი ზრდის რიგის მიხედვით — ზუსტი მნიშვნელობის ნაცვლად.</p>
 
-    <p>O-დიდის განსაზღვრებისას სამი პრინციპი გვხელმძღვანელობს:</p>
+    <p>O-დიდის განსაზღვრებისას სამი პრინციპით ვხელმძღვანელობთ:</p>
     <ol style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
-      <li style="margin-bottom:8px;">გვაინტერესებს, რამდენად სწრაფად იზრდება საჭირო დრო, როცა შემავალი მონაცემის ზომა იზრდება — არა ზუსტი მნიშვნელობა კონკრეტულ <code>n</code>-ზე.</li>
+      <li style="margin-bottom:8px;">გვაინტერესებს, რამდენად სწრაფად იზრდება საჭირო დრო, როცა შემავალი მონაცემის ზომა იზრდება (ჩვენი მიზანი არაა განვსაზღვროთ ზუსტი დამოკიდებულება <code>n</code>-ზე.)</li>
       <li style="margin-bottom:8px;">ვაკვირდებით უარეს შემთხვევას — ზრდის ზედა საზღვარს (upper bound), რაც შეიძლება მჭიდროდ.</li>
-      <li>ვინარჩუნებთ მხოლოდ ყველაზე სწრაფად მზარდ ტერმს, უგულებელვყოფთ მუდმივებს — მათემატიკურად: <code>O(f(n))</code>, თუ არსებობს დადებითი მუდმივები <code>c</code> და <code>n₀</code>, ისეთი, რომ ნებისმიერი <code>n ≥ n₀</code>-სთვის ალგორითმის ნაბიჯების რაოდენობა ≤ <code>c · f(n)</code>.</li>
+      <li>ვინარჩუნებთ მხოლოდ ყველაზე სწრაფად მზარდ ტერმს, უგულებელვყოფთ მუდმივებს — მათემატიკურად რომ ვთქვათ: <code>O(f(n))</code>, ახასიათებს თუ არსებობს დადებითი მუდმივები <code>c</code> და <code>n₀</code>, ისეთი, რომ ნებისმიერი <code>n ≥ n₀</code>-სთვის ალგორითმის ნაბიჯების რაოდენობა ≤ <code>c · f(n)</code>.</li>
     </ol>
   </div>
 </section>
@@ -317,8 +312,8 @@ print(f"დრო: {elapsed:.8f} წამი")</code></pre>
 <section id="classes">
   <div class="wrap-wide">
     <span class="section-label">05 — ტაქსონომია</span>
-    <h2 class="h-section">კომპლექსურობის კლასები</h2>
-    <p class="lede">კომპლექსურობის კლასები გვეხმარება განვსაზღვროთ, რამდენი დრო (ან მეხსიერება) დასჭირდება ალგორითმს, როცა მონაცემთა რაოდენობა იზრდება — უმცირესიდან უდიდესამდე:</p>
+    <h2 class="h-section">კომპლექსურობის / სირთულის კლასები</h2>
+    <p class="lede">კომპლექსურობის / სირთულის კლასები გვეხმარება განვსაზღვროთ, რამდენი დრო (ან მეხსიერება) დასჭირდება ალგორითმს, როცა მონაცემთა რაოდენობა იზრდება — უმცირესიდან უდიდესამდე:</p>
 
     <table class="class-table">
       <tr><th>კლასი</th><th>დახასიათება</th><th>მაგალითი</th><th>შეფასება</th></tr>
@@ -327,7 +322,7 @@ print(f"დრო: {elapsed:.8f} წამი")</code></pre>
       <tr><td class="o">O(n)</td><td>წრფივი — ყოველი ელემენტის ერთხელ გავლა.</td><td>ძებნა დაულაგებელ სიაში</td><td><span class="tag tag-normal">ნორმალური</span></td></tr>
       <tr><td class="o">O(n log n)</td><td>ლოგ-ხაზოვანი — n-ჯერადი ოპერაცია, თითოეული ლოგარითმული ხარჯით.</td><td>Merge Sort, Quick Sort</td><td><span class="tag tag-ok">დასაშვები</span></td></tr>
       <tr><td class="o">O(n²)</td><td>კვადრატული (პოლინომური) — ჩადგმული წრფივი ციკლი.</td><td>ორი სიის თანაკვეთის ნაივური ძებნა</td><td><span class="tag tag-slow">ნელი</span></td></tr>
-      <tr><td class="o">O(2ⁿ)</td><td>ექსპონენციალური — იზრდება კატასტროფულად სწრაფად.</td><td>ფიბონაჩის ნაივური რეკურსია</td><td><span class="tag tag-bad">პრაქტიკულად გამოუსადეგარი</span></td></tr>
+      <tr><td class="o">O(2ⁿ)</td><td>ექსპონენციალური — იზრდება ძალიან სწრაფად.</td><td>ფიბონაჩის ნაივური რეკურსია</td><td><span class="tag tag-bad">პრაქტიკულად გამოუსადეგარი</span></td></tr>
     </table>
 
     <div class="viz-panel">
@@ -337,7 +332,7 @@ print(f"დრო: {elapsed:.8f} წამი")</code></pre>
         <span id="raceNVal" style="font-family:var(--mono); color:var(--gold); min-width:28px; display:inline-block;">12</span>
       </div>
       <div id="raceBars"></div>
-      <p class="viz-note">ზოლების სიგრძე ლოგარითმულ შკალაზეა (თორემ O(2ⁿ) დანარჩენებს უხილავს გახდიდა) — მარჯვნივ მოცემული რიცხვი კი ზუსტი ოპერაციების რაოდენობაა მოცემულ n-ზე. გადაათრიეთ სლაიდერი — შეამჩნევთ, რამდენად სწრაფად „გაექცევა" ექსპონენციალური კლასი დანარჩენებს.</p>
+      <p class="viz-note">ზოლების სიგრძე ლოგარითმულ შკალაზეა (თორემ O(2ⁿ) დანარჩენებს უხილავს გახდიდა) — მარჯვნივ მოცემული რიცხვი კი ზუსტი ოპერაციების რაოდენობაა მოცემულ n-ზე. გადაწიეთ სლაიდერი — შეამჩნევთ, რამდენად სწრაფად „გაექცევა" ექსპონენციალური კლასი დანარჩენებს.</p>
     </div>
   </div>
 </section>
@@ -385,7 +380,7 @@ print(f"დრო: {elapsed:.8f} წამი")</code></pre>
 <section id="examples">
   <div class="wrap-wide">
     <span class="section-label">07 — მაგალითები კლასების მიხედვით</span>
-    <h2 class="h-section">რეალური მაგალითები, დახარისხებული</h2>
+    <h2 class="h-section">მაგალითები</h2>
 
     <h3 style="font-size:19px; margin:34px 0 6px;">O(1) — მასივში ელემენტზე წვდომა</h3>
     <p>მასივის ელემენტები მეხსიერებაში თანმიმდევრულადაა განლაგებული, ერთმანეთისგან ფიქსირებული მანძილით — ამიტომ <code>A[i]</code>-ზე წვდომა უბრალო არითმეტიკაა (საწყისი მისამართი + i × ზომა), მონაცემთა რაოდენობის მიუხედავად.</p>
@@ -417,7 +412,7 @@ print(f"დრო: {elapsed:.8f} წამი")</code></pre>
     for x in L:
         if x == e:
             return True
-        if x > e:      # აღარაა აზრი გაგრძელებას
+        if x > e:      # აღარა აქვს აზრი გაგრძელებას
             return False
     return False</code></pre>
         </div>
@@ -512,10 +507,6 @@ print(f"დრო: {elapsed:.8f} წამი")</code></pre>
       </div>
     </div>
 
-    <div class="callout fix">
-      <span class="icon">🔍</span>
-      <p><strong>მნიშვნელოვანი შესწორება — მოდიფიცირებადი ნაგულისხმევი არგუმენტი:</strong> ორიგინალი მასალის კოდი წერდა <code>def fibonacci_dp(n, memo={}):</code>. ეს Python-ის ერთ-ერთი ყველაზე ცნობილი „ხაფანგია": ნაგულისხმევი მნიშვნელობა (<code>{}</code>) იქმნება <strong>მხოლოდ ერთხელ</strong> — ფუნქციის განსაზღვრის დროს, არა ყოველ გამოძახებაზე — და ყველა შემდგომი გამოძახება <em>იმავე</em> dictionary-ს იზიარებს. ამან შეიძლება წარმოშვას ძნელად აღმოსაჩენი ბაგები, თუ ფუნქცია სხვადასხვა, დაუკავშირებელი გამოძახებებისთვის გამოიყენება. სწორი პატერნია: <code>memo: dict | None = None</code>, შემდეგ ფუნქციის სხეულში <code>if memo is None: memo = {}</code>.</p>
-    </div>
 
     <table class="bigo-table">
       <tr><th>ვერსია</th><th>დროითი სირთულე</th></tr>
@@ -525,7 +516,7 @@ print(f"დრო: {elapsed:.8f} წამი")</code></pre>
 
     <div class="callout insight"  style="display: flex; flex-direction: column; gap: 30px;">
       <span class="icon">🏭</span>
-      <p><strong>Tech Industry Insight:</strong> უფრო იდიომატური Python-ის გზა იგივის მისაღწევად — <code>functools.lru_cache</code> დეკორატორი, რომელიც ზუსტად ამ მემოიზაციის პატერნს გვთავაზობს ჩაშენებულად, მოდიფიცირებადი default-ის ხაფანგის გარეშე:</p>
+      <p><strong>Tech Industry Insight:</strong> უფრო იდიომატური Python-ის გზა იგივის მისაღწევად — <code>functools.lru_cache</code> დეკორატორი, რომელიც ზუსტად ამ მემოიზაციის პატერნს გვთავაზობს ჩაშენებულად.</p>
       <pre style="margin:10px 0 0; background:transparent; padding:0;"><code class="language-python" style="background:transparent;">from functools import lru_cache
 
 @lru_cache(maxsize=None)
@@ -623,7 +614,7 @@ def fibonacci(n: int) -> int:
             max_elem = elem
     return min_elem, max_elem</code></pre>
         </div>
-        <p><strong>სირთულე: O(n).</strong> ორიგინალ ვერსიას აკლდა ცარიელი სიის შემოწმება — <code>A[0]</code> ცარიელ სიაზე <code>IndexError</code>-ს გამოიწვევდა. ერთი გავლით ვამოწმებთ ორივე პირობას ერთდროულად, ამიტომ არა <code>O(2n)</code>, არამედ ზუსტად <code>O(n)</code> რჩება.</p>
+        <p><strong>სირთულე: O(n).</strong></p>
       </div>
     </details>
 
