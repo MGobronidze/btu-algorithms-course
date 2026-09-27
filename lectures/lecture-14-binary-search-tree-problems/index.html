@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 14 · ამოცანები ორობით ძებნის ხეებზე · BIT-08.2022.G</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@500;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{
+  --bg:#0B0E14;
+  --bg-panel:#12161F;
+  --bg-panel-2:#171C27;
+  --ink:#ECE8DE;
+  --ink-dim:#B7BCC9;
+  --muted:#7C849A;
+  --line:#232838;
+  --gold:#D9A64E;
+  --gold-dim:#8C7239;
+  --teal:#5AC2B6;
+  --teal-dim:#2F5F5A;
+  --green:#7CB88F;
+  --amber:#D9A64E;
+  --rose:#C97B84;
+  --code-bg:#0d1117;
+  --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.7;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--serif); color:var(--ink); font-weight:700; line-height:1.25;}
+a{color:var(--teal);}
+p{color:var(--ink-dim);}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:1040px; margin:0 auto; padding:0 24px;}
+
+/* ---------- NAV ---------- */
+
+#topnav{position:sticky; top:0; z-index:50; background:rgba(11,14,20,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+.nav-inner{max-width:1080px; margin:0 auto; padding:0 20px; display:flex; align-items:center; gap:22px; overflow-x:auto; scrollbar-width:none; height:56px;}
+.nav-inner::-webkit-scrollbar{display:none;}
+.nav-brand{font-family:var(--serif); font-weight:700; font-size:14px; white-space:nowrap; color:var(--gold); flex-shrink:0; text-decoration:none;}
+.nav-links{display:flex; gap:18px; white-space:nowrap;}
+.nav-links a{font-size:14px; color:var(--muted); text-decoration:none; padding:6px 0; border-bottom:2px solid transparent; transition:color .2s, border-color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a.active{color:var(--gold); border-color:var(--gold);}
+
+/* ---------- HERO ---------- */
+#hero{position:relative; padding:88px 24px 70px; overflow:hidden; text-align:center;}
+
+.hero-bst{
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-52%);
+  width:min(440px,100%);
+  opacity:0.3;
+  pointer-events:none;
+}
+
+.hero-inner{position:relative; z-index:1;} /* ← the missing rule */
+
+.kicker{display:inline-block; font-size:13px; color:var(--muted); margin-bottom:18px;}
+.kicker b{color:var(--gold); font-weight:600;}
+#hero h1{font-size:clamp(32px,6.5vw,56px); line-height:1.1; margin-bottom:20px;}
+.hero-sub{font-size:18px; color:var(--ink-dim); max-width:580px; margin:0 auto 30px;}
+.hero-terms{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; font-family:var(--mono); font-size:13px;}
+.hero-terms span{border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--ink-dim); background:rgba(255,255,255,0.02);}
+
+/* ---------- SECTIONS ---------- */
+main section{padding:64px 24px;}
+main section.section-full{
+  background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  padding:64px 24px;
+}
+.section-full > .wrap, .section-full > .wrap-wide{padding:0 24px;}
+.eyebrow{
+  font-family:var(--mono); font-size:12.5px; color:var(--muted);
+  text-transform:uppercase; letter-spacing:1.2px; margin:0 0 10px;
+}
+h2.h-title{font-size:29px; margin:0 0 8px;}
+h2.h-title .accent{color:var(--gold);}
+.lede{font-size:17px; color:var(--ink-dim); max-width:620px; margin-bottom:32px;}
+h3.h-sub{font-size:21px; margin:36px 0 12px; color:var(--ink);}
+h4.h-sub2{font-size:17px; margin:24px 0 10px; color:var(--ink-dim); font-family:var(--sans); font-weight:600;}
+ul.plain, ol.plain{color:var(--ink-dim); padding-left:22px;}
+ul.plain li, ol.plain li{margin-bottom:6px;}
+strong{color:var(--ink);}
+code.inline{
+  font-family:var(--mono); background:var(--bg-panel-2); color:var(--teal);
+  padding:2px 6px; border-radius:5px; font-size:0.88em; border:1px solid var(--line);
+}
+
+/* ---------- CODE WINDOW ---------- */
+.code-window{
+  background:var(--code-bg); border-radius:var(--radius); overflow:hidden;
+  border:1px solid var(--line); margin:20px 0;
+  box-shadow:0 8px 24px rgba(0,0,0,0.25);
+}
+.code-titlebar{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 14px; background:#161b22; border-bottom:1px solid #21262d;
+}
+.code-dots{display:flex; gap:6px;}
+.code-dots span{width:10px; height:10px; border-radius:50%; display:inline-block;}
+.code-dots span:nth-child(1){background:#ff5f56;}
+.code-dots span:nth-child(2){background:#ffbd2e;}
+.code-dots span:nth-child(3){background:#27c93f;}
+.code-filename{font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto;}
+.code-window code{font-family:var(--mono); font-size:13.6px; line-height:1.65; background:transparent !important;}
+.code-window pre::-webkit-scrollbar{height:8px;}
+.code-window pre::-webkit-scrollbar-thumb{background:#30363d; border-radius:4px;}
+
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0;}
+.code-pair .code-window{margin:0;}
+@media (max-width:820px){.code-pair{grid-template-columns:1fr;}}
+
+/* ---------- CALLOUTS ---------- */
+.callout{
+  border-radius:12px; padding:16px 18px; margin:20px 0;
+  border-left:3px solid var(--line); background:var(--bg-panel-2);
+  display:flex; gap:12px; align-items:flex-start;
+}
+.callout .icon{font-size:19px; line-height:1; flex-shrink:0; margin-top:1px;}
+.callout .body{color:var(--ink-dim); font-size:15.3px;}
+.callout .body b, .callout .body strong{color:var(--ink);}
+.callout .label{
+  display:block; font-family:var(--mono); font-size:11.5px; letter-spacing:0.6px;
+  text-transform:uppercase; margin-bottom:5px; font-weight:600;
+}
+.callout.fix{border-left-color:var(--rose); background:rgba(201,123,132,0.06);}
+.callout.fix .label{color:var(--rose);}
+.callout.insight{border-left-color:var(--teal); background:rgba(90,194,182,0.06);}
+.callout.insight .label{color:var(--teal);}
+.callout.warn{border-left-color:var(--amber); background:rgba(217,166,78,0.07);}
+.callout.warn .label{color:var(--amber);}
+
+/* ---------- TABLES ---------- */
+.bigo-table, .compare-table, .summary-table{
+  width:100%; border-collapse:collapse; margin:20px 0; font-size:15px;
+}
+.bigo-table th, .compare-table th, .summary-table th{
+  text-align:left; padding:10px 14px; color:var(--muted); font-family:var(--mono);
+  font-size:12px; text-transform:uppercase; letter-spacing:0.5px;
+  border-bottom:1px solid var(--line); font-weight:600;
+}
+.bigo-table td, .compare-table td, .summary-table td{
+  padding:12px 14px; border-bottom:1px solid var(--line); color:var(--ink-dim);
+}
+.bigo-table tr:last-child td, .compare-table tr:last-child td, .summary-table tr:last-child td{border-bottom:none;}
+.num{font-family:var(--mono); color:var(--gold); font-weight:600;}
+.table-scroll{overflow-x:auto;}
+
+/* ---------- TERM GRID ---------- */
+.term-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:20px 0;}
+.term-card{
+  background:var(--bg-panel-2); border:1px solid var(--line); border-radius:12px;
+  padding:16px 18px;
+}
+.term-card h4{margin:0 0 6px; font-size:15px; color:var(--gold); font-family:var(--sans); font-weight:700;}
+.term-card p{margin:0; font-size:14px; color:var(--muted);}
+@media (max-width:640px){.term-grid{grid-template-columns:1fr;}}
+
+/* ---------- INSIGHT GRID ---------- */
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:24px 0;}
+.insight-card{
+  background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; padding:20px;
+}
+.insight-card .emoji{font-size:24px; margin-bottom:10px; display:block;}
+.insight-card h4{font-size:15.5px; margin:0 0 8px; color:var(--ink);}
+.insight-card p{font-size:14px; color:var(--muted); margin:0;}
+@media (max-width:700px){.insight-grid{grid-template-columns:1fr;}}
+
+/* ---------- VIZ PANEL ---------- */
+.viz-panel{
+  background:var(--bg-panel); border:1px solid var(--line); border-radius:var(--radius);
+  padding:24px; margin:24px 0;
+}
+.viz-controls{
+  display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:18px;
+  padding-bottom:18px; border-bottom:1px solid var(--line);
+}
+.viz-controls input[type=number], .viz-controls input[type=text]{
+  background:var(--bg); border:1px solid var(--line); color:var(--ink);
+  border-radius:8px; padding:8px 12px; font-family:var(--mono); font-size:14px;
+  width:90px;
+}
+.viz-controls input:focus{outline:none; border-color:var(--teal);}
+.viz-controls label{font-size:13px; color:var(--muted); font-family:var(--mono);}
+.btn{
+  font-family:var(--sans); font-size:13.5px; font-weight:600; cursor:pointer;
+  border:none; border-radius:8px; padding:9px 16px;
+  background:var(--gold); color:#1a1508; transition:all .15s;
+}
+.btn:hover{background:#e6b45c; transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn.ghost{
+  background:transparent; border:1px solid var(--line); color:var(--ink-dim);
+}
+.btn.ghost:hover{border-color:var(--muted); color:var(--ink); background:var(--bg-panel-2);}
+.btn.teal{background:var(--teal); color:#082623;}
+.btn.teal:hover{background:#6fd4c8;}
+.btn:disabled{opacity:0.4; cursor:not-allowed; transform:none;}
+.viz-status{
+  font-family:var(--mono); font-size:13.5px; color:var(--ink-dim);
+  background:var(--bg); border:1px solid var(--line); border-radius:8px;
+  padding:10px 14px; margin-top:16px; min-height:20px;
+}
+.viz-status .ok{color:var(--green); font-weight:600;}
+.viz-status .bad{color:var(--rose); font-weight:600;}
+.viz-status .hl{color:var(--gold); font-weight:600;}
+.stack-log{
+  margin-top:10px; font-family:var(--mono); font-size:12.5px; color:var(--muted);
+  background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px 14px;
+  max-height:140px; overflow-y:auto;
+}
+.stack-log div{padding:3px 0; border-bottom:1px dashed var(--line);}
+.stack-log div:last-child{border-bottom:none;}
+
+/* ---------- TREE SVG ---------- */
+.tree-svg-wrap{
+  width:100%; overflow-x:auto; background:var(--bg); border-radius:10px;
+  border:1px solid var(--line); padding:10px;
+}
+.tree-svg-wrap svg{display:block; margin:0 auto;}
+.edge{stroke:var(--line); stroke-width:2; transition:all .3s;}
+.edge.path{stroke:var(--gold); stroke-width:3;}
+.node-circle{
+  fill:var(--bg-panel-2); stroke:var(--muted); stroke-width:2;
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+}
+.node-circle.path{fill:rgba(217,166,78,0.18); stroke:var(--gold);}
+.node-circle.found{fill:rgba(124,184,143,0.25); stroke:var(--green); stroke-width:3;}
+.node-circle.absent{fill:rgba(201,123,132,0.2); stroke:var(--rose);}
+.node-circle.ok-range{fill:rgba(124,184,143,0.18); stroke:var(--green);}
+.node-circle.bad-range{fill:rgba(201,123,132,0.25); stroke:var(--rose); stroke-width:3;}
+.node-circle.new-node{stroke:var(--teal); stroke-width:3;}
+.node-text{
+  fill:var(--ink); font-family:var(--mono); font-size:14px; font-weight:600;
+  text-anchor:middle; dominant-baseline:central; pointer-events:none;
+}
+.range-text{
+  fill:var(--muted); font-family:var(--mono); font-size:9.5px; text-anchor:middle;
+}
+
+/* ---------- ASCII TREE ---------- */
+.ascii-tree{
+  font-family:var(--mono); font-size:13px; color:var(--teal); background:var(--code-bg);
+  border:1px solid var(--line); border-radius:10px; padding:16px 20px; overflow-x:auto;
+  line-height:1.5; white-space:pre;
+}
+
+/* ---------- EXERCISES ---------- */
+details.exercise{
+  background:var(--bg-panel-2); border:1px solid var(--line); border-radius:12px;
+  margin:12px 0; padding:0; overflow:hidden;
+}
+details.exercise summary{
+  list-style:none; cursor:pointer; padding:0;
+}
+details.exercise summary::-webkit-details-marker{display:none;}
+.ex-row{
+  padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.ex-title{display:flex; align-items:center; gap:10px; font-size:15px; color:var(--ink); font-weight:600;}
+.ex-marker{
+  font-family:var(--mono); color:var(--gold); font-size:16px; width:18px; text-align:center;
+  transition:transform .2s;
+}
+details[open] .ex-marker{transform:rotate(45deg);}
+.ex-body{padding:0 18px 18px; color:var(--ink-dim); font-size:14.5px;}
+.ex-body p{margin:8px 0;}
+.badge{
+  font-family:var(--mono); font-size:10.5px; font-weight:700; padding:3px 9px;
+  border-radius:999px; text-transform:uppercase; letter-spacing:0.4px; flex-shrink:0;
+}
+.badge-easy{background:rgba(124,184,143,0.15); color:var(--green); border:1px solid var(--teal-dim);}
+.badge-medium{background:rgba(217,166,78,0.15); color:var(--gold); border:1px solid var(--gold-dim);}
+.badge-hard{background:rgba(201,123,132,0.15); color:var(--rose); border:1px solid #6b3d43;}
+
+/* ---------- STEP CARDS (walkthrough) ---------- */
+.step-strip{display:flex; flex-direction:column; gap:10px; margin:20px 0;}
+.step-card{
+  display:flex; gap:14px; background:var(--bg-panel-2); border:1px solid var(--line);
+  border-radius:10px; padding:14px 16px; align-items:flex-start;
+}
+.step-num{
+  font-family:var(--mono); font-weight:700; color:var(--gold); background:rgba(217,166,78,0.1);
+  border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; font-size:14px;
+}
+.step-card p{margin:0; font-size:14px; color:var(--ink-dim);}
+
+/* ---------- FOOTER ---------- */
+footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+
+@media (max-width:640px){
+  #hero h1{font-size:31px;}
+  .hero-svg{display:none;}
+  main section{padding:44px 20px;}
+  .wrap, .wrap-wide{padding:0 4px;}
+}
+</style>
+</head>
+<body>
+
+  <nav id="topnav">
+  <div class="nav-inner">
+    <a href="../../index.html" class="nav-brand">← კურსი · მონაცემთა სტრუქტურები და ალგორითმები I — ლექცია 14</a>
+    <div class="nav-links">
+      <a href="#what-is">შესავალი</a>
+      <a href="#validate-bst">Validate BST</a>
+      <a href="#search-bst">Search</a>
+      <a href="#insert-bst">Insert</a>
+      <a href="#convert-array">Array → BST</a>
+      <a href="#playground">Playground</a>
+      <a href="#complexity">სირთულეები</a>
+      <a href="#insights">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+
+<header id="hero">
+  <svg class="hero-bst" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g fill="none" stroke="#5AC2B6" stroke-width="1.4" opacity="0.55">
+      <line x1="200" y1="70" x2="120" y2="150"/>
+      <line x1="200" y1="70" x2="280" y2="150"/>
+      <line x1="120" y1="150" x2="70" y2="230"/>
+      <line x1="120" y1="150" x2="170" y2="230"/>
+      <line x1="280" y1="150" x2="330" y2="230"/>
+      <line x1="70" y1="230" x2="40" y2="310"/>
+      <line x1="170" y1="230" x2="200" y2="310"/>
+      <line x1="330" y1="230" x2="300" y2="310"/>
+      <line x1="330" y1="230" x2="360" y2="310"/>
+    </g>
+    <g>
+      <circle cx="200" cy="70" r="20" fill="#12161F" stroke="#D9A64E" stroke-width="2"/>
+      <circle cx="120" cy="150" r="17" fill="#12161F" stroke="#5AC2B6" stroke-width="1.6"/>
+      <circle cx="280" cy="150" r="17" fill="#12161F" stroke="#5AC2B6" stroke-width="1.6"/>
+      <circle cx="70" cy="230" r="15" fill="#12161F" stroke="#232838" stroke-width="1.4"/>
+      <circle cx="170" cy="230" r="15" fill="#12161F" stroke="#232838" stroke-width="1.4"/>
+      <circle cx="330" cy="230" r="15" fill="#12161F" stroke="#232838" stroke-width="1.4"/>
+      <circle cx="40" cy="310" r="13" fill="#12161F" stroke="#232838" stroke-width="1.2"/>
+      <circle cx="200" cy="310" r="13" fill="#12161F" stroke="#232838" stroke-width="1.2"/>
+      <circle cx="300" cy="310" r="13" fill="#12161F" stroke="#232838" stroke-width="1.2"/>
+      <circle cx="360" cy="310" r="13" fill="#12161F" stroke="#232838" stroke-width="1.2"/>
+    </g>
+  </svg>
+  <div class="hero-inner">
+    <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 14</span>
+    <h1>ამოცანები ორობით ძებნის ხეებზე</h1>
+    <p class="hero-sub">ვამოწმებთ BST-ის თვისებას, ვეძებთ და ვამატებთ კვანძებს, და ვაგებთ დაბალანსებულ ხეს დალაგებული მასივიდან — ოთხი კლასიკური ამოცანა, რომლებიც საფუძვლად უდევს ბევრ რეალურ სისტემას, დაწყებული ბაზების ინდექსებიდან, დამთავრებული ოპერაციული სისტემის დამგეგმავებით.</p>
+    <div class="hero-terms">
+      <span>Validate BST</span>
+      <span>Search — O(h)</span>
+      <span>Insert — O(h)</span>
+      <span>Sorted Array → BST — O(n)</span>
+      <span>რეკურსია + დიაპაზონი</span>
+    </div>
+  </div>
+</header>
+
+
+<main>
+
+<!-- ============ INTRO ============ -->
+<section id="intro">
+  <div class="wrap">
+    <div class="eyebrow">კვირა XIV · გეგმა</div>
+    <h2 class="h-title">დღევანდელი ოთხი ამოცანა</h2>
+    <p class="lede">გასულ ლექციაზე (13) განვსაზღვრეთ ორობითი ძებნის ხის (BST) თვისება და ვისწავლეთ BST Sort. დღეს ამ თვისებას ვიყენებთ ოთხი კლასიკური, ხშირად საინტერვიუო ამოცანის გადასაჭრელად — თითოეული მათგანი აგებულია წინა ლექციების ბაზაზე.</p>
+
+    <div class="term-grid">
+      <div class="term-card">
+        <h4>1 · Validate BST</h4>
+        <p>არის თუ არა მოცემული ორობითი ხე ნამდვილად BST — სამი განსხვავებული მიდგომით.</p>
+      </div>
+      <div class="term-card">
+        <h4>2 · Search in BST</h4>
+        <p>კლასიკური ორმაგი ძებნის იდეის გამოყენება ხის სტრუქტურაზე.</p>
+      </div>
+      <div class="term-card">
+        <h4>3 · Insert into BST</h4>
+        <p>ახალი კვანძის ჩამატება BST-ის თვისების დარღვევის გარეშე.</p>
+      </div>
+      <div class="term-card">
+        <h4>4 · Sorted Array → BST</h4>
+        <p>დალაგებული მასივიდან დაბალანსებული BST-ის აგება „გათიშე და იბატონე" პრინციპით.</p>
+      </div>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">🔗</span>
+      <div class="body"><span class="label">კავშირი ლექცია 13-თან</span>
+      გავიხსენოთ BST-ის განმარტება: <b>ყველა კვანძი მარცხენა ქვეხეში ფესვზე მცირეა, ყველა კვანძი მარჯვენა ქვეხეში — მეტი</b>, და ეს თვისება რეკურსიულად მოქმედებს ყველა ქვეხეზეც. დღევანდელი ოთხივე ალგორითმი პირდაპირ ეყრდნობა ამ ერთ განმარტებას — განსხვავება მხოლოდ იმაშია, როგორ ვამოწმებთ ან ვიყენებთ მას.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VALIDATE BST ============ -->
+<section id="validate-bst" class="section-full">
+  <div class="wrap">
+    <div class="eyebrow">ამოცანა 1 / 4</div>
+    <h2 class="h-title">Validate Binary Search Tree</h2>
+    <p class="lede">მოცემულია ორობითი ხის ფესვი — შევამოწმოთ, აკმაყოფილებს თუ არა ის BST-ის თვისებას. განვიხილავთ სამ მიდგომას, ერთმანეთისგან სულ სხვადასხვა სირთულით.</p>
+
+    <h3 class="h-sub">მაგალითები</h3>
+    <p>სამივე მაგალითი აღებულია ორიგინალი მასალიდან და გადამოწმებულია სამივე ალგორითმის საშუალებით — შედეგები ემთხვევა.</p>
+
+    <div class="tree-svg-wrap" id="examplesTree" style="padding:20px 10px;">
+      <svg viewBox="0 0 720 190" width="100%" height="190">
+        <!-- Example 1: valid -->
+        <g transform="translate(20,10)">
+          <line class="edge" x1="60" y1="30" x2="25" y2="90"/>
+          <line class="edge" x1="60" y1="30" x2="95" y2="90"/>
+          <line class="edge" x1="95" y1="90" x2="130" y2="150"/>
+          <circle class="node-circle ok-range" cx="60" cy="30" r="18"/><text class="node-text" x="60" y="31">2</text>
+          <circle class="node-circle ok-range" cx="25" cy="90" r="18"/><text class="node-text" x="25" y="91">1</text>
+          <circle class="node-circle ok-range" cx="95" cy="90" r="18"/><text class="node-text" x="95" y="91">3</text>
+          <circle class="node-circle ok-range" cx="130" cy="150" r="18"/><text class="node-text" x="130" y="151">5</text>
+          <text x="75" y="182" font-family="JetBrains Mono" font-size="12" fill="#7CB88F" text-anchor="middle">✓ true — BST</text>
+        </g>
+        <!-- Example 2: invalid -->
+        <g transform="translate(250,10)">
+          <line class="edge" x1="60" y1="30" x2="25" y2="90"/>
+          <line class="edge" x1="60" y1="30" x2="95" y2="90"/>
+          <line class="edge" x1="95" y1="90" x2="130" y2="150"/>
+          <circle class="node-circle ok-range" cx="60" cy="30" r="18"/><text class="node-text" x="60" y="31">2</text>
+          <circle class="node-circle ok-range" cx="25" cy="90" r="18"/><text class="node-text" x="25" y="91">1</text>
+          <circle class="node-circle bad-range" cx="95" cy="90" r="18"/><text class="node-text" x="95" y="91">7</text>
+          <circle class="node-circle bad-range" cx="130" cy="150" r="18"/><text class="node-text" x="130" y="151">6</text>
+          <text x="75" y="182" font-family="JetBrains Mono" font-size="12" fill="#C97B84" text-anchor="middle">✗ false — 6 &lt; 7 მარჯვნივ</text>
+        </g>
+        <!-- Example 3: invalid -->
+        <g transform="translate(490,10)">
+          <line class="edge" x1="60" y1="30" x2="25" y2="90"/>
+          <line class="edge" x1="60" y1="30" x2="100" y2="90"/>
+          <line class="edge" x1="100" y1="90" x2="70" y2="150"/>
+          <line class="edge" x1="100" y1="90" x2="135" y2="150"/>
+          <circle class="node-circle ok-range" cx="60" cy="30" r="18"/><text class="node-text" x="60" y="31">10</text>
+          <circle class="node-circle ok-range" cx="25" cy="90" r="18"/><text class="node-text" x="25" y="91">5</text>
+          <circle class="node-circle ok-range" cx="100" cy="90" r="18"/><text class="node-text" x="100" y="91">20</text>
+          <circle class="node-circle bad-range" cx="70" cy="150" r="18"/><text class="node-text" x="70" y="151">9</text>
+          <circle class="node-circle ok-range" cx="135" cy="150" r="18"/><text class="node-text" x="135" y="151">25</text>
+          <text x="80" y="182" font-family="JetBrains Mono" font-size="12" fill="#C97B84" text-anchor="middle">✗ false — 9 &lt; 10, მაგრამ მარჯვნივაა</text>
+        </g>
+      </svg>
+    </div>
+
+    <h3 class="h-sub">მიდგომა A — გამარტივებული, მაგრამ ნელი: მარცხენა/მარჯვენა ექსტრემუმები</h3>
+    <p>თითოეულ კვანძში ვამოწმებთ: მარცხენა ქვეხის მაქსიმუმი &lt; კვანძი &lt; მარჯვენა ქვეხის მინიმუმი. მარტივია გასაგებად, მაგრამ თითოეულ კვანძში მთელ ქვეხეს ვიმოწმებთ თავიდან — ეს ხდება ზედმეტი სამუშაო.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-filename">validate_bst_naive.py</div></div>
+      <pre><code class="language-python">def maxValue(node):
+    if node is None:
+        return float('-inf')
+    return max(node.data, maxValue(node.left), maxValue(node.right))
+
+def minValue(node):
+    if node is None:
+        return float('inf')
+    return min(node.data, minValue(node.left), minValue(node.right))
+
+def isBST(node):
+    if node is None:
+        return True
+    # ქვეხის მაქსიმუმი მარცხნივ უნდა იყოს კვანძზე ნაკლები
+    if node.left and maxValue(node.left) >= node.data:
+        return False
+    # ქვეხის მინიმუმი მარჯვნივ უნდა იყოს კვანძზე მეტი
+    if node.right and minValue(node.right) <= node.data:
+        return False
+    return isBST(node.left) and isBST(node.right)</code></pre>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">⚠️</span>
+      <div class="body"><span class="label">ხაფანგი — ეფექტურობა</span>
+      ეს მიდგომა თითოეული კვანძისთვის ხელახლა გადის მთელ ქვეხეს <code class="inline">maxValue</code>/<code class="inline">minValue</code>-ით. სკელეტისებურ (degenerate, ერთი „ღეროთი") ხეზე ეს ნიშნავს, რომ საერთო სირთულე <span class="num">O(n²)</span>-მდე იზრდება — 1000-კვანძიან ჯაჭვზე ეს ≈500,000 შედარებაა, მაშინ როცა B და C მიდგომები იგივეს <span class="num">O(n)</span>-ში ხსნიან.
+      </div>
+    </div>
+
+    <h3 class="h-sub">მიდგომა B — მინ/მაქს დიაპაზონის გადაცემა (რეკომენდებული, O(n))</h3>
+    <p>იდეა: თითოეულ კვანძს რეკურსიის დროს „ვუთხრათ" რა დიაპაზონშია ნებადართული მისი მნიშვნელობა. ფესვისთვის დიაპაზონია <code class="inline">(-∞, +∞)</code>. მარცხენა შვილისთვის ზედა ზღვარი ვიწროვდება მშობლის მნიშვნელობამდე, მარჯვენა შვილისთვის — ქვედა ზღვარი მკაცრდება.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-filename">validate_bst_range.py</div></div>
+      <pre><code class="language-python">def isBstUtil(node, min_val, max_val):
+    if node is None:
+        return True
+    # თუ მიმდინარე მნიშვნელობა დასაშვებ დიაპაზონს გარეთაა
+    if node.data < min_val or node.data > max_val:
+        return False
+    # რეკურსიულად ვამოწმებთ მარცხენა და მარჯვენა ქვეხეს განახლებული დიაპაზონით
+    return (isBstUtil(node.left, min_val, node.data - 1) and
+            isBstUtil(node.right, node.data + 1, max_val))
+
+def isBST(root):
+    return isBstUtil(root, float('-inf'), float('inf'))</code></pre>
+    </div>
+
+    <p>ნაბიჯ-ნაბიჯ, ხის <code class="inline">10 → (5, 20 → (9, 25))</code> მაგალითზე — ეს ხე <b>არ არის</b> ვალიდური BST, რადგან 9 < 10, მაგრამ 20-ის (და მაშასადამე 10-ის) მარჯვენა ქვეხეშია:</p>
+
+    <div class="step-strip">
+      <div class="step-card"><div class="step-num">1</div><p><code class="inline">isBstUtil(10, -∞, +∞)</code> — ფესვისთვის ნებისმიერი მნიშვნელობაა დასაშვები.</p></div>
+      <div class="step-card"><div class="step-num">2</div><p>მარცხენა ქვეხე: <code class="inline">isBstUtil(5, -∞, 9)</code> — ზედა ზღვარი გახდა <code class="inline">10-1=9</code>. 5 ჯდება დიაპაზონში → ორივე შვილი None → <span style="color:#7CB88F">True</span>.</p></div>
+      <div class="step-card"><div class="step-num">3</div><p>მარჯვენა ქვეხე: <code class="inline">isBstUtil(20, 11, +∞)</code> — ქვედა ზღვარი გახდა <code class="inline">10+1=11</code>. 20 ჯდება.</p></div>
+      <div class="step-card"><div class="step-num">4</div><p>20-ის მარცხენა შვილი: <code class="inline">isBstUtil(9, 11, 19)</code> — 9 &lt; 11, დიაპაზონს გარეთაა → <span style="color:#C97B84">False</span>.</p></div>
+      <div class="step-card"><div class="step-num">5</div><p>False ვრცელდება მთელ საკლების ჯაჭვში ზემოთ — საბოლოო შედეგი <span style="color:#C97B84">False</span>.</p></div>
+    </div>
+
+    <h3 class="h-sub">მიდგომა C — Inorder ტრავერსალი + წინა მნიშვნელობა</h3>
+    <p>ეყრდნობა ლექცია 11-ის ცოდნას: BST-ის <b>inorder</b> ტრავერსალი (მარცხენა → ფესვი → მარჯვენა) ყოველთვის ზრდადი მიმდევრობაა. საკმარისია გავიაროთ inorder-ით და შევამოწმოთ, რომ ყოველი შემდეგი მნიშვნელობა წინაზე მკაცრად მეტია — მასივის შენახვა საერთოდაც არაა საჭირო.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-filename">validate_bst_inorder.py</div></div>
+      <pre><code class="language-python">def isValidBst(node, prev):
+    if node is None:
+        return True
+    # მარცხენა ქვეხე
+    if not isValidBst(node.left, prev):
+        return False
+    # მიმდინარე მნიშვნელობა შევადაროთ წინა (inorder-ით) მნიშვნელობას
+    if prev[0] is not None and prev[0] >= node.data:
+        return False
+    prev[0] = node.data
+    # მარჯვენა ქვეხე
+    return isValidBst(node.right, prev)
+
+def isBST(root):
+    prev = [None]  # სია გამოიყენება, რადგან Python-ს არ აქვს pass-by-reference
+    return isValidBst(root, prev)</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">💡</span>
+      <div class="body"><span class="label">Clean Code შენიშვნა</span>
+      <code class="inline">prev = [None]</code> — ერთელემენტიანი სია — არის გავრცელებული Python-ული ხრიკი "mutable closure"-ის იმიტაციისთვის, რადგან <code class="inline">int</code>/<code class="inline">None</code> უცვლელია (immutable) და რეკურსიულ გამოძახებებში პირდაპირ ვერ შეიცვლება. უფრო თანამედროვე ალტერნატივაა კლასის ატრიბუტი ან <code class="inline">nonlocal</code> საკეტური ცვლადი შიდა ფუნქციაში.</div>
+    </div>
+
+    <div class="table-scroll">
+    <table class="bigo-table">
+      <tr><th>მიდგომა</th><th>დროის სირთულე</th><th>დამხმარე მეხსიერება</th><th>კომენტარი</th></tr>
+      <tr><td>A — მარცხენა/მარჯვენა ექსტრემუმები</td><td class="num">O(n²)</td><td class="num">O(h)</td><td>მარტივი გასაგებად, არაეფექტური</td></tr>
+      <tr><td>B — მინ/მაქს დიაპაზონი</td><td class="num">O(n)</td><td class="num">O(h)</td><td>რეკომენდებული — თითო კვანძი ერთხელ</td></tr>
+      <tr><td>C — Inorder + წინა მნიშვნელობა</td><td class="num">O(n)</td><td class="num">O(h)</td><td>ეყრდნობა ლექცია 11-ის ტრავერსალებს</td></tr>
+    </table>
+    </div>
+    <p style="font-size:13px; color:var(--muted);">სადაც <b>n</b> — კვანძების რაოდენობა, <b>h</b> — ხის სიმაღლე (რეკურსიის სტეკი).</p>
+  </div>
+</section>
+
+<!-- ============ SEARCH IN BST ============ -->
+<section id="search-bst">
+  <div class="wrap">
+    <div class="eyebrow">ამოცანა 2 / 4</div>
+    <h2 class="h-title">Search in a Binary Search Tree</h2>
+    <p class="lede">ვეძებთ კონკრეტულ მნიშვნელობას BST-ში. BST-ის თვისების წყალობით, ეს არსებითად იგივე იდეაა, რაც <b>ორმაგი ძებნა (Binary Search)</b> დალაგებულ მასივზე (ლექცია 2–3) — უბრალოდ მასივის შუა ელემენტის მაგივრად ვირჩევთ ხის კვანძს.</p>
+
+    <div class="callout insight">
+      <span class="icon">🔗</span>
+      <div class="body"><span class="label">კავშირი ლექცია 2-3-თან</span>
+      გაიხსენეთ Binary Search მასივზე: შუა ელემენტთან შედარება, შემდეგ ძებნის არეს განახევრება. BST-ში „მასივის შუა" შეცვლილია „მიმდინარე კვანძით", ხოლო „მარცხენა/მარჯვენა ნახევარი" — შესაბამისი ქვეხით. სწორედ ამიტომ ორივეს საშუალო სირთულეა <span class="num">O(log n)</span>.</div>
+    </div>
+
+    <div class="code-window">
+      <div class="code-titlebar"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-filename">search_bst.py</div></div>
+      <pre><code class="language-python">def search(root, key):
+    # საბაზისო შემთხვევა: ფესვი ცარიელია, ან სწორედ ეს არის საძებნი კვანძი
+    if root is None or root.key == key:
+        return root
+    # საძებნი მნიშვნელობა ფესვზე მეტია — გავაგრძელოთ მარჯვნივ
+    if root.key < key:
+        return search(root.right, key)
+    # საძებნი მნიშვნელობა ფესვზე ნაკლებია — გავაგრძელოთ მარცხნივ
+    return search(root.left, key)</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="icon">🔍</span>
+      <div class="body"><span class="label">შესწორება — ატრიბუტების შეუსაბამობა</span>
+      ორიგინალ მასალაში <b>Validate BST</b>-ის სამივე ფუნქცია იყენებს <code class="inline">node.data</code>-ს, ხოლო <b>Search</b> და (ქვემოთ) <b>Insert</b> — <code class="inline">node.key</code>-ს. ეს არ არის უბრალო სტილისტური სხვაობა: თუ ამ ფუნქციებს ერთსა და იმავე <code class="inline">Node</code> კლასზე პირდაპირ გამოვიყენებთ, მივიღებთ <code class="inline">AttributeError</code>-ს (გადამოწმებულია ქვემოთ). დღევანდელ სავარჯიშოებში ერთიანად ვიყენებთ <code class="inline">.val</code>-ს — LeetCode-ის კონვენციის მიხედვით — რათა ოთხივე ალგორითმი ერთ ხეზე იმუშაოს პრობლემების გარეშე.</div>
+    </div>
+
+    <div class="code-window">
+      <div class="code-titlebar"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-filename">>>> python3 (დემონსტრაცია)</div></div>
+      <pre><code class="language-python">&gt;&gt;&gt; root = insert(None, 50)   # insert() იყენებს .key
+&gt;&gt;&gt; insert(root, 30); insert(root, 70)
+&gt;&gt;&gt; isBST(root)               # isBST() ელოდება .data
+AttributeError: 'NodeKey' object has no attribute 'data'</code></pre>
+    </div>
+
+    <h3 class="h-sub">სირთულე</h3>
+    <div class="table-scroll">
+    <table class="bigo-table">
+      <tr><th></th><th>საშუალო (დაბალანსებული)</th><th>უარესი შემთხვევა (ჯაჭვი)</th><th>დამხმარე მეხსიერება</th></tr>
+      <tr><td>Time</td><td class="num">O(log n)</td><td class="num">O(n)</td><td>—</td></tr>
+      <tr><td>Space</td><td class="num">O(log n)</td><td class="num">O(n)</td><td>რეკურსიის სტეკი, <span class="num">O(h)</span></td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INSERT INTO BST ============ -->
+<section id="insert-bst" class="section-full">
+  <div class="wrap">
+    <div class="eyebrow">ამოცანა 3 / 4</div>
+    <h2 class="h-title">Insert into a Binary Search Tree</h2>
+    <p class="lede">ახალი გასაღები ყოველთვის ემატება <b>ფოთლის პოზიციაზე</b> — ისე, რომ BST-ის თვისება არ დაირღვეს. ვეშვებით ფესვიდან, თითოეულ კვანძში ვირჩევთ მიმართულებას შედარებით, სანამ ცარიელ ადგილს არ მივაღწევთ.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-filename">insert_bst_iterative.py</div></div>
+      <pre><code class="language-python">def insert(root, key):
+    temp = Node(key)
+    # თუ ხე ცარიელია, ახალი კვანძი ხდება ფესვი
+    if root is None:
+        return temp
+
+    # ვეძებთ კვანძს, რომელსაც temp შვილად დაერთვება
+    parent = None
+    curr = root
+    while curr is not None:
+        parent = curr
+        if curr.key > key:
+            curr = curr.left
+        elif curr.key < key:
+            curr = curr.right
+        else:
+            return root  # გასაღები უკვე არსებობს — დუბლიკატებს არ ვამატებთ
+
+    # ვამაგრებთ ახალ კვანძს სწორ მხარეს
+    if parent.key > key:
+        parent.left = temp
+    else:
+        parent.right = temp
+    return root</code></pre>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">🎯</span>
+      <div class="body"><span class="label">დიზაინის არჩევანი — რეკურსია vs იტერაცია</span>
+      ყურადღება მიაქციეთ: <code class="inline">search()</code> დაწერილია რეკურსიულად, ხოლო <code class="inline">insert()</code> — იტერაციულად. ორივე ვალიდურია (იტერაციულს <span class="num">O(1)</span> დამატებითი მეხსიერება სჭირდება <span class="num">O(h)</span>-ის ნაცვლად), მაგრამ ეს აჩვენებს — BST-ის ოპერაციები ბუნებრივად შეიძლება დაიწეროს ორივე სტილში; საბოლოო არჩევანი დამოკიდებულია იმაზე, მნიშვნელოვანია თუ არა სტეკის სივრცის დაზოგვა.</div>
+    </div>
+
+    <h3 class="h-sub">ვალიდაცია, რომელსაც ხშირად ავიწყდებათ</h3>
+    <p>თუ გასაღები უკვე არსებობს ხეში — თუნდაც შუა დონეზე, არა მხოლოდ ფოთოლთან — <code class="inline">insert()</code> ვერცერთ ცვლილებას არ შეიტანს და ხის იგივე ხე დაბრუნდება. გადავამოწმეთ ეს ორივე შემთხვევისთვის (ფოთოლი და შუალედური კვანძი) — ორივეჯერ ხე უცვლელი რჩება.</p>
+
+    <h3 class="h-sub">სირთულე</h3>
+    <div class="table-scroll">
+    <table class="bigo-table">
+      <tr><th></th><th>საშუალო</th><th>უარესი შემთხვევა</th></tr>
+      <tr><td>Time</td><td class="num">O(log n)</td><td class="num">O(n)</td></tr>
+      <tr><td>Space (იტერაციული)</td><td class="num">O(1)</td><td class="num">O(1)</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONVERT SORTED ARRAY TO BST ============ -->
+<section id="convert-array">
+  <div class="wrap">
+    <div class="eyebrow">ამოცანა 4 / 4</div>
+    <h2 class="h-title">Convert Sorted Array to Binary Search Tree</h2>
+    <p class="lede">გვაქვს დალაგებული მასივი — უნდა ავაგოთ <b>დაბალანსებული</b> BST. იდეა „გათიშე და იბატონეა" (ისევე, როგორც Merge Sort-სა და Quick Sort-ში, ლექცია 4–5): ვირჩევთ შუა ელემენტს ფესვად, შემდეგ იგივეს ვიმეორებთ რეკურსიულად ორივე ნახევარზე.</p>
+
+    <div class="callout insight">
+      <span class="icon">🔗</span>
+      <div class="body"><span class="label">კავშირი ლექცია 4–5-თან</span>
+      ეს ალგორითმი Merge Sort-ის „სარკისებური" ვერსიაა: Merge Sort მასივს ყოფს, ალაგებს ნაწილებს და მერე აერთიანებს; აქ კი უკვე დალაგებულ მასივს ვყოფთ და თითო ნაწილს პირდაპირ ვაქცევთ ხის კვანძად — შერწყმის ნაბიჯი საერთოდ არ გვჭირდება, რადგან მასივი უკვე დალაგებულია.</div>
+    </div>
+
+    <div class="code-window">
+      <div class="code-titlebar"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-filename">sorted_array_to_bst.py</div></div>
+      <pre><code class="language-python">def sortedArrayToBSTRecur(arr, start, end):
+    if start > end:
+        return None
+    # შუა ელემენტი ხდება მიმდინარე ქვეხის ფესვი
+    mid = start + (end - start) // 2
+    root = Node(arr[mid])
+    root.left = sortedArrayToBSTRecur(arr, start, mid - 1)
+    root.right = sortedArrayToBSTRecur(arr, mid + 1, end)
+    return root
+
+def sortedArrayToBST(arr):
+    return sortedArrayToBSTRecur(arr, 0, len(arr) - 1)</code></pre>
+    </div>
+
+    <div class="callout warn">
+      <span class="icon">⚠️</span>
+      <div class="body"><span class="label">დაუდასტურებელი შემთხვევა — დუბლიკატები</span>
+      ეს ალგორითმი <b>არასდროს ადარებს</b> მნიშვნელობებს — უბრალოდ ინდექსებით ჭრის მასივს. თუ მასივი შეიცავს გამეორებულ მნიშვნელობებს, შედეგი შეიძლება <b>აღარ იყოს ვალიდური BST</b> მკაცრი განმარტებით. გადამოწმებულია: <code class="inline">arr = [1, 2, 2, 3]</code>-ზე მიღებული ხე ორივე Validate-ალგორითმზე (B და C) აბრუნებს <code class="inline">False</code>-ს — მიუხედავად იმისა, რომ თავად <code class="inline">sortedArrayToBST</code> „წარმატებით" დაასრულებს მუშაობას შეცდომის გარეშე. პრაქტიკაში საჭიროა წინასწარი პირობა („მასივი შეიცავს უნიკალურ მნიშვნელობებს") ან დუბლიკატების გაწმენდა წინასწარ.
+      </div>
+    </div>
+
+    <div class="code-window">
+      <div class="code-titlebar"><div class="code-dots"><span></span><span></span><span></span></div><div class="code-filename">>>> python3 (გადამოწმება)</div></div>
+      <pre><code class="language-python">&gt;&gt;&gt; root = sortedArrayToBST([1, 2, 2, 3])
+&gt;&gt;&gt; preorder(root)
+2 1 2 3
+&gt;&gt;&gt; isBST(root)   # B ან C მიდგომით
+False</code></pre>
+    </div>
+
+    <h3 class="h-sub">სირთულე</h3>
+    <div class="table-scroll">
+    <table class="bigo-table">
+      <tr><th></th><th>მნიშვნელობა</th><th>კომენტარი</th></tr>
+      <tr><td>Time</td><td class="num">O(n)</td><td>თითოეული ელემენტისთვის — ერთი კვანძი</td></tr>
+      <tr><td>Space (ხე)</td><td class="num">O(n)</td><td>n კვანძი იქმნება</td></tr>
+      <tr><td>Space (რეკურსიის სტეკი)</td><td class="num">O(log n)</td><td>ხის სიმაღლე — შედეგი ყოველთვის დაბალანსებულია</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FLAGSHIP PLAYGROUND ============ -->
+<section id="playground" class="section-full">
+  <div class="wrap-wide">
+    <div class="eyebrow">ინტერაქტიული ვიზუალიზატორი</div>
+    <h2 class="h-title">BST <span class="accent">Playground</span> — Insert · Search · Validate</h2>
+    <p class="lede">ააგეთ საკუთარი ორობითი ძებნის ხე, მოძებნეთ მნიშვნელობა (ნახეთ ზუსტად ის მარშრუტი, რასაც <code class="inline">search()</code> გაივლის) და გაუშვით ვალიდაცია, რომელიც კვანძ-კვანძზე აჩვენებს დასაშვებ დიაპაზონს — ზუსტად ისე, როგორც ზემოთ „მიდგომა B"-ში ვნახეთ.</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <label>მნიშვნელობა:</label>
+        <input type="number" id="pgValue" placeholder="42" min="-999" max="999">
+        <button class="btn" id="pgInsertBtn">➕ ჩასმა</button>
+        <button class="btn teal" id="pgSearchBtn">🔍 ძებნა</button>
+        <button class="btn ghost" id="pgValidateBtn">✅ ვალიდაცია</button>
+        <button class="btn ghost" id="pgRandomBtn">🎲 შემთხვევითი ხე</button>
+        <button class="btn ghost" id="pgResetBtn">🗑 გასუფთავება</button>
+      </div>
+      <div class="tree-svg-wrap" id="pgTreeWrap">
+        <svg id="pgSvg" viewBox="0 0 900 320" width="100%" height="320"></svg>
+      </div>
+      <div class="viz-status" id="pgStatus">დაწყებისთვის დააჭირეთ „შემთხვევითი ხე" ან ჩასვით პირველი მნიშვნელობა.</div>
+      <div class="stack-log" id="pgLog"></div>
+    </div>
+
+    <div class="callout insight">
+      <span class="icon">💡</span>
+      <div class="body"><span class="label">როგორ გამოვიყენოთ</span>
+      სცადეთ: ჩასვით 8-10 მნიშვნელობა, შემდეგ მოძებნეთ ერთ-ერთი — დაინახავთ ზუსტად რომელ კვანძებში მოხდა შედარება. შემდეგ დააჭირეთ „ვალიდაცია" — ვინაიდან ეს ხე თქვენ თვითონ ააგეთ <code class="inline">insert()</code>-ით, ის ყოველთვის იქნება ვალიდური BST (თუ ხელით არ „გაატეხთ" თანმიმდევრობას მისი აგების დროს).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPLEXITY SUMMARY ============ -->
+<section id="complexity">
+  <div class="wrap">
+    <div class="eyebrow">შეჯამება</div>
+    <h2 class="h-title">სირთულეების ცხრილი — ოთხივე ალგორითმი</h2>
+    <p class="lede">ერთ ადგილას შეჯამებული — ყველა რიცხვი გადამოწმებულია პრაქტიკულ ტესტებში.</p>
+
+    <div class="table-scroll">
+    <table class="summary-table">
+      <tr><th>ალგორითმი</th><th>დროის სირთულე</th><th>მეხსიერება</th></tr>
+      <tr><td>Validate BST — ექსტრემუმებით (A)</td><td class="num">O(n²)</td><td class="num">O(h)</td></tr>
+      <tr><td>Validate BST — მინ/მაქს დიაპაზონი (B)</td><td class="num">O(n)</td><td class="num">O(h)</td></tr>
+      <tr><td>Validate BST — Inorder (C)</td><td class="num">O(n)</td><td class="num">O(h)</td></tr>
+      <tr><td>Search in BST</td><td class="num">O(h)</td><td class="num">O(h)</td></tr>
+      <tr><td>Insert into BST (იტერაციული)</td><td class="num">O(h)</td><td class="num">O(1)</td></tr>
+      <tr><td>Sorted Array → BST</td><td class="num">O(n)</td><td class="num">O(n)</td></tr>
+    </table>
+    </div>
+    <p style="font-size:13px; color:var(--muted);">დაბალანსებულ ხეზე <span class="num">h ≈ log n</span>; დეგენერირებულ (ჯაჭვისებურ) ხეზე <span class="num">h = n</span> — სწორედ ამიტომ არის მნიშვნელოვანი მე-16 ლექციაზე განხილული თვითდაბალანსებადი ხეები (AVL).</p>
+
+    <div class="callout insight">
+      <span class="icon">🔮</span>
+      <div class="body"><span class="label">რა გველოდება შემდეგ (ლექცია 15)</span>
+      ყველა დღევანდელი ალგორითმის სირთულე <span class="num">O(h)</span>-ზეა დამოკიდებული, და უარეს შემთხვევაში <code class="inline">h = n</code> (მაგ. თუ მასივს ზრდადობით ჩავსვამთ ერთმანეთის მიყოლებით). შემდეგ ლექციაზე გავეცნობით <b>AVL ხეს</b> — თვითდაბალანსებად BST-ს, რომელიც გარანტირებულად ინარჩუნებს <span class="num">h = O(log n)</span>-ს ნებისმიერი თანმიმდევრობით ჩასმისას.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH INDUSTRY INSIGHTS ============ -->
+<section id="insights" class="section-full">
+  <div class="wrap-wide">
+    <div class="eyebrow">Tech Industry Insights</div>
+    <h2 class="h-title">სად მუშაობს ეს რეალურ სისტემებში</h2>
+    <p class="lede">BST არ არის მხოლოდ სასწავლო აბსტრაქცია — მისი პრინციპები პირდაპირ დევს ინფრასტრუქტურის ბირთვში, რომელსაც ყოველდღე იყენებთ.</p>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <span class="emoji">🐧</span>
+        <h4>Linux-ის CFS დამგეგმავი</h4>
+        <p>Linux-ის Completely Fair Scheduler (CFS) იყენებს წითელ-შავ ხეს (self-balancing BST) გაშვებადი პროცესების დასალაგებლად „ვირტუალური გაშვების დროის" მიხედვით — BST-ის ძებნისა და ჩასმის იგივე ლოგიკა, დღეს ნასწავლი.</p>
+      </div>
+      <div class="insight-card">
+        <span class="emoji">☕</span>
+        <h4>Java TreeMap / C++ std::map</h4>
+        <p>Java-ს <code class="inline">TreeMap</code>/<code class="inline">TreeSet</code> და C++-ის <code class="inline">std::map</code>/<code class="inline">std::set</code> დაფუძნებულია წითელ-შავ ხეებზე — თვითდაბალანსებად BST-ებზე, რომლებიც გარანტირებულად O(log n) ჩასმას, ძებნასა და დალაგებულ იტერაციას გვთავაზობენ.</p>
+      </div>
+      <div class="insight-card">
+        <span class="emoji">🗄️</span>
+        <h4>ბაზების ინდექსები (MySQL, PostgreSQL)</h4>
+        <p>InnoDB (MySQL) და PostgreSQL იყენებენ B-Tree ინდექსებს — BST-ის განზოგადებას, სადაც თითო კვანძს ბევრი შვილი ჰყავს დისკზე წაკითხვების მინიმიზაციისთვის. საბაზისო იდეა — დალაგებული, ნავიგირებადი სტრუქტურა — ზუსტად დღევანდელია.</p>
+      </div>
+      <div class="insight-card">
+        <span class="emoji">💼</span>
+        <h4>ტექნიკური გასაუბრებები</h4>
+        <p>Validate BST, Kth Smallest in BST და Lowest Common Ancestor არის ერთ-ერთი ყველაზე ხშირად დასმული კითხვა დიდი ტექ-კომპანიების (Google, Meta, Amazon) ინტერვიუებზე — სწორედ იმიტომ, რომ ისინი ამოწმებენ რეკურსიისა და BST-ის თვისების ღრმა გაგებას.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXERCISES ============ -->
+<section id="exercises">
+  <div class="wrap">
+    <div class="eyebrow">სავარჯიშოები</div>
+    <h2 class="h-title">გამოცადეთ საკუთარი თავი</h2>
+    <p class="lede">პირველი ოთხი — დღევანდელი ლექციის ძირითადი ამოცანებია. შემდეგი ჯგუფი აფართოებს იმავე იდეებს ახალი კუთხით — მოერიდეთ AVL-სა და Counting/Radix Sort-ის თემებს, ეს მომდევნო ლექციებზეა (15-16).</p>
+
+    <h4 class="h-sub2">ძირითადი (ლექციის ამოცანები)</h4>
+
+    <details class="exercise">
+      <summary><div class="ex-row"><span class="ex-title"><span class="ex-marker">+</span>Validate Binary Search Tree</span><span class="badge badge-medium">Medium</span></div></summary>
+      <div class="ex-body">
+        <p>დაწერეთ სამივე მიდგომა (A, B, C) და გადაამოწმეთ სამივეზე ერთდაიგივე ტესტ-შემთხვევები. შეადარეთ მათი შესრულების დრო 10,000-კვანძიან დეგენერირებულ (ჯაჭვისებურ) ხეზე — თვალნათლივ დაინახავთ O(n²) vs O(n) სხვაობას.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><div class="ex-row"><span class="ex-title"><span class="ex-marker">+</span>Search / Insert into BST</span><span class="badge badge-easy">Easy</span></div></summary>
+      <div class="ex-body">
+        <p>გადაწერეთ <code class="inline">search()</code> იტერაციულად და <code class="inline">insert()</code> — რეკურსიულად. დარწმუნდით, რომ ორივე ვერსია ერთსა და იმავე შედეგს იძლევა ორიგინალთან შედარებით.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><div class="ex-row"><span class="ex-title"><span class="ex-marker">+</span>Convert Sorted Array to BST</span><span class="badge badge-medium">Medium</span></div></summary>
+      <div class="ex-body">
+        <p>შეასწორეთ დღეს ნაპოვნი ხარვეზი: დაწერეთ <code class="inline">sortedArrayToBST</code>-ის ვერსია, რომელიც წინასწარ ამოწმებს დუბლიკატებს და ან გამორიცხავს მათ, ან აგდებს <code class="inline">ValueError</code>-ს გასაგები შეტყობინებით.</p>
+      </div>
+    </details>
+
+    <h4 class="h-sub2">გაფართოებული — LeetCode სტილი</h4>
+
+    <details class="exercise">
+      <summary><div class="ex-row"><span class="ex-title"><span class="ex-marker">+</span>Minimum Absolute Difference in BST</span><span class="badge badge-easy">Easy</span></div></summary>
+      <div class="ex-body">
+        <p>იპოვეთ მინიმალური სხვაობა ნებისმიერ ორ კვანძს შორის BST-ში. <b>მინიშნება:</b> გამოიყენეთ inorder ტრავერსალი (მიდგომა C) — ზრდადი მიმდევრობის მეზობელ ელემენტებს შორის სხვაობა ყოველთვის საკმარისია შესამოწმებლად.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><div class="ex-row"><span class="ex-title"><span class="ex-marker">+</span>Two Sum IV — Input is a BST</span><span class="badge badge-easy">Easy</span></div></summary>
+      <div class="ex-body">
+        <p>მოცემულია BST და რიცხვი k — არსებობს თუ არა ორი კვანძი, რომელთა ჯამი k-ს უდრის? <b>მინიშნება:</b> გადაიყვანეთ ხე მასივად inorder ტრავერსალით (ისევ მიდგომა C), შემდეგ გამოიყენეთ ორი მაჩვენებელი (two-pointer) დალაგებულ მასივზე.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><div class="ex-row"><span class="ex-title"><span class="ex-marker">+</span>Kth Smallest Element in a BST</span><span class="badge badge-medium">Medium</span></div></summary>
+      <div class="ex-body">
+        <p>იპოვეთ k-ურად უმცირესი მნიშვნელობა BST-ში. <b>მინიშნება:</b> inorder ტრავერსალი აწარმოებს ზრდად მიმდევრობას — საკმარისია დაითვალოთ ვიზიტები და შეჩერდეთ k-ურზე, მასივის სრულად აგების გარეშე.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><div class="ex-row"><span class="ex-title"><span class="ex-marker">+</span>Lowest Common Ancestor of a BST</span><span class="badge badge-medium">Medium</span></div></summary>
+      <div class="ex-body">
+        <p>იპოვეთ ორი კვანძის უახლოესი საერთო წინაპარი BST-ში. <b>მინიშნება:</b> გამოიყენეთ BST-ის თვისება პირდაპირ — არ გჭირდებათ მთელი ხის მოვლა, საკმარისია შედარება ფესვთან, ისევე როგორც <code class="inline">search()</code>-ში.</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><div class="ex-row"><span class="ex-title"><span class="ex-marker">+</span>Delete Node in a BST</span><span class="badge badge-hard">Hard</span></div></summary>
+      <div class="ex-body">
+        <p>წაშალეთ კვანძი BST-დან ისე, რომ BST-ის თვისება შენარჩუნდეს. <b>მინიშნება:</b> სამი შემთხვევაა — ფოთოლი (უბრალოდ წავშალოთ), ერთი შვილი (შევცვალოთ შვილით), ორი შვილი (ვიპოვოთ მემკვიდრე მარჯვენა ქვეხის უმცირეს მნიშვნელობაში — inorder successor).</p>
+      </div>
+    </details>
+
+    <details class="exercise">
+      <summary><div class="ex-row"><span class="ex-title"><span class="ex-marker">+</span>Recover Binary Search Tree</span><span class="badge badge-hard">Hard</span></div></summary>
+      <div class="ex-body">
+        <p>ორ კვანძს BST-ში შემთხვევით გაუცვალეს ადგილი — გამოასწორეთ ხე მათი მნიშვნელობების დაბრუნებით, სტრუქტურის შეცვლის გარეშე. <b>მინიშნება:</b> ეს არის „მიდგომა C"-ის (inorder + prev) პირდაპირი გაფართოება — მოძებნეთ ორი ადგილი, სადაც <code class="inline">prev >= curr</code>.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+ <p> BIT-08.2022.G · მონაცემთა სტრუქტურები და ალგორითმები I · ლექცია 14 — ამოცანები ორობით ძებნის ხეებზე<br>
+  ბიზნესისა და ტექნოლოგიების უნივერსიტეტი (BTU)</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+/* ============ SCROLLSPY ============ */
+(function(){
+  const sections = document.querySelectorAll('main section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const map = {};
+  navLinks.forEach(a => map[a.getAttribute('href').slice(1)] = a);
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = map[e.target.id];
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+  sections.forEach(s => obs.observe(s));
+})();
+
+/* ============ BST PLAYGROUND ============ */
+(function(){
+  class Node {
+    constructor(val){ this.val = val; this.left = null; this.right = null; this.x = 0; this.y = 0; }
+  }
+  let root = null;
+  const svg = document.getElementById('pgSvg');
+  const statusEl = document.getElementById('pgStatus');
+  const logEl = document.getElementById('pgLog');
+
+  function log(msg){
+    const d = document.createElement('div');
+    d.textContent = msg;
+    logEl.prepend(d);
+    while (logEl.children.length > 12) logEl.removeChild(logEl.lastChild);
+  }
+  function clearLog(){ logEl.innerHTML = ''; }
+  function setStatus(html){ statusEl.innerHTML = html; }
+
+  function insertBST(rt, val){
+    if (rt === null) return new Node(val);
+    let cur = rt;
+    while (true){
+      if (val === cur.val) return rt; // no duplicates
+      if (val < cur.val){
+        if (cur.left === null){ cur.left = new Node(val); cur.left.isNew = true; break; }
+        cur = cur.left;
+      } else {
+        if (cur.right === null){ cur.right = new Node(val); cur.right.isNew = true; break; }
+        cur = cur.right;
+      }
+    }
+    return rt;
+  }
+
+  function clearFlags(node){
+    if (!node) return;
+    node.isNew = false; node.state = null; node.lo = null; node.hi = null;
+    clearFlags(node.left); clearFlags(node.right);
+  }
+
+  function layoutTree(rt){
+    let counter = 0;
+    let maxDepth = 0;
+    function assign(node, depth){
+      if (!node) return;
+      assign(node.left, depth + 1);
+      node.x = counter++;
+      node.y = depth;
+      maxDepth = Math.max(maxDepth, depth);
+      assign(node.right, depth + 1);
+    }
+    assign(rt, 0);
+    return { count: counter, maxDepth };
+  }
+
+  function render(){
+    svg.innerHTML = '';
+    if (!root){
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x','450'); t.setAttribute('y','160');
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('fill','#7C849A');
+      t.setAttribute('font-family','JetBrains Mono'); t.setAttribute('font-size','14');
+      t.textContent = 'ხე ცარიელია — ჩასვით მნიშვნელობა';
+      svg.appendChild(t);
+      return;
+    }
+    const { count, maxDepth } = layoutTree(root);
+    const wSlot = Math.max(60, Math.min(90, 840 / Math.max(count,1)));
+    const totalW = Math.max(880, count * wSlot + 60);
+    const totalH = Math.max(260, (maxDepth + 1) * 70 + 60);
+    svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+    svg.setAttribute('height', Math.min(totalH, 340));
+
+    const offsetX = 40;
+    const offsetY = 40;
+    const ns = 'http://www.w3.org/2000/svg';
+
+    function px(node){ return offsetX + node.x * wSlot; }
+    function py(node){ return offsetY + node.y * 68; }
+
+    function drawEdges(node){
+      if (!node) return;
+      if (node.left){
+        const line = document.createElementNS(ns,'line');
+        line.setAttribute('class','edge' + (node.left.edgePath ? ' path' : ''));
+        line.setAttribute('x1', px(node)); line.setAttribute('y1', py(node));
+        line.setAttribute('x2', px(node.left)); line.setAttribute('y2', py(node.left));
+        svg.appendChild(line);
+        drawEdges(node.left);
+      }
+      if (node.right){
+        const line = document.createElementNS(ns,'line');
+        line.setAttribute('class','edge' + (node.right.edgePath ? ' path' : ''));
+        line.setAttribute('x1', px(node)); line.setAttribute('y1', py(node));
+        line.setAttribute('x2', px(node.right)); line.setAttribute('y2', py(node.right));
+        svg.appendChild(line);
+        drawEdges(node.right);
+      }
+    }
+    function drawNodes(node){
+      if (!node) return;
+      drawNodes(node.left);
+      const g = document.createElementNS(ns,'g');
+      const circle = document.createElementNS(ns,'circle');
+      let cls = 'node-circle';
+      if (node.isNew) cls += ' new-node';
+      if (node.state === 'path') cls += ' path';
+      if (node.state === 'found') cls += ' found';
+      if (node.state === 'ok') cls += ' ok-range';
+      if (node.state === 'bad') cls += ' bad-range';
+      circle.setAttribute('class', cls);
+      circle.setAttribute('cx', px(node)); circle.setAttribute('cy', py(node)); circle.setAttribute('r','19');
+      const text = document.createElementNS(ns,'text');
+      text.setAttribute('class','node-text');
+      text.setAttribute('x', px(node)); text.setAttribute('y', py(node));
+      text.textContent = node.val;
+      g.appendChild(circle); g.appendChild(text);
+      if (node.lo !== undefined && node.lo !== null){
+        const rt = document.createElementNS(ns,'text');
+        rt.setAttribute('class','range-text');
+        rt.setAttribute('x', px(node)); rt.setAttribute('y', py(node) + 32);
+        const loS = node.lo === -Infinity ? '-∞' : node.lo;
+        const hiS = node.hi === Infinity ? '∞' : node.hi;
+        rt.textContent = `[${loS}, ${hiS}]`;
+        g.appendChild(rt);
+      }
+      svg.appendChild(g);
+      drawNodes(node.right);
+    }
+    drawEdges(root);
+    drawNodes(root);
+  }
+
+  function collectPathFlags(pathNodes){
+    function clearP(node){ if(!node) return; node.edgePath=false; clearP(node.left); clearP(node.right); }
+    clearP(root);
+    pathNodes.forEach(n => n.edgePath = true);
+  }
+
+  document.getElementById('pgInsertBtn').addEventListener('click', () => {
+    const inp = document.getElementById('pgValue');
+    const val = parseInt(inp.value, 10);
+    if (isNaN(val)) { setStatus('გთხოვთ, შეიყვანოთ მთელი რიცხვი.'); return; }
+    clearFlags(root);
+    const existed = (function has(n){ if(!n) return false; if(n.val===val) return true; return val<n.val?has(n.left):has(n.right); })(root);
+    root = insertBST(root, val);
+    render();
+    if (existed){
+      setStatus(`მნიშვნელობა <span class="hl">${val}</span> უკვე არსებობს — დუბლიკატები არ ემატება.`);
+      log(`insert(${val}) → უკვე არსებობს, ხე უცვლელია`);
+    } else {
+      setStatus(`კვანძი <span class="hl">${val}</span> დაემატა ფოთლის პოზიციაზე.`);
+      log(`insert(${val}) → დაემატა ახალი ფოთოლი`);
+    }
+    inp.value = '';
+  });
+
+  document.getElementById('pgSearchBtn').addEventListener('click', () => {
+    const inp = document.getElementById('pgValue');
+    const val = parseInt(inp.value, 10);
+    if (isNaN(val)) { setStatus('გთხოვთ, შეიყვანოთ საძებნი მთელი რიცხვი.'); return; }
+    if (!root) { setStatus('ხე ცარიელია.'); return; }
+    clearFlags(root);
+    const path = [];
+    let cur = root;
+    let found = false;
+    while (cur){
+      path.push(cur);
+      cur.state = 'path';
+      if (cur.val === val){ found = true; cur.state = 'found'; break; }
+      cur = val < cur.val ? cur.left : cur.right;
+    }
+    collectPathFlags(path);
+    render();
+    log(`search(${val}) → მარშრუტი: ${path.map(n=>n.val).join(' → ')}`);
+    if (found){
+      setStatus(`<span class="ok">✓ ნაპოვნია!</span> მარშრუტი: ${path.map(n=>n.val).join(' → ')} (${path.length} შედარება)`);
+    } else {
+      setStatus(`<span class="bad">✗ ვერ მოიძებნა.</span> ბოლო შემოწმებული მარშრუტი: ${path.map(n=>n.val).join(' → ')}`);
+    }
+  });
+
+  document.getElementById('pgValidateBtn').addEventListener('click', () => {
+    if (!root){ setStatus('ხე ცარიელია — ცარიელი ხე ვალიდურ BST-ად ითვლება.'); return; }
+    clearFlags(root);
+    clearLog();
+    let valid = true;
+    let checks = 0;
+    function helper(node, lo, hi){
+      if (!node) return true;
+      checks++;
+      const ok = node.val > lo && node.val < hi;
+      node.lo = lo; node.hi = hi;
+      node.state = ok ? 'ok' : 'bad';
+      log(`შემოწმება: ${node.val} ∈ (${lo===-Infinity?'-∞':lo}, ${hi===Infinity?'∞':hi}) → ${ok ? 'OK' : 'დარღვევა!'}`);
+      if (!ok){ valid = false; return false; }
+      const leftOk = helper(node.left, lo, node.val);
+      const rightOk = helper(node.right, node.val, hi);
+      return leftOk && rightOk;
+    }
+    helper(root, -Infinity, Infinity);
+    render();
+    setStatus(valid
+      ? `<span class="ok">✓ ვალიდური BST</span> — შემოწმდა ${checks} კვანძი მინ/მაქს დიაპაზონის მეთოდით.`
+      : `<span class="bad">✗ არ არის ვალიდური BST</span> — დარღვევა ნაპოვნია (იხ. ჟურნალი ქვემოთ).`);
+  });
+
+  document.getElementById('pgRandomBtn').addEventListener('click', () => {
+    root = null;
+    const vals = new Set();
+    while (vals.size < 9) vals.add(Math.floor(Math.random()*90)+5);
+    const arr = Array.from(vals);
+    arr.forEach(v => root = insertBST(root, v));
+    clearFlags(root);
+    render();
+    setStatus(`შემთხვევითი ხე აშენდა: ${arr.join(', ')}`);
+    clearLog();
+    log(`generated: [${arr.join(', ')}]`);
+  });
+
+  document.getElementById('pgResetBtn').addEventListener('click', () => {
+    root = null;
+    render();
+    setStatus('ხე გასუფთავდა.');
+    clearLog();
+  });
+
+  render();
+})();
+
+hljs.highlightAll();
+</script>
+</body>
+</html>
