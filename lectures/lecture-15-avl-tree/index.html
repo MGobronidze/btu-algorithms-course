@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ლექცია 15 · მონაცემთა სტრუქტურა AVL ხე</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+Georgian:wght@400;600;700&family=Noto+Serif+Georgian:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root{--bg:#0B0E14;--bg-panel:#12161F;--bg-panel-2:#171C27;--ink:#ECE8DE;--ink-dim:#B7BCC9;--muted:#7C849A;--line:#232838;--gold:#D9A64E;--gold-dim:#8C7239;--teal:#5AC2B6;--teal-dim:#2F5F5A;--green:#7CB88F;--amber:#D9A64E;--rose:#C97B84;--code-bg:#0d1117;--radius:14px;--serif:'Noto Serif Georgian','Noto Serif',serif;--sans:'Noto Sans Georgian','Noto Sans',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;--maxw:760px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 var(--sans)}
+a{color:var(--teal)}
+#topnav{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 24px;background:rgba(11,14,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.brand{color:var(--gold);text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap}
+.nav-links{display:flex;gap:4px;overflow-x:auto}.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.nav-links a.active{color:var(--gold);background:var(--bg-panel-2)}
+#hero{position:relative;overflow:hidden;padding:88px 24px 72px;text-align:center;border-bottom:1px solid var(--line)}
+#hero .bg{position:absolute;inset:0;opacity:.16;display:flex;justify-content:center;align-items:center;pointer-events:none}#hero .bg svg{height:130%;width:auto}
+#hero>*:not(.bg){position:relative}
+.kicker{color:var(--teal);font-size:13px;letter-spacing:.02em;margin:0 0 14px}
+h1,h2,h3{font-family:var(--serif);line-height:1.3}h1{font-size:clamp(38px,7vw,64px);margin:0 0 12px;color:var(--gold)}
+.sub{color:var(--ink-dim);max-width:640px;margin:0 auto 22px;font-size:18px}
+.hero-terms{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}.hero-terms span{border:1px solid var(--gold-dim);color:var(--gold);border-radius:99px;padding:3px 14px;font-size:13px}
+section{padding:64px 24px}.section-full{background:var(--bg-panel);border-block:1px solid var(--line)}
+.wrap{max-width:var(--maxw);margin:0 auto}.wrap.wide{max-width:980px}
+h2{font-size:30px;margin:0 0 18px}h3{font-size:20px;margin:28px 0 8px;color:var(--gold)}p{margin:0 0 14px;color:var(--ink-dim)}p b,li b{color:var(--ink)}
+code{font-family:var(--mono);font-size:.9em;color:var(--teal);background:var(--bg-panel-2);padding:1px 6px;border-radius:6px}
+.code-window{background:var(--code-bg);border:1px solid var(--line);border-radius:var(--radius);margin:16px 0;overflow:hidden}
+.code-titlebar{display:flex;align-items:center;gap:6px;padding:9px 14px;background:var(--bg-panel-2);color:var(--muted);font:12px var(--mono)}
+.code-titlebar i{width:10px;height:10px;border-radius:50%;background:var(--line)}.code-titlebar i:nth-child(1){background:var(--rose)}.code-titlebar i:nth-child(2){background:var(--amber)}.code-titlebar i:nth-child(3){background:var(--green)}.code-titlebar span{margin-left:8px}
+.code-window pre{margin:0;overflow-x:auto}.code-window code{background:none;padding:16px;display:block;font-size:13px;line-height:1.6;color:inherit}
+.code-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}.code-pair .code-window{margin:8px 0}
+.callout{border:1px solid var(--line);border-left:3px solid var(--teal);background:var(--bg-panel-2);border-radius:var(--radius);padding:14px 18px;margin:20px 0}.callout p:last-child{margin:0}.callout>b:first-child{display:block;margin-bottom:4px;color:var(--ink)}
+.callout.fix{border-left-color:var(--gold)}.callout.warn{border-left-color:var(--rose)}.callout.insight{border-left-color:var(--teal)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14.5px}th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:600}
+.bigo-table,.compare-table,.summary-table{background:var(--bg-panel-2);border-radius:var(--radius);overflow:hidden}.num{color:var(--gold);font-family:var(--mono)}
+.table-scroll{overflow-x:auto}
+.term-grid,.insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:18px 0}
+.term-card,.insight-card{background:var(--bg-panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:16px}.term-card b{color:var(--gold);font-family:var(--mono)}.term-card p,.insight-card p{margin:6px 0 0;font-size:14.5px}
+.insight-card .em{font-size:26px}.insight-card h4{margin:6px 0 0;font-family:var(--serif);color:var(--ink);font-size:16px}
+.viz-panel{background:var(--bg-panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin:20px 0}
+.viz-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.viz-controls input{background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:8px 12px;font:14px var(--mono);width:190px}
+.btn{background:var(--gold);color:#1a1405;border:0;border-radius:10px;padding:8px 14px;font:600 13px var(--sans);cursor:pointer}.btn.ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line)}
+.btn:hover{filter:brightness(1.1)}.btn:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.tree-svg-wrap{overflow-x:auto;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center}.tree-svg-wrap svg{max-width:100%;height:auto}
+.edge{stroke:var(--muted);stroke-width:1.6;fill:none}.node-circle{fill:var(--bg-panel-2);stroke:var(--muted);stroke-width:2}.nlabel{fill:var(--ink);font:600 13px var(--mono);text-anchor:middle;dominant-baseline:central}
+.bf{font:600 10.5px var(--mono);fill:var(--muted)}.bf.bad{fill:var(--rose)}
+.node-circle.path{stroke:var(--teal)}.node-circle.cur{fill:var(--teal-dim);stroke:var(--teal)}.node-circle.new{stroke:var(--green);fill:#25372c}.node-circle.ok{stroke:var(--green)}
+.node-circle.z{stroke:var(--rose);fill:#3a2126}.node-circle.y{stroke:var(--amber);fill:#372e1a}.node-circle.x{stroke:var(--teal);fill:var(--teal-dim)}
+.tri{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 3}.tlabel{fill:var(--muted);font:11px var(--mono);text-anchor:middle}
+.msg{min-height:3.4em;margin:12px 0 0;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--line);color:var(--ink);font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--muted);margin-top:10px}.legend b{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;border:2px solid}
+.case{margin:26px 0}.case-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.case-row .st{flex:1 1 200px;min-width:190px;text-align:center}.cap{font:12px var(--mono);color:var(--gold);margin-top:4px}.arrow{font-size:24px;color:var(--gold-dim)}
+.ascii-tree{font:13px/1.4 var(--mono);white-space:pre;color:var(--ink-dim);background:var(--code-bg);padding:14px;border-radius:12px;overflow-x:auto}
+details.exercise{background:var(--bg-panel-2);border:1px solid var(--line);border-radius:var(--radius);margin:12px 0}details.exercise>summary{cursor:pointer;list-style:none;padding:14px 18px;font-weight:600;display:flex;gap:10px;align-items:center}
+details.exercise>summary::-webkit-details-marker{display:none}details.exercise>summary::after{content:"+";margin-left:auto;color:var(--gold);font:600 20px var(--mono)}details.exercise[open]>summary::after{content:"−"}.ex-body{padding:0 18px 16px}
+.badge-easy,.badge-medium,.badge-hard{font:600 11px var(--mono);padding:2px 9px;border-radius:99px;border:1px solid}.badge-easy{color:var(--green)}.badge-medium{color:var(--amber)}.badge-hard{color:var(--rose)}
+footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
+footer p{font-size:13px; margin:0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+
+@media(max-width:720px){.code-pair{grid-template-columns:1fr}#topnav{padding:10px 14px}.brand{font-size:12px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav id="topnav"><a class="brand" href="../../index.html">← კურსი · მონაცემთა სტრუქტურა AVL ხე — ლექცია 15</a>
+<div class="nav-links"><a href="#theory">თეორია</a><a href="#rotations">როტაციები</a><a href="#viz">ვიზუალიზატორი</a><a href="#code">კოდი</a><a href="#analysis">ანალიზი</a><a href="#industry">ინდუსტრია</a><a href="#exercises">სავარჯიშოები</a></div></nav>
+
+<header id="hero"><div class="bg" id="heroBg"></div>
+<p class="kicker">BIT-08.2022.G · მონაცემთა სტრუქტურები და ალგორითმები I · ლექცია 15</p>
+<h1>AVL ხე</h1>
+<p class="sub">თვითბალანსირებადი ორობითი ძიების ხე: როგორ ინარჩუნებს ის სიმაღლეს O(log n)-ზე ყოველი ჩასმის შემდეგ.</p>
+<div class="hero-terms"><span>ბალანსის ფაქტორი</span><span>როტაცია</span><span>LL · LR · RR · RL</span><span>AVL sort</span></div></header>
+
+<main>
+<section id="theory"><div class="wrap">
+<h2>რა არის AVL ხე და რატომ გვჭირდება</h2>
+<p>AVL ხე (ადელსონ-ველსკი და ლანდისი, 1962) არის BST, სადაც <b>ყოველი</b> კვანძისთვის მარცხენა და მარჯვენა ქვეხის სიმაღლეთა სხვაობა არ აღემატება ერთს. ამ სხვაობას კვანძის <b>ბალანსის ფაქტორი</b> ეწოდება:</p>
+<p style="text-align:center"><code>BF(v) = h(v.left) − h(v.right) ∈ {−1, 0, +1}</code></p>
+<p>პრობლემა, რასაც ეს წყვეტს: ჩვეულებრივ BST-ში დალაგებული მიმდევრობის ჩასმა ხეს სიას აქცევს და ოპერაციები O(n) ხდება. ჩვენ გაზომილ ექსპერიმენტში 1…3000 დალაგებული გასაღების BST-ში ჩასმა Python-ის რეკურსიის ლიმიტს (1000) არღვევს, ხოლო AVL-ში 100 000 დალაგებული გასაღები სიმაღლე 17-ს იძლევა.</p>
+<div class="term-grid">
+<div class="term-card"><b>სიმაღლე</b><p>ცარიელი ხე (<code>None</code>) = 0, ფოთოლი = 1.</p></div>
+<div class="term-card"><b>BF &gt; 1</b><p>მარცხნივ გადახრილი: შემთხვევა LL ან LR.</p></div>
+<div class="term-card"><b>BF &lt; −1</b><p>მარჯვნივ გადახრილი: შემთხვევა RR ან RL.</p></div>
+<div class="term-card"><b>z · y · x</b><p>z — პირველი დისბალანსირებული კვანძი, y — მისი შვილი, x — შვილიშვილი ჩასმის გზაზე.</p></div></div>
+<div class="callout fix"><b>🔍 შესწორება 1 — ბალანსის ნიშანი</b><p>პრეზენტაციაში სლაიდი 25 განსაზღვრავს BF = მარცხენა − მარჯვენა, მაგრამ სლაიდების 21–24 დიაგრამებზე მარცხნივ გადახრილ კვანძს აწერია <code>−2</code> (ანუ მარჯვენა − მარცხენა). ერთი ნიშნის შეცდომა LL/RR-ის აღრევას იწვევს. ჩვენ ყველგან ვიყენებთ <b>მარცხენა − მარჯვენა</b>: LL-ს შეესაბამება +2, RR-ს −2.</p></div>
+<div class="callout fix"><b>🔍 შესწორება 2 — სიმაღლის კონვენცია</b><p>სლაიდებზე <code>height()</code> და <code>Node</code> არ არის ნაჩვენები. თუ ფოთლის სიმაღლეს 0 დავაყენებთ, ხოლო <code>height(None)</code>-ს 0 დავტოვებთ, ფოთოლი და ცარიელი ქვეხე არ განირჩევა. გავუშვით: 1, 2, 3 მიმდევრობის ჩასმა უკვე რეალურად დისბალანსირებულ ხეს გვიბრუნებს. წესი: <b>ფოთოლი = 1, None = 0</b>.</p></div>
+<div class="callout insight"><b>🔗 კავშირი წინა ლექციებთან</b><p><b>ლექცია 11:</b> სიმაღლე იგივეა, რასაც Maximum Depth of Binary Tree ითვლიდა; განსხვავება ის არის, რომ AVL-ში ის კვანძში ინახება და ჩასმისას O(1)-ში ახლდება. <b>ლექცია 13:</b> ჩასმა და ძიება BST-ისაა, ხოლო BST Sort-ი დალაგებულ შესასვლელზე O(n²) იყო: AVL Sort ამას აქრობს. <b>ლექცია 14:</b> Validate Binary Search Tree-ის ტექნიკა (ქვედა და ზედა საზღვრები) ზუსტად ის არის, რასაც ქვემოთ <code>is_valid</code> იყენებს.</p></div>
+</div></section>
+
+<section id="rotations" class="section-full"><div class="wrap wide">
+<h2>როტაციები და ოთხი დისბალანსი</h2>
+<p>ბალანსის აღსადგენად საკმარისია ორი პრიმიტივი — <code>rotate_left</code> და <code>rotate_right</code>. სლაიდის „ოთხი როტაცია“ სინამდვილეში ამ ორის კომბინაციებია: LL და RR ერთი პრიმიტივია, LR და RL — ორი. ორივე O(1)-ია და ინარჩუნებს in-order მიმდევრობას, ამიტომ BST თვისება არ ირღვევა. <b>T1…T4</b> არის ნებისმიერი ქვეხე.</p>
+<div id="cases"></div>
+<div class="callout warn"><b>⚠️ ორმაგი როტაციის ხაფანგი</b><p>LR-ში პირველი როტაცია ხდება <b>y-ზე</b> (z-ის შვილზე), არა z-ზე. მხოლოდ ამის შემდეგ ხდება ის LL შემთხვევა, რომელსაც z-ზე ერთი მარჯვნივ როტაცია აგვარებს. სლაიდი 10 ამას არ აზუსტებს.</p></div>
+</div></section>
+
+<section id="viz"><div class="wrap wide">
+<h2>ინტერაქტიული ჩასმა</h2>
+<p>შეიყვანეთ გასაღებები (მძიმით გამოყოფილი, −99…999) და გაიარეთ ალგორითმი ნაბიჯ-ნაბიჯ: გზა ქვევით, სიმაღლეებისა და BF-ის განახლება უკან დაბრუნებისას, z-y-x-ის პოვნა და როტაცია. სცადეთ <code>10,20,30,40,50,25</code>, ან დუბლიკატიანი <code>5,3,5,1</code>. ქვემოთ ყოველ ნაბიჯზე ჩანს in-order გავლა, ანუ AVL sort-ის შედეგი.</p>
+<div class="viz-panel">
+<div class="viz-controls"><input id="keys" value="10,20,30" aria-label="გასაღებები" spellcheck="false"><button class="btn" id="bIns">ჩასმა</button><button class="btn ghost" id="bPrev">← წინა</button><button class="btn ghost" id="bNext">შემდეგი →</button><button class="btn ghost" id="bPlay">▶ ავტო</button><button class="btn ghost" id="bDemo">მაგალითი</button><button class="btn ghost" id="bRand">შემთხვევითი</button><button class="btn ghost" id="bClr">გასუფთავება</button></div>
+<div class="tree-svg-wrap" id="vizTree" style="min-height:220px"></div>
+<div class="msg" id="vizMsg" aria-live="polite"></div>
+<div class="msg" id="vizSorted" style="min-height:0;margin-top:8px;font-family:var(--mono);font-size:13px;color:var(--teal)"></div>
+<div class="legend"><span><b style="border-color:var(--green)"></b>ახალი / ბალანსში</span><span><b style="border-color:var(--rose)"></b>z (დისბალანსი)</span><span><b style="border-color:var(--amber)"></b>y</span><span><b style="border-color:var(--teal)"></b>x / გზა</span><span>რიცხვი კვანძის გვერდით — BF</span></div>
+</div></div></section>
+
+<section id="code" class="section-full"><div class="wrap wide">
+<h2>Python 3.12 რეალიზაცია</h2>
+<p>ქვემოთ მოცემული კოდი სრულად გავუშვით: 3000 შემთხვევით მიმდევრობაზე (დუბლიკატებითაც) შევამოწმეთ BST თვისება, სიმაღლეები და |BF| ≤ 1; 200 000 დალაგებული გასაღებისთვის სიმაღლე 18-ია.</p>
+<div class="code-window"><div class="code-titlebar"><i></i><i></i><i></i><span>avl.py</span></div><pre><code class="language-python">"""AVL tree — clean version of lecture 15 (insertion + AVL sort)."""
+from __future__ import annotations
+
+from collections.abc import Iterable, Iterator
+from typing import Protocol
+
+
+class Comparable(Protocol):
+    def __lt__(self, other, /) -&gt; bool: ...
+
+
+class Node[K: Comparable]:
+    """One AVL node. A leaf has height 1, a missing child (None) has height 0."""
+
+    __slots__ = ("key", "left", "right", "height", "count")
+
+    def __init__(self, key: K) -&gt; None:
+        self.key = key
+        self.left: Node[K] | None = None
+        self.right: Node[K] | None = None
+        self.height = 1
+        self.count = 1  # multiplicity of the key (used by avl_sort)
+
+
+def height[K: Comparable](node: Node[K] | None) -&gt; int:
+    return node.height if node is not None else 0
+
+
+def balance_factor[K: Comparable](node: Node[K] | None) -&gt; int:
+    """height(left) - height(right); a valid AVL node has -1, 0 or +1."""
+    return height(node.left) - height(node.right) if node is not None else 0
+
+
+def update_height[K: Comparable](node: Node[K]) -&gt; None:
+    node.height = 1 + max(height(node.left), height(node.right))
+
+
+def rotate_right[K: Comparable](z: Node[K]) -&gt; Node[K]:
+    """Right rotation around z (left-heavy). Returns the new subtree root."""
+    y = z.left
+    assert y is not None, "rotate_right needs a left child"
+    z.left, y.right = y.right, z
+    update_height(z)  # z is now the lower node -&gt; update it first
+    update_height(y)
+    return y
+
+
+def rotate_left[K: Comparable](z: Node[K]) -&gt; Node[K]:
+    """Left rotation around z (right-heavy). Returns the new subtree root."""
+    y = z.right
+    assert y is not None, "rotate_left needs a right child"
+    z.right, y.left = y.left, z
+    update_height(z)
+    update_height(y)
+    return y
+
+
+def rebalance[K: Comparable](z: Node[K]) -&gt; Node[K]:
+    """Restore the AVL property at z (children already valid AVL trees)."""
+    update_height(z)
+    bf = balance_factor(z)
+    if bf &gt; 1:  # left-heavy: LL or LR
+        assert z.left is not None
+        if balance_factor(z.left) &lt; 0:  # LR -&gt; first rotate the child left
+            z.left = rotate_left(z.left)
+        return rotate_right(z)
+    if bf &lt; -1:  # right-heavy: RR or RL
+        assert z.right is not None
+        if balance_factor(z.right) &gt; 0:  # RL -&gt; first rotate the child right
+            z.right = rotate_right(z.right)
+        return rotate_left(z)
+    return z
+
+
+def insert[K: Comparable](node: Node[K] | None, key: K) -&gt; Node[K]:
+    """Insert key, return the (possibly new) root. Duplicates raise count."""
+    if node is None:
+        return Node(key)
+    if key &lt; node.key:
+        node.left = insert(node.left, key)
+    elif node.key &lt; key:
+        node.right = insert(node.right, key)
+    else:
+        node.count += 1
+        return node
+    return rebalance(node)
+
+
+def inorder[K: Comparable](node: Node[K] | None) -&gt; Iterator[K]:
+    """In-order traversal; a key with count c is yielded c times."""
+    if node is not None:
+        yield from inorder(node.left)
+        yield from (node.key for _ in range(node.count))
+        yield from inorder(node.right)
+
+
+def avl_sort[K: Comparable](items: Iterable[K]) -&gt; list[K]:
+    """O(n log n) sort: n balanced insertions, then one in-order pass."""
+    root: Node[K] | None = None
+    for item in items:
+        root = insert(root, item)
+    return list(inorder(root))
+</code></pre></div>
+<div class="callout fix"><b>🔍 შესწორება 3 — როტაციის ტიპის განსაზღვრა</b><p>ორიგინალი LL/RR-ს ადგენს ახალი გასაღების შედარებით: <code>key &lt; node.left.key</code>. ჩასმისას ეს სწორია (3000 შემთხვევით მიმდევრობაზე ორივე ვარიანტმა იდენტური ხე მოგვცა), მაგრამ ჩასმის გარეშე, მაგალითად წაშლისას (ეს ამ კურსის თემა არ არის, თუმცა პრაქტიკაში აუცილებელია), ახალი გასაღები არ არსებობს. ამიტომ <code>rebalance</code> ადარებს <b>შვილის BF-ს</b>: ეს ერთი და იგივე ფუნქციაა ყველა შემთხვევისთვის და გასაღებზე დამოკიდებული არ არის.</p>
+<div class="code-pair"><div class="code-window"><div class="code-titlebar"><i></i><i></i><i></i><span>ორიგინალი</span></div><pre><code class="language-python">if balance &gt; 1 and key &lt; node.left.key:
+    return right_rotate(node)</code></pre></div><div class="code-window"><div class="code-titlebar"><i></i><i></i><i></i><span>rebalance</span></div><pre><code class="language-python">if bf &gt; 1:
+    if balance_factor(z.left) &lt; 0:
+        z.left = rotate_left(z.left)
+    return rotate_right(z)</code></pre></div></div></div>
+<div class="callout fix"><b>🔍 შესწორება 4 — დუბლიკატები იკარგება და AVL sort</b><p>ორიგინალის <code>else: return node</code> მეორე ერთნაირ გასაღებს ჩუმად აგდებს, ამიტომ ამ ხეზე დალაგება მონაცემებს კარგავს: სიის <code>[3, 1, 3]</code> ნაცვლად მივიღებდით <code>[1, 3]</code>. გამოსწორება: კვანძში <code>count</code> ველი. გადამოწმებული: <code>avl_sort([3,1,3]) == [1,3,3]</code> და 2000 შემთხვევითი სია ემთხვევა <code>sorted()</code>-ს. დამატებით, <code>if not node</code> ვცვალეთ <code>is None</code>-ით: ეს PEP 8-ის წესია და არ იმუშავებს არასწორად, თუ Node-ს ოდესმე <code>__bool__</code> ექნება.</p></div>
+<div class="callout insight"><b>🎯 დალაგება AVL ხით</b><p><code>avl_sort</code> არის n ჩასმა (თითო O(log n)) და ერთი in-order გავლა O(n), ანუ ჯამში O(n log n) დროში და O(n) მეხსიერებაში, უარეს შემთხვევაშიც. გაფრთხილება: BST-ზე დაფუძნებული დალაგება უარეს შემთხვევაში O(n²) იყო.</p></div>
+</div></section>
+
+<section id="analysis"><div class="wrap">
+<h2>სირთულის ანალიზი</h2>
+<p>რატომ არის სიმაღლე O(log n)? მინიმალური კვანძების რაოდენობა h სიმაღლის AVL ხეში აკმაყოფილებს N(h) = N(h−1) + N(h−2) + 1-ს (ფიბონაჩის მსგავსად): <span class="num">1, 2, 4, 7, 12, 20, 33, 54, 88, 143, 232, 376</span> (h = 1…12). აქედან h ≤ 1.44·log₂(n+2). გამოთვლით: 10⁶ გასაღებზე მაქსიმალური სიმაღლე 28-ია (log₂ = 19.9).</p>
+<div class="table-scroll"><table class="bigo-table"><tr><th>ოპერაცია</th><th>BST უარესი</th><th>AVL უარესი</th><th>სივრცე</th></tr>
+<tr><td>ძიება</td><td class="num">O(n)</td><td class="num">O(log n)</td><td class="num">O(1)</td></tr>
+<tr><td>ჩასმა (რეკურსიით)</td><td class="num">O(n)</td><td class="num">O(log n)</td><td class="num">O(log n) სტეკი</td></tr>
+<tr><td>ერთი როტაცია</td><td>—</td><td class="num">O(1)</td><td class="num">O(1)</td></tr>
+<tr><td>AVL sort</td><td class="num">O(n²)</td><td class="num">O(n log n)</td><td class="num">O(n)</td></tr></table></div>
+<div class="callout insight"><b>💡 ჩასმაზე მაქსიმუმ ერთი შეკეთება</b><p>ჩასმისას პირველი შეკეთების (ერთმაგი ან ორმაგი როტაცია) შემდეგ ქვეხის სიმაღლე ისევ ჩასმამდელი ხდება, ამიტომ ზემოთ არაფერი იცვლება. გამოვცადეთ 300 000-ზე მეტ ჩასმაზე: ერთი ჩასმა არასდროს იყენებს 2 პრიმიტივზე მეტ როტაციას. ამ ფაქტს ვიზუალიზატორიც აჩვენებს.</p></div>
+<div class="callout insight"><b>🎯 შედარება სხვა დალაგებებთან და კავშირი ლექცია 16-თან</b><p>Heap Sort (ლექცია 12) იგივე O(n log n)-ია, მაგრამ დამატებით მეხსიერებას არ ითხოვს (O(1)), ხოლო AVL sort-ს O(n) სჭირდება. სამაგიეროდ AVL ხე დალაგებულია <b>ყოველ მომენტში</b>: ახალი ელემენტი O(log n)-ში ჩაჯდება და ძიება, min/max ან in-order მაშინვე ხელმისაწვდომია. AVL sort, Merge და Quick Sort ერთი ოჯახია (ელემენტებს ერთმანეთს ადარებს), ამიტომ შედარებაზე დაფუძნებული დალაგება Ω(n log n)-ზე სწრაფი ვერ იქნება. შემდეგ ლექციაზე Counting და Radix Sort ამ ზღვარს შედარების გარეშე გადალახავს.</p></div>
+</div></section>
+
+<section id="industry" class="section-full"><div class="wrap wide">
+<h2>Tech Industry Insights</h2>
+<div class="insight-grid">
+<div class="insight-card"><div class="em">🐧</div><h4>Linux-ის ბირთვი</h4><p>პროცესის მეხსიერების არეებს (VMA) წლების განმავლობაში modified red-black tree და დამატებითი სია ინახავდა. Linux 6.1-დან მათ maple tree ცვლის: RCU-უსაფრთხო, cache-ისთვის მორგებული B-tree.</p></div>
+<div class="insight-card"><div class="em">⚙️</div><h4>C++ STL</h4><p><code>std::map</code> და <code>std::set</code>-ის libstdc++ იმპლემენტაცია red-black ხეა. AVL უფრო მკაცრად ბალანსდება (ძიება სწრაფია), red-black ჩასმა-წაშლისას ნაკლებ როტაციას აკეთებს.</p></div>
+<div class="insight-card"><div class="em">☕</div><h4>Java HashMap</h4><p>Java 8-დან, როცა ერთ ბაკეტში 8 ან მეტი ელემენტი გროვდება (და ცხრილი საკმარისად დიდია), სია red-black ხედ გადაიქცევა: უარესი შემთხვევა O(n)-დან O(log n)-მდე ეცემა.</p></div>
+<div class="insight-card"><div class="em">🐍</div><h4>Python: sortedcontainers</h4><p>დალაგებული სიის ბიბლიოთეკა ხეს არ იყენებს: სიების სიაა. ავტორები მიუთითებენ, რომ ეს ხეზე ნაკლებ მეხსიერებას და უკეთეს cache-ლოკალურობას იძლევა, თუმცა ხის ასიმპტოტიკა უკეთესია.</p></div>
+</div></div></section>
+
+<section id="exercises"><div class="wrap">
+<h2>სავარჯიშოები</h2>
+<p>სილაბუსის მიხედვით გამოცდაზე ორი ტიპის დავალება გვხვდება: (1) კოდს რამდენიმე სტრიქონი აკლია და სტუდენტმა უნდა შეავსოს, ასევე შეაფასოს დრო და მეხსიერება; (2) მოცემულია შემავალი მონაცემები და საჭიროა ნაბიჯ-ნაბიჯ აღწერა, რას გააკეთებს კოდი. პირველი ორი სავარჯიშო სწორედ ასეთია.</p>
+<details class="exercise" open><summary>ნაბიჯ-ნაბიჯ: 45, 20, 60, 10, 30, 25, 27 <span class="badge-easy">საბაზისო</span></summary><div class="ex-body"><p>ჩასვით გასაღებები თანმიმდევრობით ცარიელ AVL ხეში. თითო ჩასმაზე დაწერეთ z, y, x და შემთხვევა (თუ დისბალანსია). შემდეგ შეამოწმეთ ვიზუალიზატორში.</p>
+<details class="exercise"><summary>პასუხი</summary><div class="ex-body"><p>პირველი ხუთი ჩასმა (45, 20, 60, 10, 30) როტაციას არ საჭიროებს. <b>25</b>-ის ჩასმისას z = 45 (BF = +2), y = 20, x = 30, შემთხვევა <b>LR</b>: ჯერ <code>rotate_left(20)</code>, შემდეგ <code>rotate_right(45)</code>; ფესვი ხდება 30. <b>27</b> უკვე ბალანსშია. საბოლოო ხე:</p><div class="ascii-tree">        30
+      /    \
+    20      45
+   /  \       \
+ 10    25      60
+         \
+          27</div><p>გაშვებით დადასტურებული: სიმაღლე 4, მთელი ხე AVL-ია.</p></div></details></div></details>
+<details class="exercise"><summary>შეავსეთ ხარვეზი: <code>rotate_right</code> <span class="badge-easy">საბაზისო</span></summary><div class="ex-body"><p>შეავსეთ სამი გამოტოვებული სტრიქონი და დაასახელეთ დროის და მეხსიერების სირთულე.</p><div class="code-window"><div class="code-titlebar"><i></i><i></i><i></i><span>rotate_right.py</span></div><pre><code class="language-python">def rotate_right(z: Node) -&gt; Node:
+    y = z.left
+    ________________________   # 1) გადაანაცვლეთ y.right და z
+    ________________________   # 2) განაახლეთ სიმაღლე
+    ________________________   # 3) განაახლეთ სიმაღლე
+    return y</code></pre></div><details class="exercise"><summary>პასუხი</summary><div class="ex-body"><p><code>z.left, y.right = y.right, z</code>, შემდეგ <code>update_height(z)</code> და მხოლოდ ამის შემდეგ <code>update_height(y)</code>. რიგი მნიშვნელოვანია: z ახლა y-ის შვილია, ამიტომ მისი სიმაღლე პირველი უნდა გამოითვალოს. შებრუნებული რიგი გავუშვით და სამ მიმდევრობაზე (მათ შორის 30, 20, 10) დარღვეულ სიმაღლეებს იძლევა. სირთულე: დრო O(1), მეხსიერება O(1).</p></div></details></div></details>
+<details class="exercise"><summary>Balanced Binary Tree (LC 110) <span class="badge-easy">Easy</span></summary><div class="ex-body"><p>დაადგინეთ, აქვს თუ არა ხეს AVL-ის სიმაღლის თვისება (ეს არის სლაიდების 5 და 7 ხეების შემოწმება კოდით). იდეა: ერთ გავლაში ვაბრუნებთ სიმაღლეს, დისბალანსისას კი −1-ს. დრო O(n), მეხსიერება O(h).</p><div class="code-window"><div class="code-titlebar"><i></i><i></i><i></i><span>lc110.py</span></div><pre><code class="language-python">@dataclass
+class TreeNode:
+    val: int = 0
+    left: 'TreeNode | None' = None
+    right: 'TreeNode | None' = None
+
+
+def is_balanced(root: TreeNode | None) -&gt; bool:
+    """One pass: return -1 as 'unbalanced' sentinel, else the height. O(n)/O(h)."""
+    def h(n: TreeNode | None) -&gt; int:
+        if n is None:
+            return 0
+        lh = h(n.left)
+        if lh == -1:
+            return -1
+        rh = h(n.right)
+        if rh == -1 or abs(lh - rh) &gt; 1:
+            return -1
+        return 1 + max(lh, rh)
+    return h(root) != -1</code></pre></div></div></details>
+<details class="exercise"><summary>My Calendar I (LC 729) <span class="badge-medium">Medium</span></summary><div class="ex-body"><p>ყოველი <code>book(start, end)</code> ჯავშნის ინტერვალს [start, end), თუ ის არცერთს არ კვეთს. იდეა: AVL ხეში ვინახავთ საწყისებს და ვეძებთ უახლოეს წინა და მომდევნო ჯავშანს. დრო O(log n) ჯავშანზე. გამოცდილია brute-force-თან 3000 შემთხვევით სცენარზე და 10 000 ჯავშანზე ხის სიმაღლე 14-ია.</p><div class="code-window"><div class="code-titlebar"><i></i><i></i><i></i><span>lc729.py</span></div><pre><code class="language-python">from avl import Node, insert  # ლექციის კოდი
+
+
+class MyCalendar:
+    """LC 729: half-open intervals [start, end); AVL keyed by start."""
+    def __init__(self) -&gt; None:
+        self.root: Node[int] | None = None
+        self.end_of: dict[int, int] = {}
+
+    def _neighbours(self, start: int) -&gt; tuple[int | None, int | None]:
+        prev = nxt = None
+        node = self.root
+        while node is not None:
+            if node.key &lt;= start:      # candidate for "largest start &lt;= start"
+                prev = node.key
+                node = node.right
+            else:                      # candidate for "smallest start &gt; start"
+                nxt = node.key
+                node = node.left
+        return prev, nxt
+
+    def book(self, start: int, end: int) -&gt; bool:
+        prev, nxt = self._neighbours(start)
+        if prev is not None and self.end_of[prev] &gt; start:
+            return False
+        if nxt is not None and nxt &lt; end:
+            return False
+        self.root = insert(self.root, start)
+        self.end_of[start] = end
+        return True</code></pre></div></div></details>
+<details class="exercise"><summary>Count of Smaller Numbers After Self (LC 315) <span class="badge-hard">Hard</span></summary><div class="ex-body"><p>თითოეული <code>nums[i]</code>-სთვის იპოვეთ მასზე მარჯვნივ მდგომი, მასზე მცირე ელემენტების რაოდენობა. იდეა: მასივს მარჯვნიდან მარცხნივ გავუყვეთ, AVL კვანძში დავამატოთ <code>size</code> (ქვეხის ელემენტების რაოდენობა) და <code>cnt</code> (დუბლიკატები); მცირე ელემენტების დათვლა O(log n)-ია, ჯამში O(n log n). ემთხვევა brute-force-ს 1500 შემთხვევით მასივზე, 10⁵ ელემენტს დაახლოებით 1 წამში ამუშავებს.</p><div class="code-window"><div class="code-titlebar"><i></i><i></i><i></i><span>lc315.py</span></div><pre><code class="language-python">class _N:
+    __slots__ = ("key", "left", "right", "height", "cnt", "size")
+    def __init__(self, key: int) -&gt; None:
+        self.key = key; self.left = self.right = None
+        self.height = 1; self.cnt = 1; self.size = 1   # size = keys in subtree incl. duplicates
+
+def _h(n: _N | None) -&gt; int: return n.height if n else 0
+def _s(n: _N | None) -&gt; int: return n.size if n else 0
+
+def _upd(n: _N) -&gt; None:
+    n.height = 1 + max(_h(n.left), _h(n.right))
+    n.size = n.cnt + _s(n.left) + _s(n.right)
+
+def _rot_r(z: _N) -&gt; _N:
+    y = z.left; z.left, y.right = y.right, z; _upd(z); _upd(y); return y
+
+def _rot_l(z: _N) -&gt; _N:
+    y = z.right; z.right, y.left = y.left, z; _upd(z); _upd(y); return y
+
+def _rebalance(z: _N) -&gt; _N:
+    _upd(z)
+    bf = _h(z.left) - _h(z.right)
+    if bf &gt; 1:
+        if _h(z.left.left) &lt; _h(z.left.right): z.left = _rot_l(z.left)
+        return _rot_r(z)
+    if bf &lt; -1:
+        if _h(z.right.right) &lt; _h(z.right.left): z.right = _rot_r(z.right)
+        return _rot_l(z)
+    return z
+
+def _insert(n: _N | None, key: int) -&gt; _N:
+    if n is None: return _N(key)
+    if key &lt; n.key: n.left = _insert(n.left, key)
+    elif key &gt; n.key: n.right = _insert(n.right, key)
+    else: n.cnt += 1
+    return _rebalance(n)
+
+def _count_less(n: _N | None, key: int) -&gt; int:
+    total = 0
+    while n is not None:
+        if key &lt;= n.key: n = n.left
+        else:
+            total += _s(n.left) + n.cnt
+            n = n.right
+    return total
+
+def count_smaller(nums: list[int]) -&gt; list[int]:
+    """counts[i] = #{j &gt; i : nums[j] &lt; nums[i]}. Right-to-left + order-statistic AVL. O(n log n)."""
+    root: _N | None = None
+    out = [0] * len(nums)
+    for i in range(len(nums) - 1, -1, -1):
+        out[i] = _count_less(root, nums[i])
+        root = _insert(root, nums[i])
+    return out</code></pre></div></div></details>
+</div></section>
+</main>
+<footer>
+ <p> BIT-08.2022.G · მონაცემთა სტრუქტურები და ალგორითმები I · ლექცია 15 — AVL ხე<br>
+  ბიზნესისა და ტექნოლოგიების უნივერსიტეტი (BTU)</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+/* ===== AVL engine (shared by the page and the Node tests) ===== */
+class AvlNode { constructor(k){ this.k=k; this.l=null; this.r=null; this.h=1; } }
+const H  = n => n ? n.h : 0;
+const BF = n => n ? H(n.l) - H(n.r) : 0;
+const upd = n => { n.h = 1 + Math.max(H(n.l), H(n.r)); };
+function rotR(z){ const y=z.l; z.l=y.r; y.r=z; upd(z); upd(y); return y; }
+function rotL(z){ const y=z.r; z.r=y.l; y.l=z; upd(z); upd(y); return y; }
+function snap(n){ return n ? {k:n.k, h:n.h, b:BF(n), l:snap(n.l), r:snap(n.r)} : null; }
+function cloneTree(n){ if(!n) return null; const c=new AvlNode(n.k); c.h=n.h; c.l=cloneTree(n.l); c.r=cloneTree(n.r); return c; }
+
+/* insert(root,key) -> {root, frames, dup, rotated}
+   frame = {tree, msg, marks:{key:cls}, edgeMarks?, phase}
+   marks classes: path, cur, new, z, y, x, ok, bad                      */
+function insertSteps(root, key){
+  const frames=[]; let rotated=null;
+  const push=(msg, marks, phase)=>frames.push({tree:snap(root), msg, marks:Object.assign({},marks), phase});
+  if(root===null){
+    root=new AvlNode(key);
+    push(`ხე ცარიელია: ${key} ხდება ფესვი.`, {[key]:'new'}, 'place');
+    push(`ჩასმა დასრულდა. ბალანსი 0.`, {}, 'done');
+    return {root, frames, dup:false, rotated:null};
+  }
+  const path=[]; let cur=root; const marks={};
+  for(;;){
+    if(key===cur.k){
+      push(`${key} უკვე არსებობს ხეში: სტრუქტურა უცვლელია, კვანძის მრიცხველი (count) იზრდება, ამიტომ AVL sort დუბლიკატს არ კარგავს.`, {[key]:'cur'}, 'dup');
+      return {root, frames, dup:true, rotated:null};
+    }
+    path.push(cur); marks[cur.k]='path';
+    const dirL = key < cur.k;
+    push(`ვადარებთ ${key} და ${cur.k}: ${key} ${dirL?'<':'>'} ${cur.k}, ამიტომ მივდივართ ${dirL?'მარცხნივ':'მარჯვნივ'}.`, Object.assign({},marks,{[cur.k]:'cur'}), 'descend');
+    const nxt = dirL ? cur.l : cur.r;
+    if(!nxt) break;
+    cur = nxt;
+  }
+  const parent=path[path.length-1], nn=new AvlNode(key);
+  if(key<parent.k) parent.l=nn; else parent.r=nn;
+  push(`თავისუფალი ადგილი ნაპოვნია: ${key} ჩაისმის ${parent.k}-ის ${key<parent.k?'მარცხენა':'მარჯვენა'} შვილად (ჩვეულებრივი BST ჩასმა).`, Object.assign({},marks,{[key]:'new'}), 'place');
+  for(let i=path.length-1;i>=0;i--){
+    const z=path[i]; upd(z); const b=BF(z);
+    if(Math.abs(b)<=1){
+      push(`ვბრუნდებით ზევით: ${z.k} → სიმაღლე ${z.h}, ბალანსი ${b>0?'+'+b:b} ✓ (|BF| ≤ 1).`, Object.assign({},marks,{[key]:'new',[z.k]:'ok'}), 'retrace');
+      continue;
+    }
+    const left = b>1;
+    const y = left ? z.l : z.r;
+    let kind, x;
+    if(left){ if(BF(y)>=0){kind='LL'; x=y.l;} else {kind='LR'; x=y.r;} }
+    else    { if(BF(y)<=0){kind='RR'; x=y.r;} else {kind='RL'; x=y.l;} }
+    const m2=Object.assign({},marks,{[key]:'new'}); m2[z.k]='z'; m2[y.k]='y'; m2[x.k]='x';
+    push(`⚠ ${z.k}-ზე BF = ${b>0?'+'+b:b} → პირველი დისბალანსირებული კვანძი z=${z.k}. y=${y.k} (z-ის ${left?'მარცხენა':'მარჯვენა'} შვილი), x=${x.k} (y-ის ${(kind==='LL'||kind==='RL')?'მარცხენა':'მარჯვენა'} შვილი) → შემთხვევა ${kind}.`, m2, 'detect');
+    const gp = i>0 ? path[i-1] : null;
+    const attach = sub => { if(gp===null) root=sub; else if(gp.l===z) gp.l=sub; else gp.r=sub; };
+    const hBefore = z.h;
+    const preH = hBefore; // height of subtree after insertion (before fixing)
+    let sub;
+    if(kind==='LL'){ sub=rotR(z); attach(sub); }
+    else if(kind==='RR'){ sub=rotL(z); attach(sub); }
+    else if(kind==='LR'){
+      z.l=rotL(y); upd(z);
+      push(`${kind} — ნაბიჯი 1: მარცხნივ როტაცია y=${y.k}-ზე. ახლა ეს ჩვეულებრივი LL შემთხვევაა.`, {[z.k]:'z',[x.k]:'y',[y.k]:'x',[key]:'new'}, 'rot1');
+      sub=rotR(z); attach(sub);
+    } else {
+      z.r=rotR(y); upd(z);
+      push(`${kind} — ნაბიჯი 1: მარჯვნივ როტაცია y=${y.k}-ზე. ახლა ეს ჩვეულებრივი RR შემთხვევაა.`, {[z.k]:'z',[x.k]:'y',[y.k]:'x',[key]:'new'}, 'rot1');
+      sub=rotL(z); attach(sub);
+    }
+    const rname = kind==='LL'||kind==='LR' ? 'მარჯვნივ' : 'მარცხნივ';
+    rotated = {kind, z:z.k, y:y.k, x:x.k, newRoot:sub.k, sameHeight: sub.h < preH};
+    push(`${kind==='LL'||kind==='RR' ? 'ერთი' : (kind==='LR'||kind==='RL' ? 'ნაბიჯი 2:' : '')} ${rname} როტაცია z=${z.k}-ზე. ქვეხის ახალი ფესვია ${sub.k}, სიმაღლე ${sub.h} — ჩასმამდე იგივე, ამიტომ ზემოთ წინაპრები უკვე ბალანსშია.`.trim(), {[sub.k]:'ok',[key]:'new'}, 'rot2');
+    break;
+  }
+  push(`ჩასმა დასრულდა: ხე ისევ AVL-ია (ყველა |BF| ≤ 1).`, {}, 'done');
+  return {root, frames, dup:false, rotated};
+}
+
+/* ===== leaf-order layout: leaves take consecutive slots, parents are centred ===== */
+function layout(tree, opts){
+  const o=Object.assign({dx:58, dy:70, off:0.22, padX:34, padY:34}, opts||{});
+  let slot=0; const pos=[];
+  (function go(n,d){
+    if(!n) return null;
+    let x;
+    if(!n.l && !n.r){ x=slot++; }
+    else if(n.l && n.r){ const a=go(n.l,d+1), b=go(n.r,d+1); x=(a+b)/2; }
+    else if(n.l){ x=go(n.l,d+1)+o.off; }
+    else { x=go(n.r,d+1)-o.off; }
+    n.__x=x; n.__d=d; pos.push(n); return x;
+  })(tree,0);
+  return {pos, o};
+}
+function collect(tree){ const out=[]; (function go(n,p){ if(!n) return; out.push({n,p}); go(n.l,n); go(n.r,n); })(tree,null); return out; }
+
+
+const NS='http://www.w3.org/2000/svg';
+function svgTree(tree,o){o=Object.assign({dx:58,dy:66,r:15,bf:false,marks:{},pad:34,off:.22,tri:false},o||{});
+ if(!tree)return '';const L=layout(tree,{dx:o.dx,dy:o.dy,off:o.off});
+ let minX=1e9,maxX=-1e9,maxD=0;L.pos.forEach(n=>{minX=Math.min(minX,n.__x);maxX=Math.max(maxX,n.__x);maxD=Math.max(maxD,n.__d)});
+ const X=n=>o.pad+(n.__x-minX)*o.dx,Y=n=>o.pad+n.__d*o.dy,W=o.pad*2+(maxX-minX)*o.dx,Hh=o.pad*2+maxD*o.dy;let e='',v='';
+ L.pos.forEach(n=>{[n.l,n.r].forEach(c=>{if(c)e+=`<line class="edge" x1="${X(n)}" y1="${Y(n)}" x2="${X(c)}" y2="${Y(c)}"/>`})});
+ L.pos.forEach(n=>{const x=X(n),y=Y(n);
+  if(n.tri){v+=`<polygon class="tri" points="${x},${y-14} ${x-19},${y+18} ${x+19},${y+18}"/><text class="tlabel" x="${x}" y="${y+10}">${n.k}</text>`;return}
+  const cls=o.marks[n.k]||(/^[zyx]$/.test(n.k)?n.k:'');
+  v+=`<circle class="node-circle ${cls}" cx="${x}" cy="${y}" r="${o.r}"/><text class="nlabel" x="${x}" y="${y}">${n.k}</text>`;
+  if(o.bf)v+=`<text class="bf ${Math.abs(n.b)>1?'bad':''}" x="${x+o.r+2}" y="${y-o.r+4}">${n.b>0?'+'+n.b:n.b}</text>`});
+ return `<svg viewBox="0 0 ${W} ${Hh}" width="${W}" role="img" xmlns="${NS}">${e}${v}</svg>`}
+const N=(k,l,r)=>({k,l,r}),T=k=>({k,l:null,r:null,tri:1}),t1=T('T1'),t2=T('T2'),t3=T('T3'),t4=T('T4');
+const CASES=[
+ ['LL — y მარცხნივ, x მარცხნივ',[[N('z',N('y',N('x',T('T1'),T('T2')),T('T3')),T('T4')),'დისბალანსი (BF z = +2)'],[N('y',N('x',T('T1'),T('T2')),N('z',T('T3'),T('T4'))),'rotate_right(z)']]],
+ ['LR — y მარცხნივ, x მარჯვნივ',[[N('z',N('y',T('T1'),N('x',T('T2'),T('T3'))),T('T4')),'დისბალანსი'],[N('z',N('x',N('y',T('T1'),T('T2')),T('T3')),T('T4')),'1) rotate_left(y)'],[N('x',N('y',T('T1'),T('T2')),N('z',T('T3'),T('T4'))),'2) rotate_right(z)']]],
+ ['RR — y მარჯვნივ, x მარჯვნივ',[[N('z',T('T1'),N('y',T('T2'),N('x',T('T3'),T('T4')))),'დისბალანსი (BF z = −2)'],[N('y',N('z',T('T1'),T('T2')),N('x',T('T3'),T('T4'))),'rotate_left(z)']]],
+ ['RL — y მარჯვნივ, x მარცხნივ',[[N('z',T('T1'),N('y',N('x',T('T2'),T('T3')),T('T4'))),'დისბალანსი'],[N('z',T('T1'),N('x',T('T2'),N('y',T('T3'),T('T4')))),'1) rotate_right(y)'],[N('x',N('z',T('T1'),T('T2')),N('y',T('T3'),T('T4'))),'2) rotate_left(z)']]]];
+document.getElementById('cases').innerHTML=CASES.map(([t,st])=>`<div class="case"><h3>${t}</h3><div class="case-row">${st.map((s,i)=>(i?'<span class="arrow">→</span>':'')+`<div class="st tree-svg-wrap">${svgTree(s[0],{dx:54,dy:56,r:14})}<div class="cap">${s[1]}</div></div>`).join('')}</div></div>`).join('');
+(function(){const hb=[50,30,70,20,40,60,80,10,35,65];let r=null;hb.forEach(k=>{r=insertSteps(r,k).root});document.getElementById('heroBg').innerHTML=svgTree(snap(r),{dx:70,dy:80,r:18})})();
+/* ---- flagship visualizer ---- */
+let root=null,frames=[],idx=-1,timer=null,cnts={};const $=id=>document.getElementById(id);
+function count(n){return n?1+count(n.l)+count(n.r):0}
+function draw(){const w=$('vizTree');if(idx<0){w.innerHTML='<p style="color:var(--muted);padding:70px 0">ხე ცარიელია. შეიყვანეთ გასაღებები და დააჭირეთ „ჩასმა“-ს.</p>';$('vizMsg').textContent='';$('vizSorted').textContent='';return}
+ const f=frames[idx];w.innerHTML=svgTree(f.tree,{bf:true,marks:f.marks});$('vizMsg').textContent=`(${idx+1}/${frames.length}) ${f.msg}`;const out=[];(function go(n){if(n){go(n.l);for(let i=0;i<(f.cnt[n.k]||1);i++)out.push(n.k);go(n.r)}})(f.tree);$('vizSorted').textContent='AVL sort → in-order გავლა: ['+out.join(', ')+']'}
+function addKeys(ks){const start=frames.length;for(const k of ks){if(count(snap(root))>=31){$('vizMsg').textContent='მაქსიმუმ 31 კვანძია — გაასუფთავეთ ხე.';break}const r=insertSteps(root,k);root=r.root;cnts[k]=(cnts[k]||0)+1;const cc=Object.assign({},cnts);r.frames.forEach(f=>f.cnt=cc);frames.push(...r.frames)}
+ if(frames.length>start){idx=start;draw()}}
+function parse(){return $('keys').value.split(/[\s,;]+/).filter(Boolean).map(Number).filter(n=>Number.isInteger(n)&&n>=-99&&n<=999)}
+function stop(){clearInterval(timer);timer=null;$('bPlay').textContent='▶ ავტო'}
+function step(d){const j=idx+d;if(j>=0&&j<frames.length){idx=j;draw()}else if(d>0)stop()}
+$('bIns').onclick=()=>{stop();addKeys(parse())};
+$('bNext').onclick=()=>{stop();step(1)};$('bPrev').onclick=()=>{stop();step(-1)};
+$('bPlay').onclick=()=>{if(timer){stop();return}if(idx>=frames.length-1&&frames.length)idx=Math.max(0,idx);$('bPlay').textContent='⏸ პაუზა';timer=setInterval(()=>{if(idx>=frames.length-1)stop();else step(1)},1100)};
+$('bDemo').onclick=()=>{stop();root=null;frames=[];idx=-1;cnts={};$('keys').value='10,20,30,40,50,25';addKeys(parse())};
+$('bRand').onclick=()=>{stop();root=null;frames=[];idx=-1;cnts={};const s=new Set();while(s.size<9)s.add(1+Math.floor(Math.random()*99));$('keys').value=[...s].join(',');addKeys(parse())};
+$('bClr').onclick=()=>{stop();root=null;frames=[];idx=-1;cnts={};draw()};
+draw();
+/* ---- scrollspy + highlighting ---- */
+const links=[...document.querySelectorAll('.nav-links a')];
+new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-40% 0px -55% 0px'}).observe&&document.querySelectorAll('main section').forEach(s=>{});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}),{rootMargin:'-40% 0px -55% 0px'});
+document.querySelectorAll('main section').forEach(s=>io.observe(s));
+window.hljs&&hljs.highlightAll();
+</script>
+</body>
+</html>
