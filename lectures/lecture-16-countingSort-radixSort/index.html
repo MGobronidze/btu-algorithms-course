@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ლექცია 16 · დათვლით და რედიქს დალაგება</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@500;600;700&family=Noto+Sans+Georgian:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<style>
+:root{
+  --bg:#0B0E14; --bg-panel:#12161F; --bg-panel-2:#171C27;
+  --ink:#ECE8DE; --ink-dim:#B7BCC9; --muted:#7C849A; --line:#232838;
+  --gold:#D9A64E; --gold-dim:#8C7239; --teal:#5AC2B6; --teal-dim:#2F5F5A;
+  --green:#7CB88F; --amber:#D9A64E; --rose:#C97B84;
+  --code-bg:#0d1117; --radius:14px;
+  --serif:'Noto Serif Georgian','Noto Serif',serif;
+  --sans:'Noto Sans Georgian','Noto Sans',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --maxw:760px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); line-height:1.65; font-size:17px;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--serif); font-weight:600; color:var(--ink); line-height:1.25; margin:0 0 .5em;}
+p{margin:0 0 1.1em;}
+a{color:var(--teal);}
+::selection{background:var(--gold-dim); color:var(--ink);}
+
+/* ---------- layout helpers ---------- */
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
+.wrap-wide{max-width:1040px; margin:0 auto; padding:0 24px;}
+section{padding:76px 0;}
+.section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+h2{font-size:1.7rem; margin-bottom:.7em;}
+h3{font-size:1.25rem; margin-top:1.6em;}
+.lede{color:var(--ink-dim); font-size:1.08rem;}
+
+/* ---------- nav ---------- */
+#topnav{
+  position:sticky; top:0; z-index:50; background:rgba(11,14,20,.88);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+}
+#topnav .inner{
+  max-width:1040px; margin:0 auto; padding:0 24px; height:58px;
+  display:flex; align-items:center; justify-content:space-between; gap:20px;
+}
+#topnav .brand{color:var(--ink-dim); font-size:.86rem; text-decoration:none; white-space:nowrap;}
+#topnav .brand:hover{color:var(--ink);}
+.nav-links{display:flex; gap:22px; overflow-x:auto; scrollbar-width:none;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-links a{
+  color:var(--muted); text-decoration:none; font-size:.86rem; white-space:nowrap;
+  padding:6px 0; border-bottom:2px solid transparent; transition:color .15s, border-color .15s;
+}
+.nav-links a:hover{color:var(--ink-dim);}
+.nav-links a.active{color:var(--gold); border-bottom-color:var(--gold);}
+
+/* ---------- hero ---------- */
+#hero{position:relative; padding:88px 0 64px; overflow:hidden;}
+#hero .hero-bg{position:absolute; inset:0; z-index:0; opacity:.55;}
+#hero .wrap{position:relative; z-index:1;}
+.kicker{color:var(--gold); font-size:.86rem; letter-spacing:.02em; margin-bottom:18px;}
+#hero h1{font-size:2.5rem; max-width:640px;}
+#hero .subtitle{color:var(--ink-dim); font-size:1.12rem; max-width:600px; margin-top:.4em;}
+.hero-terms{display:flex; flex-wrap:wrap; gap:10px; margin-top:28px;}
+.hero-terms span{
+  border:1px solid var(--line); color:var(--ink-dim); font-size:.84rem;
+  padding:6px 14px; border-radius:999px; background:var(--bg-panel);
+}
+
+/* ---------- code blocks ---------- */
+.code-window{
+  background:var(--code-bg); border:1px solid var(--line); border-radius:var(--radius);
+  overflow:hidden; margin:1.4em 0;
+}
+.code-titlebar{
+  display:flex; align-items:center; gap:8px; padding:10px 14px;
+  background:#11151c; border-bottom:1px solid var(--line);
+}
+.code-titlebar .dots{display:flex; gap:6px;}
+.code-titlebar .dots span{width:10px; height:10px; border-radius:50%; background:#3a3f4c;}
+.code-titlebar .dots span:nth-child(1){background:#e0605a;}
+.code-titlebar .dots span:nth-child(2){background:#e0b04e;}
+.code-titlebar .dots span:nth-child(3){background:#5fbf6f;}
+.code-titlebar .fname{color:var(--muted); font-family:var(--mono); font-size:.8rem; margin-left:4px;}
+.code-window pre{margin:0; padding:18px 20px; overflow-x:auto; font-size:.86rem;}
+.code-window code{font-family:var(--mono); background:none !important;}
+.code-pair{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+@media (max-width:820px){.code-pair{grid-template-columns:1fr;}}
+
+/* ---------- callouts ---------- */
+.callout{
+  border-radius:var(--radius); padding:18px 20px; margin:1.6em 0;
+  border:1px solid var(--line); background:var(--bg-panel-2);
+}
+.callout .callout-label{font-weight:600; font-size:.82rem; margin-bottom:.4em; display:block;}
+.callout.fix{border-color:var(--teal-dim);}
+.callout.fix .callout-label{color:var(--teal);}
+.callout.insight{border-color:var(--gold-dim);}
+.callout.insight .callout-label{color:var(--gold);}
+.callout.warn{border-color:#6b3f3f;}
+.callout.warn .callout-label{color:var(--rose);}
+.callout p:last-child{margin-bottom:0;}
+
+/* ---------- tables ---------- */
+.bigo-table, .compare-table, .summary-table{
+  width:100%; border-collapse:collapse; margin:1.4em 0; font-size:.92rem;
+}
+.bigo-table th, .bigo-table td, .compare-table th, .compare-table td, .summary-table th, .summary-table td{
+  border-bottom:1px solid var(--line); padding:11px 14px; text-align:left;
+}
+.bigo-table th, .compare-table th, .summary-table th{color:var(--muted); font-weight:600; font-size:.8rem;}
+.num{font-family:var(--mono); color:var(--gold);}
+
+/* ---------- term / insight grids ---------- */
+.term-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; margin:1.5em 0;}
+.term-card{background:var(--bg-panel-2); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px;}
+.term-card h4{font-family:var(--sans); font-size:.95rem; color:var(--gold); margin:0 0 .4em;}
+.term-card p{font-size:.9rem; color:var(--ink-dim); margin:0;}
+
+.insight-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:1.6em;}
+@media (max-width:700px){.insight-grid{grid-template-columns:1fr;}}
+.insight-card{background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); padding:20px;}
+.insight-card .emoji{font-size:1.5rem;}
+.insight-card h4{font-family:var(--sans); font-size:1rem; margin:.5em 0 .35em;}
+.insight-card p{font-size:.9rem; color:var(--ink-dim); margin:0;}
+
+/* ---------- visualizer ---------- */
+.viz-panel{
+  background:var(--bg-panel-2); border:1px solid var(--line); border-radius:var(--radius);
+  padding:22px; margin:1.6em 0;
+}
+.viz-controls{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:18px;}
+.viz-controls input[type=text]{
+  background:var(--bg); border:1px solid var(--line); color:var(--ink);
+  font-family:var(--mono); font-size:.88rem; padding:9px 12px; border-radius:8px; width:240px;
+}
+.btn{
+  background:var(--gold); color:#1a1406; border:none; font-family:var(--sans); font-weight:600;
+  font-size:.88rem; padding:9px 18px; border-radius:8px; cursor:pointer; transition:filter .15s;
+}
+.btn:hover{filter:brightness(1.08);}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.btn.ghost{background:transparent; border:1px solid var(--line); color:var(--ink-dim);}
+.btn.ghost:hover{color:var(--ink); border-color:var(--muted);}
+.viz-msg{color:var(--ink-dim); font-size:.9rem; min-height:1.4em; margin-bottom:14px;}
+.viz-msg b{color:var(--gold); font-weight:600;}
+
+.array-viz{margin:14px 0;}
+.array-viz .label{font-family:var(--mono); font-size:.78rem; color:var(--muted); margin-bottom:6px;}
+.array-row{display:flex; gap:5px; flex-wrap:wrap;}
+.cell{
+  min-width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+  background:var(--bg); border:1px solid var(--line); border-radius:6px;
+  font-family:var(--mono); font-size:.86rem; color:var(--ink-dim); position:relative; transition:background .2s,border-color .2s,color .2s,transform .2s;
+}
+.cell .idx{position:absolute; top:-18px; font-size:.65rem; color:var(--muted); left:50%; transform:translateX(-50%);}
+.cell.empty{color:var(--muted); border-style:dashed;}
+.cell.active{border-color:var(--gold); color:var(--gold); background:#1e1a0f; transform:translateY(-3px);}
+.cell.done{border-color:var(--teal-dim); color:var(--teal);}
+.cell.placed{border-color:var(--teal); color:var(--teal); background:#0f1c1a;}
+
+/* ---------- exercises ---------- */
+details.exercise{
+  border:1px solid var(--line); border-radius:var(--radius); padding:14px 18px; margin:12px 0;
+  background:var(--bg-panel-2);
+}
+details.exercise summary{
+  cursor:pointer; list-style:none; display:flex; align-items:center; gap:12px;
+  font-weight:600; color:var(--ink); position:relative; padding-right:28px;
+}
+details.exercise summary::-webkit-details-marker{display:none;}
+details.exercise summary::after{
+  content:"+"; position:absolute; right:0; font-size:1.3rem; color:var(--muted); font-weight:400;
+}
+details.exercise[open] summary::after{content:"−";}
+details.exercise .body{margin-top:14px; color:var(--ink-dim); font-size:.94rem;}
+.badge-easy, .badge-medium, .badge-hard{
+  display:inline-flex; align-items:center; flex-shrink:0; white-space:nowrap;
+  font-size:.7rem; font-family:var(--mono); padding:2px 9px; border-radius:999px; font-weight:600;
+}
+.badge-easy{background:#1c2e22; color:var(--green);}
+.badge-medium{background:#332a13; color:var(--amber);}
+.badge-hard{background:#331a1d; color:var(--rose);}
+
+/* ---------- footer ---------- */
+footer{padding:48px 0; text-align:center; color:var(--muted); font-size:.86rem;}
+
+@media (max-width:600px){
+  #hero h1{font-size:1.9rem;}
+  section{padding:56px 0;}
+  .viz-controls input[type=text]{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="inner">
+    <a class="brand" href="../../index.html">← კურსი · მონაცემთა სტრუქტურები და ალგორითმები I — ლექცია 16</a>
+    <div class="nav-links">
+      <a href="#counting-theory">დათვლით დალაგება</a>
+      <a href="#counting-viz">ვიზუალიზაცია</a>
+      <a href="#counting-code">კოდი</a>
+      <a href="#radix-theory">რედიქს დალაგება</a>
+      <a href="#radix-steps">ნაბიჯები</a>
+      <a href="#insights">ინდუსტრია</a>
+      <a href="#exercises">სავარჯიშოები</a>
+    </div>
+  </div>
+</nav>
+
+<header id="hero">
+  <svg class="hero-bg" viewBox="0 0 1040 340" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="barGrad" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0%" stop-color="#5AC2B6" stop-opacity=".28"/>
+        <stop offset="100%" stop-color="#5AC2B6" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <g stroke="#232838" stroke-width="1">
+      <line x1="0" y1="300" x2="1040" y2="300"/>
+    </g>
+    <g>
+      <!-- decorative counting-sort bins: heights encode a frequency histogram -->
+      <g fill="url(#barGrad)" stroke="#5AC2B6" stroke-opacity=".5">
+        <rect x="80"  y="230" width="46" height="70"/>
+        <rect x="150" y="180" width="46" height="120"/>
+        <rect x="220" y="255" width="46" height="45"/>
+        <rect x="290" y="140" width="46" height="160"/>
+        <rect x="360" y="200" width="46" height="100"/>
+        <rect x="430" y="265" width="46" height="35"/>
+        <rect x="500" y="170" width="46" height="130"/>
+        <rect x="570" y="240" width="46" height="60"/>
+      </g>
+      <g font-family="JetBrains Mono" font-size="13" fill="#7C849A">
+        <text x="103" y="316" text-anchor="middle">0</text>
+        <text x="173" y="316" text-anchor="middle">1</text>
+        <text x="243" y="316" text-anchor="middle">2</text>
+        <text x="313" y="316" text-anchor="middle">3</text>
+        <text x="383" y="316" text-anchor="middle">4</text>
+        <text x="453" y="316" text-anchor="middle">5</text>
+        <text x="523" y="316" text-anchor="middle">6</text>
+        <text x="593" y="316" text-anchor="middle">7</text>
+      </g>
+      <g fill="none" stroke="#D9A64E" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="3 4">
+        <path d="M 700 260 L 760 260 L 760 190 L 820 190 L 820 230 L 880 230 L 880 150 L 940 150"/>
+      </g>
+      <g fill="#D9A64E">
+        <circle cx="700" cy="260" r="3.5"/>
+        <circle cx="760" cy="190" r="3.5"/>
+        <circle cx="820" cy="230" r="3.5"/>
+        <circle cx="880" cy="150" r="3.5"/>
+        <circle cx="940" cy="150" r="3.5"/>
+      </g>
+    </g>
+  </svg>
+  <div class="wrap">
+    <div class="kicker">BIT-08.2022.G · მონაცემთა სტრუქტურები და ალგორითმები I · ლექცია 16</div>
+    <h1>დათვლით დალაგება და რედიქს დალაგების მეთოდი</h1>
+    <p class="subtitle">როგორ დავალაგოთ მასივი ელემენტების შედარების გარეშე — წრფივი დროის ორი ალგორითმი, რომლებიც არღვევს O(n log n)-ის ცნობილ ზღვარს კონკრეტული, მაგრამ ხშირად გვხვდადი პირობებისთვის.</p>
+    <div class="hero-terms">
+      <span>Counting Sort</span>
+      <span>Radix Sort</span>
+      <span>არა-შედარებითი დალაგება</span>
+      <span>O(n + k)</span>
+      <span>სტაბილურობა</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section id="recap">
+  <div class="wrap">
+    <h2>წინა ლექციების გაგრძელება</h2>
+    <p>ლექციებზე IV და V ვისწავლეთ სამი შედარებაზე დაფუძნებული დალაგების მეთოდი — insertion, merge და quick sort. სამივემ საერთო ზღვარი გვაჩვენა: ერთი წყვილის შედარება ერთი ბიტი ინფორმაციაა, და n ელემენტის ყველა შესაძლო დალაგებას (n! ვარიანტი) გასარჩევად საჭიროა სულ მცირე log₂(n!) ≈ n log n შედარება. ეს არის დამტკიცებადი ქვედა ზღვარი ნებისმიერი შედარებაზე დაფუძნებული ალგორითმისთვის.</p>
+    <p>დღევანდელი ორი ალგორითმი ამ ზღვარს არ არღვევს — ისინი უბრალოდ საერთოდ არ იყენებენ შედარებას. Counting sort და radix sort ელემენტებს პირდაპირ მათი მნიშვნელობით ალაგებენ მასივის ინდექსებად გამოყენებით, ამიტომ n log n-ის მაგივრად მივიღებთ წრფივთან ახლოს მდგომ სირთულეს — მაგრამ მხოლოდ მაშინ, როცა მონაცემებს კონკრეტული სტრუქტურა აქვთ (მცირე დიაპაზონი ან ფიქსირებული სიგრძის გასაღები).</p>
+    <div class="callout insight">
+      <span class="callout-label">🔗 კავშირი წინა მასალასთან</span>
+      <p>ლექცია II-ში ვნახეთ, რომ ალგორითმის სირთულე დამოკიდებულია არა მხოლოდ n-ზე, არამედ იმაზეც, რა ოპერაციებს ვუშვებთ. აქ სწორედ ეს პრინციპია საქმეში: შედარების აკრძალვით ვიღებთ სწრაფ, მაგრამ შეზღუდულ ალგორითმებს — ისინი მუშაობენ მხოლოდ მთელ რიცხვებზე (ან მათზე დაყვანად გასაღებებზე).</p>
+    </div>
+  </div>
+</section>
+
+<section id="counting-theory" class="section-full">
+  <div class="wrap">
+    <h2>დათვლით დალაგება</h2>
+    <p class="lede">Counting Sort არის შედარებაზე არადამოკიდებული დალაგების ალგორითმი, რომელიც განსაკუთრებით ეფექტურია, როცა შემავალი მონაცემების მნიშვნელობების დიაპაზონი (k) შედარებით მცირეა ელემენტების რაოდენობასთან (n).</p>
+    <p>იდეა მარტივია: ვთვლით, რამდენჯერ გვხვდება თითოეული უნიკალური მნიშვნელობა მასივში, შემდეგ ამ სიხშირეების გამოყენებით პირდაპირ ვანგარიშობთ, სად უნდა დადგეს თითოეული ელემენტი საბოლოო, დალაგებულ მასივში — შედარების გარეშე.</p>
+
+    <div class="term-grid">
+      <div class="term-card">
+        <h4>countArray[]</h4>
+        <p>დამხმარე მასივი, სადაც ინდექსი = მნიშვნელობა, მნიშვნელობა = სიხშირე (მოგვიანებით — პრეფიქსული ჯამი).</p>
+      </div>
+      <div class="term-card">
+        <h4>პრეფიქსული ჯამი</h4>
+        <p>countArray[i] = countArray[i−1] + countArray[i] — გვეუბნება, რამდენი ელემენტია ≤ i.</p>
+      </div>
+      <div class="term-card">
+        <h4>outputArray[]</h4>
+        <p>საბოლოო დალაგებული მასივი, რომელსაც ვავსებთ inputArray-ის ბოლოდან დაწყებული იტერაციით.</p>
+      </div>
+    </div>
+
+    <h3>ნაბიჯები</h3>
+    <ol>
+      <li>ვპოულობთ inputArray-ის უდიდეს (და უმცირეს) ელემენტს — ამით ვსაზღვრავთ countArray-ის ზომას.</li>
+      <li>ვქმნით countArray[]-ს, თავიდან ბოლომდე 0-ებით.</li>
+      <li>ვთვლით: countArray[x]++ თითოეული x ∈ inputArray-სთვის.</li>
+      <li>ვაქცევთ პრეფიქსულ ჯამად: countArray[i] += countArray[i-1].</li>
+      <li>inputArray-ს ბოლოდან დასაწყისამდე ვავსებთ outputArray-ს: outputArray[countArray[x]-1] = x, შემდეგ countArray[x]--.</li>
+    </ol>
+
+    <div class="callout warn">
+      <span class="callout-label">⚠️ რატომ ბოლოდან?</span>
+      <p>თუ inputArray-ს დასაწყისიდან გავივლიდით (i = 0, 1, 2, ...), დალაგება მაინც სწორი გამოვიდოდა, მაგრამ <b>დაიკარგებოდა სტაბილურობა</b> — ერთნაირი მნიშვნელობის ელემენტები საბოლოო მასივში საწყისი თანმიმდევრობის საპირისპიროდ დალაგდებოდნენ. ბოლოდან დაწყებული იტერაცია სწორედ ამის ასაცილებლადაა საჭირო.</p>
+    </div>
+  </div>
+</section>
+
+<section id="counting-walkthrough">
+  <div class="wrap">
+    <h2>ნაბიჯ-ნაბიჯ მაგალითზე</h2>
+    <p>ავიღოთ მასივი <code>[2, 5, 3, 0, 2, 3, 0, 3]</code> და გავყვეთ ალგორითმს ბოლომდე.</p>
+
+    <div class="array-viz">
+      <div class="label">ნაბიჯი 1 — ვპოულობთ max-ს</div>
+      <div class="array-row">
+        <div class="cell"><span class="idx">0</span>2</div>
+        <div class="cell"><span class="idx">1</span>5</div>
+        <div class="cell"><span class="idx">2</span>3</div>
+        <div class="cell"><span class="idx">3</span>0</div>
+        <div class="cell"><span class="idx">4</span>2</div>
+        <div class="cell"><span class="idx">5</span>3</div>
+        <div class="cell"><span class="idx">6</span>0</div>
+        <div class="cell active"><span class="idx">7</span>3</div>
+      </div>
+      <p style="margin-top:10px; font-size:.9rem; color:var(--ink-dim);">max = 5 → countArray-ს სჭირდება 6 ადგილი (ინდექსები 0-დან 5-მდე).</p>
+    </div>
+
+    <div class="array-viz">
+      <div class="label">ნაბიჯი 3 — სიხშირეების დათვლა</div>
+      <div class="array-row">
+        <div class="cell done"><span class="idx">0</span>2</div>
+        <div class="cell done"><span class="idx">1</span>0</div>
+        <div class="cell done"><span class="idx">2</span>2</div>
+        <div class="cell done"><span class="idx">3</span>3</div>
+        <div class="cell done"><span class="idx">4</span>0</div>
+        <div class="cell done"><span class="idx">5</span>1</div>
+      </div>
+      <p style="margin-top:10px; font-size:.9rem; color:var(--ink-dim);">მაგალითად, ელემენტი 3 გვხვდება 3-ჯერ → countArray[3] = 3.</p>
+    </div>
+
+    <div class="array-viz">
+      <div class="label">ნაბიჯი 4 — პრეფიქსული ჯამი</div>
+      <div class="array-row">
+        <div class="cell placed"><span class="idx">0</span>2</div>
+        <div class="cell placed"><span class="idx">1</span>2</div>
+        <div class="cell placed"><span class="idx">2</span>4</div>
+        <div class="cell placed"><span class="idx">3</span>7</div>
+        <div class="cell placed"><span class="idx">4</span>7</div>
+        <div class="cell placed"><span class="idx">5</span>8</div>
+      </div>
+      <p style="margin-top:10px; font-size:.9rem; color:var(--ink-dim);">countArray[3] = 7 ნიშნავს: 7 ელემენტი მასივში არის ≤ 3.</p>
+    </div>
+    <p>ბოლო, მე-5 ნაბიჯს — ბოლოდან იტერაციას outputArray-ის ჩასაწერად — ინტერაქტიულად ქვემოთ ვნახავთ.</p>
+  </div>
+</section>
+
+<section id="counting-viz" class="section-full">
+  <div class="wrap">
+    <h2>ინტერაქტიული ვიზუალიზატორი</h2>
+    <p class="lede">შეიყვანეთ საკუთარი მასივი (მთელი რიცხვები, მძიმით გამოყოფილი) და გაუშვით ალგორითმი ნაბიჯ-ნაბიჯ ან ავტომატურად.</p>
+
+    <div class="viz-panel">
+      <div class="viz-controls">
+        <input type="text" id="cs-input" value="2, 5, 3, 0, 2, 3, 0, 3">
+        <button class="btn" id="cs-load">მასივის ჩატვირთვა</button>
+        <button class="btn ghost" id="cs-step">შემდეგი ნაბიჯი →</button>
+        <button class="btn ghost" id="cs-play">▶ ავტომატურად</button>
+        <button class="btn ghost" id="cs-reset">თავიდან</button>
+      </div>
+      <div class="viz-msg" id="cs-msg">დააჭირეთ „მასივის ჩატვირთვას" დასაწყებად.</div>
+
+      <div class="array-viz">
+        <div class="label">inputArray</div>
+        <div class="array-row" id="cs-input-row"></div>
+      </div>
+      <div class="array-viz">
+        <div class="label">countArray</div>
+        <div class="array-row" id="cs-count-row"></div>
+      </div>
+      <div class="array-viz">
+        <div class="label">outputArray</div>
+        <div class="array-row" id="cs-output-row"></div>
+      </div>
+    </div>
+
+    <div class="callout insight">
+      <span class="callout-label">💡 დააკვირდით</span>
+      <p>ავტომატურ რეჟიმში ნახავთ, რომ countArray-ის მნიშვნელობები ერთი-ერთის მცირდება ყოველ განთავსებაზე — ეს არის ის მექანიზმი, რომელიც ერთნაირ მნიშვნელობებს სტაბილურად, სწორი თანმიმდევრობით ანაწილებს outputArray-ში.</p>
+    </div>
+  </div>
+</section>
+
+<section id="counting-code">
+  <div class="wrap">
+    <h2>ალგორითმი და Python კოდი</h2>
+    <p>ორიგინალი მასალის ფსევდოკოდი, გასუფთავებული და შევსებული Python 3.12+ სტილში — type hints, docstring-ი და edge-case-ების დაცვა.</p>
+
+    <div class="code-window">
+      <div class="code-titlebar"><div class="dots"><span></span><span></span><span></span></div><span class="fname">sorts.py</span></div>
+      <pre><code class="language-python">def counting_sort(nums: Sequence[int]) -> list[int]:
+    """სტაბილური დათვლით დალაგება. ამუშავებს უარყოფით რიცხვებსაც.
+
+    დრო:    O(n + k), სადაც k = max(nums) - min(nums) + 1
+    სივრცე: O(n + k)
+    """
+    if not nums:
+        return []
+
+    lo, hi = min(nums), max(nums)
+    counts = [0] * (hi - lo + 1)
+
+    for x in nums:
+        counts[x - lo] += 1
+
+    for i in range(1, len(counts)):
+        counts[i] += counts[i - 1]
+
+    result = [0] * len(nums)
+    for x in reversed(nums):          # ბოლოდან — სტაბილურობისთვის
+        counts[x - lo] -= 1
+        result[counts[x - lo]] = x
+
+    return result</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="callout-label">🔍 შესწორება ორიგინალთან შედარებით</span>
+      <p>ორიგინალ სლაიდებზე countArray-ის ზომა განისაზღვრება მხოლოდ <code>max(inputArray)+1</code>-ით — ეს ვარაუდობს, რომ ყველა ელემენტი ≥ 0-ია. თუ მასივში გვხვდება უარყოფითი რიცხვი, <code>countArray[num]</code>-ზე წვდომა უარყოფითი ინდექსით მოხდება, რაც Python-ში ჩუმად „მუშაობს" (მასივს ბოლოდან კითხულობს), მაგრამ არასწორ შედეგს იძლევა — ეს გადამოწმებულია ცალკე ტესტით. ზემოთ მოცემული ვერსია იყენებს <code>lo = min(nums)</code>-ს წანაცვლებად, რაც უარყოფით რიცხვებსაც სწორად ამუშავებს.</p>
+    </div>
+    <div class="callout fix">
+      <span class="callout-label">🔍 ცარიელი მასივი</span>
+      <p>ორიგინალი ფსევდოკოდი <code>max(inputArray)</code>-ს პირდაპირ იძახებს — ცარიელ მასივზე ეს <code>ValueError</code>-ს ისვრის (გადამოწმებულია გაშვებით). ზემოთ დამატებული <code>if not nums: return []</code> ეს ფრთხილად ამოწმებს, სანამ min/max-ს გამოვიძახებთ.</p>
+    </div>
+
+    <h3>Big-O ანალიზი</h3>
+    <table class="bigo-table">
+      <thead><tr><th>რესურსი</th><th>სირთულე</th><th>განმარტება</th></tr></thead>
+      <tbody>
+        <tr><td>დრო</td><td class="num">O(n + k)</td><td>n — ელემენტების რაოდენობა, k — მნიშვნელობების დიაპაზონი</td></tr>
+        <tr><td>დამატებითი სივრცე</td><td class="num">O(n + k)</td><td>countArray (k) + outputArray (n)</td></tr>
+        <tr><td>სტაბილურობა</td><td class="num">კი</td><td>ბოლოდან იტერაციის წყალობით</td></tr>
+        <tr><td>ადგილზე (in-place)?</td><td class="num">არა</td><td>სჭირდება ორი დამატებითი მასივი</td></tr>
+      </tbody>
+    </table>
+    <div class="callout warn">
+      <span class="callout-label">⚠️ როდის არ ღირს</span>
+      <p>თუ k >> n (მაგალითად, ორი ელემენტიანი მასივი მნიშვნელობებით 1 და 10,000,000), countArray-ის ზომა თავად გახდება ბოლოკო — ასეთ შემთხვევაში O(n log n) შედარებითი დალაგება (merge/quick sort) სჯობს.</p>
+    </div>
+  </div>
+</section>
+
+<section id="radix-theory" class="section-full">
+  <div class="wrap">
+    <h2>რედიქს დალაგების ალგორითმი</h2>
+    <p class="lede">Radix Sort წრფივი დროის დალაგების ალგორითმია მთელი რიცხვებისთვის (ან ფიქსირებული სიგრძის გასაღებებისთვის) — ელემენტების პირდაპირი შედარების ნაცვლად, ისინი თანრიგ-თანრიგ, ციფრის მნიშვნელობის მიხედვით ნაწილდება.</p>
+    <p>ძირითადი იდეა: ჯერ ვალაგებთ ერთეულების ციფრის მიხედვით, მერე ათეულების, მერე ასეულების — ყოველ ჯერზე <b>სტაბილური</b> ქვე-დალაგებით (და counting sort ზუსტად ასეთია). ყველაზე ნაკლებად მნიშვნელოვანი ციფრიდან ყველაზე მნიშვნელოვნამდე (LSD — Least Significant Digit) გავლის შემდეგ, მასივი სრულად დალაგებულია.</p>
+
+    <div class="callout insight">
+      <span class="callout-label">🎯 რატომ უნდა იყოს ქვე-დალაგება სტაბილური?</span>
+      <p>წარმოვიდგინოთ, რომ ათეულების ციფრით ვალაგებთ და უკვე გვაქვს ორი ელემენტი ერთნაირი ათეულის ციფრით, მაგრამ განსხვავებული ერთეულის ციფრით (მაგ. 802 და 809 — ორივეს ათეულების ციფრი 0-ია). თუ ეს ნაბიჯი არასტაბილურია, მათი ერთმანეთთან შედარებითი წყობა (802 უნდა იყოს 809-ზე ადრე, რადგან ერთეულების დალაგება ეს უკვე უზრუნველყო) დაიკარგება. Radix sort-ის სისწორე მთლიანად ეყრდნობა ყოველი გავლის სტაბილურობას.</p>
+    </div>
+  </div>
+</section>
+
+<section id="radix-steps">
+  <div class="wrap">
+    <h2>როგორ მუშაობს — ნაბიჯ-ნაბიჯ</h2>
+    <p>ავიღოთ მასივი <code>[170, 45, 75, 90, 802, 24, 2, 66]</code>. უდიდესი ელემენტი — 802 — სამციფრიანია, ამიტომ დაგვჭირდება 3 გავლა.</p>
+
+    <div class="array-viz">
+      <div class="label">საწყისი მასივი</div>
+      <div class="array-row">
+        <div class="cell">170</div><div class="cell">45</div><div class="cell">75</div><div class="cell">90</div>
+        <div class="cell">802</div><div class="cell">24</div><div class="cell">2</div><div class="cell">66</div>
+      </div>
+    </div>
+
+    <div class="array-viz">
+      <div class="label">გავლა 1 — ერთეულის ციფრი (counting sort, exp=1)</div>
+      <div class="array-row">
+        <div class="cell placed">170</div><div class="cell placed">90</div><div class="cell placed">802</div><div class="cell placed">2</div>
+        <div class="cell placed">24</div><div class="cell placed">45</div><div class="cell placed">75</div><div class="cell placed">66</div>
+      </div>
+    </div>
+
+    <div class="array-viz">
+      <div class="label">გავლა 2 — ათეულის ციფრი (exp=10)</div>
+      <div class="array-row">
+        <div class="cell placed">802</div><div class="cell placed">2</div><div class="cell placed">24</div><div class="cell placed">45</div>
+        <div class="cell placed">66</div><div class="cell placed">170</div><div class="cell placed">75</div><div class="cell placed">90</div>
+      </div>
+    </div>
+
+    <div class="array-viz">
+      <div class="label">გავლა 3 — ასეულის ციფრი (exp=100) → საბოლოოდ დალაგებული</div>
+      <div class="array-row">
+        <div class="cell done">2</div><div class="cell done">24</div><div class="cell done">45</div><div class="cell done">66</div>
+        <div class="cell done">75</div><div class="cell done">90</div><div class="cell done">170</div><div class="cell done">802</div>
+      </div>
+    </div>
+    <p style="font-size:.9rem; color:var(--ink-dim);">3 გავლა = 802-ის ციფრების რაოდენობა. თითოეული გავლა — სრული, სტაბილური counting sort იმ თანრიგზე.</p>
+  </div>
+</section>
+
+<section id="radix-code" class="section-full">
+  <div class="wrap">
+    <h2>რედიქს დალაგების კოდი</h2>
+    <div class="code-window">
+      <div class="code-titlebar"><div class="dots"><span></span><span></span><span></span></div><span class="fname">sorts.py</span></div>
+      <pre><code class="language-python">def _count_by_digit(nums: list[int], exp: int, base: int = 10) -> list[int]:
+    """ერთი სტაბილური counting-sort გავლა, exp თანრიგზე (1, 10, 100, ...)."""
+    counts = [0] * base
+    for x in nums:
+        counts[(x // exp) % base] += 1
+    for i in range(1, base):
+        counts[i] += counts[i - 1]
+
+    result = [0] * len(nums)
+    for x in reversed(nums):
+        digit = (x // exp) % base
+        counts[digit] -= 1
+        result[counts[digit]] = x
+    return result
+
+
+def radix_sort(nums: Sequence[int], base: int = 10) -> list[int]:
+    """LSD Radix Sort. მხოლოდ არაუარყოფითი მთელი რიცხვებისთვის."""
+    if not nums:
+        return []
+
+    result = list(nums)
+    max_val = max(result)
+    exp = 1
+    while max_val // exp > 0:      # მთელრიცხვური გაყოფა — არა float
+        result = _count_by_digit(result, exp, base)
+        exp *= base
+    return result</code></pre>
+    </div>
+
+    <div class="callout fix">
+      <span class="callout-label">🔍 შესწორება ორიგინალთან შედარებით</span>
+      <p>ორიგინალი კოდი გამეორების პირობად იყენებდა <code>max1 / exp >= 1</code> — Python 3-ში <code>/</code> ყოველთვის float-ს აბრუნებს. მცირე რიცხვებზე ეს მუშაობს, მაგრამ ძალიან დიდი მთელი რიცხვებისთვის (რომლებსაც float ვეღარ იტევს ზუსტად) ეს კოდი <code>OverflowError</code>-ს ისვრის — გადამოწმებულია გაშვებით (<code>10**400 / 1</code> უკვე ავარიულდება). გასწორებული ვერსია იყენებს მთელრიცხვურ გაყოფას <code>//</code>-ს, რომელსაც ზომის შეზღუდვა არ აქვს.</p>
+    </div>
+
+    <h3>Big-O ანალიზი</h3>
+    <table class="bigo-table">
+      <thead><tr><th>რესურსი</th><th>სირთულე</th><th>განმარტება</th></tr></thead>
+      <tbody>
+        <tr><td>დრო</td><td class="num">O(d · (n + b))</td><td>d — ციფრების რაოდენობა, b — ფუძე (ჩვეულებრივ 10)</td></tr>
+        <tr><td>დამატებითი სივრცე</td><td class="num">O(n + b)</td><td>ერთი counting-sort გავლის მასივები</td></tr>
+        <tr><td>სტაბილურობა</td><td class="num">კი</td><td>თუ ყოველი შიდა გავლა სტაბილურია</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Counting sort vs. Radix sort</h3>
+    <table class="compare-table">
+      <thead><tr><th></th><th>Counting Sort</th><th>Radix Sort</th></tr></thead>
+      <tbody>
+        <tr><td>გამოსადეგია, როცა</td><td>დიაპაზონი k მცირეა</td><td>k დიდია, მაგრამ ციფრების რაოდენობა მცირეა</td></tr>
+        <tr><td>გავლების რაოდენობა</td><td>1</td><td>d (ციფრების რაოდენობა)</td></tr>
+        <tr><td>ქვე-ალგორითმად იყენებს</td><td>—</td><td>counting sort-ს ყოველი ციფრისთვის</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="insights">
+  <div class="wrap-wide">
+    <h2>Tech Industry Insights</h2>
+    <p class="lede" style="max-width:var(--maxw);">არა-შედარებითი დალაგება არ არის მხოლოდ სახელმძღვანელოს მაგალითი — ის რეალურ ინფრასტრუქტურაში მუშაობს იქ, სადაც შედარებაზე დაფუძნებული O(n log n) უბრალოდ ნელია.</p>
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="emoji">🎮</div>
+        <h4>GPU-ზე დალაგება (NVIDIA Thrust/CUB)</h4>
+        <p>NVIDIA-ს Thrust და CUB ბიბლიოთეკები radix sort-ს იყენებენ, როგორც ძირითად ალგორითმს <code>sort()</code>-ისთვის — რადგან შედარებაზე დაფუძნებული სორტირება ცუდად პარალელდება, ხოლო ციფრ-ციფრ დანაწილება ათასობით GPU ნაკადში ბუნებრივად თანხვდება.</p>
+      </div>
+      <div class="insight-card">
+        <div class="emoji">🌐</div>
+        <h4>Real-time Ray Tracing (LBVH)</h4>
+        <p>Karras-ის 2012 წლის LBVH ალგორითმი, რომელსაც თანამედროვე GPU ray-tracing engine-ები იყენებენ, სცენის ობიექტებს Morton-კოდებად აქცევს და radix sort-ით ალაგებს — ეს არის დაჩქარებული სტრუქტურის აგების ყველაზე სწრაფი გზა.</p>
+      </div>
+      <div class="insight-card">
+        <div class="emoji">🧬</div>
+        <h4>სუფიქსური მასივები ბიოინფორმატიკაში</h4>
+        <p>გენომის ანალიზისა და ტექსტის ინდექსირებისთვის გამოყენებული DC3/SA-IS ალგორითმები სუფიქსური მასივის აგებისას LSD radix sort-ს (ან counting sort-ს) იყენებენ წრფივი O(n) დროის მისაღწევად.</p>
+      </div>
+      <div class="insight-card">
+        <div class="emoji">🗄️</div>
+        <h4>ClickHouse-ის ORDER BY</h4>
+        <p>სვეტებრივი მონაცემთა ბაზა ClickHouse თავის შესრულების ძრავში ცალკე ახორციელებს და აქტიურად აოპტიმიზირებს radix sort-ს რიცხვითი და დაბალკარდინალობის სვეტების დასალაგებლად, სადაც ის შედარებით სორტირებას აჯობებს.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="exercises" class="section-full">
+  <div class="wrap">
+    <h2>სავარჯიშოები</h2>
+
+    <h3>საბაზისო</h3>
+    <details class="exercise">
+      <summary>დალაგება უარყოფითი რიცხვებით <span class="badge-easy">Easy</span></summary>
+      <div class="body">დაწერეთ <code>counting_sort</code>-ის გამოძახება, რომელიც ამოწმებს, რომ <code>[3, -1, 2, -2, 0]</code> სწორად დალაგდება <code>[-2, -1, 0, 2, 3]</code>-ად. ახსენით, რატომ ჩავარდებოდა ეს ორიგინალ (მხოლოდ არაუარყოფითებზე გათვლილ) ვერსიაზე.</div>
+    </details>
+    <details class="exercise">
+      <summary>ბაზის შეცვლა რედიქს დალაგებაში <span class="badge-medium">Medium</span></summary>
+      <div class="body">გაუშვით <code>radix_sort</code> <code>base=16</code>-ით მასივზე <code>[170, 45, 75, 90, 802, 24, 2, 66]</code>-ზე. რამდენი გავლა დასჭირდება ახლა (base=10-თან შედარებით) და რატომ?</div>
+    </details>
+
+    <h3>LeetCode-ტიპის</h3>
+    <details class="exercise">
+      <summary>Sort Colors <span class="badge-medium">Medium</span></summary>
+      <div class="body">დალაგეთ 0, 1, 2 მნიშვნელობებისგან შემდგარი მასივი ადგილზე (in-place), ერთი გავლით. ეს არის counting sort-ის უმარტივესი შემთხვევა k=3-ით — სცადეთ ერთი გავლით, დამხმარე outputArray-ის გარეშე.</div>
+    </details>
+    <details class="exercise">
+      <summary>Height Checker <span class="badge-easy">Easy</span></summary>
+      <div class="body">მოცემულია სტუდენტების სიმაღლეების მასივი. დაითვალეთ, რამდენ პოზიციაზე განსხვავდება მასივი მისი დალაგებული ვერსიისგან. გამოიყენეთ <code>counting_sort</code> დამხმარე ფუნქციად.</div>
+    </details>
+    <details class="exercise">
+      <summary>Maximum Gap <span class="badge-hard">Hard</span></summary>
+      <div class="body">დაუსორტირებელ მასივში იპოვეთ უდიდესი სხვაობა მეზობელ ელემენტებს შორის დალაგებული სახით — O(n) დროში. გამოიყენეთ <code>radix_sort</code>, რომ თავიდან აირიდოთ O(n log n) შედარებითი დალაგება.</div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  BIT-08.2022.G · მონაცემთა სტრუქტურები და ალგორითმები I · ლექცია 16 — დათვლით და რედიქს დალაგება
+</footer>
+
+<script>
+hljs.highlightAll();
+
+// scrollspy
+(function(){
+  const links = document.querySelectorAll('.nav-links a');
+  const map = new Map();
+  links.forEach(a=>{const id=a.getAttribute('href').slice(1); const el=document.getElementById(id); if(el) map.set(el,a);});
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      const a = map.get(e.target);
+      if(!a) return;
+      if(e.isIntersecting) links.forEach(l=>l.classList.remove('active')), a.classList.add('active');
+    });
+  }, {rootMargin:'-40% 0px -50% 0px'});
+  map.forEach((a,el)=>io.observe(el));
+})();
+
+// ---------- counting sort visualizer ----------
+(function(){
+  const $ = (id)=>document.getElementById(id);
+  const inputEl = $('cs-input'), msg = $('cs-msg');
+  const rowIn = $('cs-input-row'), rowCount = $('cs-count-row'), rowOut = $('cs-output-row');
+  const btnLoad = $('cs-load'), btnStep = $('cs-step'), btnPlay = $('cs-play'), btnReset = $('cs-reset');
+
+  let steps = [], cursor = -1, arr = [], playTimer = null;
+
+  function parseArr(text){
+    return text.split(',').map(s=>s.trim()).filter(s=>s.length).map(Number)
+      .filter(n=>Number.isInteger(n));
+  }
+
+  function buildSteps(nums){
+    const S = [];
+    const n = nums.length;
+    const lo = Math.min(...nums), hi = Math.max(...nums);
+    const k = hi - lo + 1;
+    let counts = new Array(k).fill(0);
+    let out = new Array(n).fill(null);
+
+    const snap = (extra)=> S.push(Object.assign({
+      counts: counts.slice(), out: out.slice(), activeIn:-1, activeCount:-1
+    }, extra));
+
+    snap({text:`ვპოულობთ დიაპაზონს: min=${lo}, max=${hi} → countArray ზომით ${k}.`});
+
+    for(let i=0;i<n;i++){
+      counts[nums[i]-lo]++;
+      snap({activeIn:i, activeCount:nums[i]-lo, text:`ვთვლით ${nums[i]}-ს სიხშირეს → countArray[${nums[i]-lo}] = ${counts[nums[i]-lo]}`});
+    }
+    for(let j=1;j<k;j++){
+      counts[j]+=counts[j-1];
+      snap({activeCount:j, text:`პრეფიქსული ჯამი: countArray[${j}] = ${counts[j]}`});
+    }
+    for(let i=n-1;i>=0;i--){
+      const x = nums[i];
+      counts[x-lo]--;
+      out[counts[x-lo]] = x;
+      snap({activeIn:i, activeCount:x-lo, text:`i=${i}: ${x} → outputArray[${counts[x-lo]}], countArray[${x-lo}] მცირდება ${counts[x-lo]}-მდე`});
+    }
+    snap({text:`დასრულდა — outputArray = [${out.join(', ')}]`});
+    return {steps:S, lo, hi};
+  }
+
+  let lo=0;
+  function render(){
+    const s = steps[Math.max(cursor,0)] || {counts:[], out:[], activeIn:-1, activeCount:-1};
+    rowIn.innerHTML = arr.map((v,i)=>
+      `<div class="cell${i===s.activeIn?' active':''}"><span class="idx">${i}</span>${v}</div>`).join('');
+    rowCount.innerHTML = (s.counts||[]).map((v,i)=>
+      `<div class="cell${i===s.activeCount?' active':''}"><span class="idx">${i+lo}</span>${v}</div>`).join('');
+    rowOut.innerHTML = (s.out||[]).map((v)=>
+      v===null ? `<div class="cell empty">·</div>` : `<div class="cell placed">${v}</div>`).join('');
+    msg.innerHTML = cursor<0 ? 'დააჭირეთ „მასივის ჩატვირთვას" დასაწყებად.' : `<b>ნაბიჯი ${cursor+1}/${steps.length}:</b> ${s.text}`;
+    btnStep.disabled = cursor>=steps.length-1;
+  }
+
+  function load(){
+    clearInterval(playTimer); playTimer=null; btnPlay.textContent='▶ ავტომატურად';
+    arr = parseArr(inputEl.value);
+    if(arr.length===0){ msg.textContent='გთხოვთ შეიყვანოთ სულ მცირე ერთი მთელი რიცხვი.'; return; }
+    if(arr.length>20){ arr = arr.slice(0,20); }
+    const built = buildSteps(arr);
+    steps = built.steps; lo = built.lo; cursor = 0;
+    render();
+  }
+
+  btnLoad.addEventListener('click', load);
+  btnStep.addEventListener('click', ()=>{ if(cursor<steps.length-1){ cursor++; render(); } });
+  btnReset.addEventListener('click', ()=>{ clearInterval(playTimer); playTimer=null; btnPlay.textContent='▶ ავტომატურად'; cursor = steps.length?0:-1; render(); });
+  btnPlay.addEventListener('click', ()=>{
+    if(playTimer){ clearInterval(playTimer); playTimer=null; btnPlay.textContent='▶ ავტომატურად'; return; }
+    if(!steps.length) load();
+    btnPlay.textContent='⏸ გაჩერება';
+    playTimer = setInterval(()=>{
+      if(cursor>=steps.length-1){ clearInterval(playTimer); playTimer=null; btnPlay.textContent='▶ ავტომატურად'; return; }
+      cursor++; render();
+    }, 900);
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>
