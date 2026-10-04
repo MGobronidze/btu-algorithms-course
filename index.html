@@ -58,6 +58,9 @@ main{padding:60px 0 90px;}
 .lecture-row.available .lec-status{background:rgba(217,166,78,0.15); color:var(--gold);}
 .lecture-row.soon .lec-status{background:rgba(124,132,154,0.12); color:var(--muted);}
 
+.lec-side{display:flex; flex-direction:column; align-items:flex-end; gap:6px;}
+.lec-quiz{font-family:var(--mono); font-size:12px; padding:4px 12px; border-radius:999px; white-space:nowrap; background:rgba(90,194,182,0.14); color:var(--teal);}
+
 .week-divider{
   font-family:var(--mono); font-size:12px; color:var(--muted); margin:26px 0 10px; padding-left:4px;
 }
@@ -90,8 +93,8 @@ footer p{font-size:13px; margin:0;}
 
 <main>
   <div class="wrap">
-    <div class="progress-bar"><div class="progress-fill" style="width:12%"></div></div>
-    <div class="progress-label"> დამატებულია 2 / 16 ლექცია</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:18%"></div></div>
+    <div class="progress-label"> დამატებულია 3 / 16 ლექცია</div>
 
     <div class="week-divider">I ნაწილი — საფუძვლები</div>
     <div class="lecture-list">
@@ -105,10 +108,10 @@ footer p{font-size:13px; margin:0;}
         <span class="lec-body"><h3>ალგორითმის სირთულის ანალიზი</h3><span>O(1), O(log n), O(n), O(n log n), O(n²), O(2ⁿ) · ზრდის რიგის ვიზუალიზაცია</span></span>
         <span class="lec-status">ხელმისაწვდომია</span>
       </a>
-      <a class="lecture-row soon">
+      <a class="lecture-row available" href="lectures/lecture-03-binary-search/index.html">
         <span class="lec-num">03</span>
         <span class="lec-body"><h3>ორობითი ძებნა და Power Set</h3><span>O(log n) · Binary Search ვიზუალიზატორი · ქვესიმრავლეების გენერაცია · ჰანოისა და ფიბონაჩის ფორმალური დამტკიცება</span></span>
-        <span class="lec-status">მალე</span>
+        <span class="lec-status">ხელმისაწვდომია</span> 
       </a>
     </div>
 
@@ -117,7 +120,7 @@ footer p{font-size:13px; margin:0;}
       <a class="lecture-row soon" >
         <span class="lec-num">04</span>
         <span class="lec-body"><h3>Insertion Sort და Merge Sort</h3><span>Bisection Search · ინტერაქტიული დალაგების ვიზუალიზატორები · სტაბილურობა · Timsort</span></span>
-        <span class="lec-status">მალე</span>
+        <span class="lec-side"><span class="lec-status">მალე</span><span class="lec-quiz">ქუიზის კვირა</span></span>
       </a>
       <a class="lecture-row soon">
         <span class="lec-num">05</span>
@@ -136,7 +139,7 @@ footer p{font-size:13px; margin:0;}
       <a class="lecture-row soon">
         <span class="lec-num">07</span>
         <span class="lec-body"><h3>ბმული სია (Linked List)</h3><span>კვანძები · ჩასმა/წაშლა · ინტერაქტიული ვიზუალიზატორი · fast/slow მაჩვენებლები</span></span>
-        <span class="lec-status">მალე</span>
+        <span class="lec-side"><span class="lec-status">მალე</span><span class="lec-quiz">ქუიზის კვირა</span></span>
       </a>
       <a class="lecture-row soon">
         <span class="lec-num">08</span>
@@ -146,7 +149,7 @@ footer p{font-size:13px; margin:0;}
       <a class="lecture-row soon" >
         <span class="lec-num">09</span>
         <span class="lec-body"><h3>ამოცანები ბმულ სიებზე</h3><span>Cycle Detection · Remove Duplicates · Merge · Reverse ვიზუალიზატორი</span></span>
-        <span class="lec-status">მალე</span>
+        <span class="lec-side"><span class="lec-status">მალე</span></span>
       </a>
     </div>
 
@@ -155,32 +158,32 @@ footer p{font-size:13px; margin:0;}
       <a class="lecture-row soon">
         <span class="lec-num">10</span>
         <span class="lec-body"><h3>ორობითი ხე (Binary Tree)</h3><span>Inorder/Preorder/Postorder · ინტერაქტიული შემოვლის ვიზუალიზატორი</span></span>
-        <span class="lec-status">მალე</span>
+         <span class="lec-side"><span class="lec-status">მალე</span><span class="lec-quiz">ქუიზის კვირა</span></span>
       </a>
       <a class="lecture-row soon" >
         <span class="lec-num">11</span>
         <span class="lec-body"><h3>ამოცანები ორობით ხეებზე</h3><span>Same Tree · Maximum Depth · Path Sum · Invert Binary Tree ვიზუალიზატორი</span></span>
-        <span class="lec-status">მალე</span>
+        <span class="lec-side"><span class="lec-status">მალე</span></span>
       </a>
       <a class="lecture-row soon" >
         <span class="lec-num">12</span>
         <span class="lec-body"><h3>გროვა (Heap)</h3><span>MaxHeap კლასი · Heap Sort ინტერაქტიული ვიზუალიზატორი · heapq</span></span>
-        <span class="lec-status">მალე</span>
+         <span class="lec-side"><span class="lec-status">მალე</span><span class="lec-quiz">ქუიზის კვირა</span></span>
       </a>
       <a class="lecture-row soon">
         <span class="lec-num">13</span>
         <span class="lec-body"><h3>ორობითი ძებნის ხე (BST)</h3><span>BST Sort</span></span>
-        <span class="lec-status">მალე</span>
+        <span class="lec-side"><span class="lec-status">მალე</span></span>
       </a>
       <a class="lecture-row soon">
         <span class="lec-num">14</span>
         <span class="lec-body"><h3>ამოცანები BST-ზე</h3><span>Validate · Insert · Search</span></span>
-        <span class="lec-status">მალე</span>
+        <span class="lec-side"><span class="lec-status">მალე</span><span class="lec-quiz">ქუიზის კვირა</span></span>
       </a>
       <a class="lecture-row soon">
         <span class="lec-num">15</span>
         <span class="lec-body"><h3>AVL ხე</h3><span>თვითდაბალანსებადი ხე · AVL Sort</span></span>
-        <span class="lec-status">მალე</span>
+        <span class="lec-side"><span class="lec-status">მალე</span></span>
       </a>
     </div>
 
@@ -189,7 +192,7 @@ footer p{font-size:13px; margin:0;}
       <a class="lecture-row soon">
         <span class="lec-num">16</span>
         <span class="lec-body"><h3>Counting Sort და Radix Sort</h3><span>წრფივი დროის დალაგების ალგორითმები</span></span>
-        <span class="lec-status">მალე</span>
+         <span class="lec-side"><span class="lec-status">მალე</span><span class="lec-quiz">ქუიზის კვირა</span></span>
       </a>
     </div>
   </div>
