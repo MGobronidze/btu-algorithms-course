@@ -454,8 +454,7 @@ footer p{font-size:13px; margin:0;}
         return fib_recur(n - 1) + fib_recur(n - 2)</code></pre>
     </div>
 
-    <div class="callout math">
-      <span class="icon">φ</span>
+    <div class="callout math" style="display: flex; flex-direction: column;">
       <p><strong>უფრო მჭიდრო შეფასება:</strong> გამოძახებების ხის ზრდის ზუსტი ტემპი განისაზღვრება ოქროს კვეთით (<code>φ = (1+√5)/2 ≈ 1.618</code>) — ფიბონაჩის მიმდევრობის საკუთარი „ბუნებრივი მუდმივით":</p>
       <p style="text-align:center; font-family:var(--mono); font-size:16px; color:var(--gold); margin-top:8px;">T(n) = O(φⁿ) ≈ O(1.618ⁿ)</p>
       <p>ეს მკაცრად ნაკლებია, ვიდრე <code>O(2ⁿ)</code> — მაგრამ ორივე მაინც <strong>ექსპონენციალურია</strong>, ანუ პრაქტიკულად ერთნაირად „უსარგებლო" კლასს განეკუთვნება დიდი <code>n</code>-ისთვის. სწორედ ამიტომ საკმარისი და მისაღები იყო O(2ⁿ)-ის დასახელება ლექცია 2-ში — ზედა საზღვარი მჭიდრო არ იყო, მაგრამ ასიმპტოტურ კლასს სწორად ასახავდა.</p>
