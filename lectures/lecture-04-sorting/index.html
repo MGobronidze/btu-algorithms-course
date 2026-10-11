@@ -157,6 +157,31 @@ footer p{font-size:13px; margin:0;}
 .mg-log-wrap .bigo-table td{color:var(--ink-dim);}
 .mg-log-wrap .bigo-table td.cmpcol{color:var(--gold);}
 .mg-log-wrap .bigo-table tr:last-child td{color:var(--green);}
+.mv-scroll{overflow-x:auto; padding-bottom:6px;}
+.mv-tree{position:relative; min-width:520px;}
+.mv-row{position:relative; height:62px; margin-bottom:6px;}
+.mv-slot{position:absolute; top:0; bottom:0; padding:0 3px;}
+.mv-node{height:100%; display:flex; gap:3px; padding:5px; border:1px solid var(--line); border-radius:10px; background:var(--bg-panel-2); transition:all .3s ease;}
+.mv-node.waiting{opacity:0.55;}
+.mv-node.split{border-style:dashed;}
+.mv-node.cur{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold-dim);}
+.mv-node.merging{border-color:var(--teal);}
+.mv-node.sorted{border-color:var(--green); background:rgba(124,184,143,0.08);}
+.mv-node.done{opacity:0.4;}
+.mv-c{flex:1; min-width:0; display:flex; align-items:center; justify-content:center; border-radius:6px; background:var(--bg); border:1px solid var(--line); font-family:var(--mono); font-weight:700; font-size:13px; color:var(--ink); transition:all .3s ease;}
+.mv-c.ph{color:var(--muted); font-weight:400; border-style:dashed; background:transparent;}
+.mv-c.used{opacity:0.25;}
+.mv-c.cmp{border-color:var(--gold); color:var(--gold); background:rgba(217,166,78,0.18);}
+.mv-c.pick{border-color:var(--green); color:var(--green); background:rgba(124,184,143,0.25);}
+.mv-info{margin-top:20px; padding-top:18px; border-top:1px solid var(--line);}
+.mv-meta{display:flex; align-items:center; gap:12px; margin-bottom:10px; font-family:var(--mono); font-size:12.5px; color:var(--muted);}
+.mv-tag{font-size:12px; padding:3px 10px; border-radius:999px; font-family:var(--mono);}
+.mv-tag.split{background:rgba(201,123,132,0.15); color:var(--rose);}
+.mv-tag.base{background:rgba(124,184,143,0.15); color:var(--green);}
+.mv-tag.merge{background:rgba(90,194,182,0.15); color:var(--teal);}
+.mv-tag.pick{background:rgba(217,166,78,0.15); color:var(--gold);}
+.mv-what{font-family:var(--mono); font-size:14px; color:var(--ink); margin-bottom:6px;}
+.mv-why{font-size:14.5px; color:var(--ink-dim); max-width:70ch; min-height:44px;}
 </style>
 </head>
 <body>
@@ -170,7 +195,6 @@ footer p{font-size:13px; margin:0;}
       <a href="#insertion-sort">Insertion Sort</a>
       <a href="#insertion-viz">ვიზუალიზაცია</a>
       <a href="#merge-sort">Merge Sort</a>
-      <a href="#merge-step">Merge ოპერაცია</a>
       <a href="#merge-viz">Merge ვიზუალიზაცია</a>
       <a href="#compare">შედარება</a>
       <a href="#industry">ინდუსტრია</a>
@@ -385,22 +409,30 @@ footer p{font-size:13px; margin:0;}
   <div class="wrap-wide">
     <span class="section-label">06 — სცადეთ თავად</span>
     <h2 class="h-section">Merge Sort ნაბიჯ-ნაბიჯ</h2>
-    <p class="lede">დააჭირეთ „შემდეგი ნაბიჯი" — ნახავთ ყოველ <code>merge</code> ოპერაციას ცალ-ცალკე, იმ თანმიმდევრობით, როგორც რეკურსია რეალურად ასრულებს მათ (ქვემოდან ზემოთ — ჯერ პატარა ნაწილები, შემდეგ დიდი).</p>
+    <p class="lede">რეკურსიის სრული სურათი: ჯერ მასივი იყოფა ერთელემენტიან ბლოკებად, შემდეგ ბლოკები ქვემოდან ზემოთ ერთიანდება. ყოველ ნაბიჯზე წერია, <strong>რა</strong> ხდება და <strong>რატომ</strong>.</p>
 
     <div class="viz-panel">
       <div class="viz-controls">
         <label for="mrgArrInput">მასივი:</label>
         <input type="text" id="mrgArrInput" value="38,27,43,10,9,82">
         <button class="btn" onclick="mrgInit()">↺ დაწყება</button>
-        <button class="btn ghost" onclick="mrgStep()">შემდეგი ნაბიჯი →</button>
+        <button class="btn ghost" onclick="mrgPrev()">← წინა</button>
+        <button class="btn ghost" onclick="mrgStep()">შემდეგი →</button>
+        <button class="btn ghost" id="mrgPlayBtn" onclick="mrgPlay()">▶ ავტომატურად</button>
       </div>
-      <div class="bars-wrap" id="mrgBars"></div>
-      <div class="viz-status" id="mrgStatus"></div>
+
+      <div class="mv-scroll"><div class="mv-tree" id="mrgTree"></div></div>
+
+      <div class="mv-info">
+        <div class="mv-meta"><span class="mv-tag" id="mrgTag"></span><span id="mrgCount"></span></div>
+        <div class="mv-what" id="mrgWhat"></div>
+        <div class="mv-why" id="mrgWhy"></div>
+      </div>
     </div>
-    <p class="viz-note">მწვანე ზოლები უკვე თავისი საბოლოო, დალაგებული პოზიციისკენ მოძრაობს ამ merge-ის ფარგლებში; ნაცრისფერი — ჯერ არ შეხებია ამ ეტაპს.</p>
+
+    <p class="viz-note"><strong>ფერები:</strong> ყვითელი — შესადარებელი ელემენტი; მწვანე — არჩეული ელემენტი ან დალაგებული ბლოკი; გაფერმკრთალებული — უკვე გადატანილი ელემენტი; წყვეტილი ჩარჩო — ბლოკი ჯერ გაყოფილია და შვილებს ელოდება; ფერმკრთალი ბლოკი — რიგს ელოდება (რეკურსია ჯერ მარცხენა ნაწილს ამთავრებს).</p>
   </div>
 </section>
-
 <hr class="divider">
 
 <!-- ============ COMPARISON ============ -->
@@ -691,61 +723,189 @@ function renderIns(statusText, compareIdx){
 insInit();
 
 /* ============ MERGE SORT VISUALIZER (snapshot-based) ============ */
-let mrgSnapshots = [];
-let mrgIdx = 0;
+/* ============ MERGE SORT VISUALIZER (recursion tree) ============ */
+let mrgSteps = [], mrgNodes = [], mrgIdx = 0, mrgN = 0, mrgMaxDepth = 0, mrgTimer = null;
+
+function mrgBuild(arr){
+  const st = {}, steps = [], nodes = [];
+  let nid = 0;
+  const fmt = a => '[' + a.join(', ') + ']';
+
+  const mk = (lo, hi, depth) => {
+    const nd = { id: nid++, lo, hi, depth, vals: arr.slice(lo, hi) };
+    nodes.push(nd);
+    st[nd.id] = { vis: false, status: 'waiting', cells: nd.vals.map(v => ({ v, cls: '' })) };
+    return nd;
+  };
+  const snap = (tag, kind, what, why, cur) =>
+    steps.push({ tag, kind, what, why, cur, st: JSON.parse(JSON.stringify(st)) });
+
+  function sort(nd){
+    const s = st[nd.id], len = nd.hi - nd.lo;
+    s.status = 'active';
+
+    // ---- ბაზისური შემთხვევა ----
+    if(len === 1){
+      s.status = 'sorted';
+      snap('ბაზისური შემთხვევა', 'base',
+        `${fmt(nd.vals)} — ერთი ელემენტია`,
+        'ერთელემენტიანი სია ყოველთვის დალაგებულია, ამიტომ რეკურსია აქ ჩერდება და ბლოკი გაერთიანებას ელოდება.',
+        nd.id);
+      return nd.vals.slice();
+    }
+
+    // ---- გაყოფა ----
+    const mid = (nd.lo + nd.hi) >> 1;
+    const Ln = mk(nd.lo, mid, nd.depth + 1), Rn = mk(mid, nd.hi, nd.depth + 1);
+    s.status = 'split';
+    st[Ln.id].vis = true; st[Rn.id].vis = true;
+    snap('გაყოფა', 'split',
+      `${fmt(nd.vals)} → ${fmt(Ln.vals)} და ${fmt(Rn.vals)}`,
+      `სიგრძე ${len} > 1, ამიტომ დალაგებულობა გარანტირებული არ არის. ვყოფთ შუაზე (mid = ${mid}) და თითოეულ ნახევარს რეკურსიულად ვალაგებთ, ჯერ მარცხენას.`,
+      nd.id);
+
+    const left = sort(Ln), right = sort(Rn);
+    const Ls = st[Ln.id], Rs = st[Rn.id];
+
+    // ---- გაერთიანება ----
+    s.status = 'merging';
+    const out = [];
+    let i = 0, j = 0;
+
+    const paint = side => {
+      Ls.cells = left.map((v, k) => ({ v, cls: k < i ? 'used' : (k === i ? (side === 'L' ? 'pick' : 'cmp') : '') }));
+      Rs.cells = right.map((v, k) => ({ v, cls: k < j ? 'used' : (k === j ? (side === 'R' ? 'pick' : 'cmp') : '') }));
+      s.cells = out.map((v, k) => ({ v, cls: (side && k === out.length - 1) ? 'pick' : '' }))
+        .concat(Array(len - out.length).fill(0).map(() => ({ v: '·', cls: 'ph' })));
+    };
+
+    paint(null);
+    snap('გაერთიანება', 'merge',
+      `ვაერთიანებთ ${fmt(left)} და ${fmt(right)}`,
+      'ორივე სია უკვე დალაგებულია, ამიტომ უმცირესი დარჩენილი ელემენტი აუცილებლად რომელიმე სიის თავშია. საკმარისია მხოლოდ ორი თავის შედარება.',
+      nd.id);
+
+    while(i < left.length && j < right.length){
+      const a = left[i], b = right[j];
+      if(a <= b){
+        out.push(a); paint('L');
+        snap('არჩევა', 'pick',
+          `${a} (მარცხენა) ≤ ${b} (მარჯვენა) → ვიღებთ ${a}-ს`,
+          `${a} პატარაა ან ტოლია ${b}-ზე და, რადგან სიები დალაგებულია, ორივე სიის დანარჩენ ელემენტებზეც პატარაა. ამიტომ ახლა სწორედ ის უნდა მოხვდეს შედეგში.` +
+          (a === b ? ' ტოლობისას მარცხენას ვირჩევთ, რომ ტოლი ელემენტების თავდაპირველი რიგი არ შეიცვალოს (სტაბილურობა).' : ''),
+          nd.id);
+        i++;
+      } else {
+        out.push(b); paint('R');
+        snap('არჩევა', 'pick',
+          `${a} (მარცხენა) > ${b} (მარჯვენა) → ვიღებთ ${b}-ს`,
+          `${b} მკაცრად პატარაა ${a}-ზე და, რადგან სიები დალაგებულია, ორივე სიის დანარჩენ ელემენტებზეც პატარაა. ამიტომ ახლა სწორედ ის უნდა მოხვდეს შედეგში.`,
+          nd.id);
+        j++;
+      }
+    }
+
+    // ---- დარჩენილი ელემენტები ----
+    if(i < left.length || j < right.length){
+      const fromL = i < left.length;
+      const rest = fromL ? left.slice(i) : right.slice(j);
+      const start = out.length;
+      out.push(...rest);
+      Ls.cells = left.map((v, k) => ({ v, cls: (fromL && k >= i) ? 'pick' : 'used' }));
+      Rs.cells = right.map((v, k) => ({ v, cls: (!fromL && k >= j) ? 'pick' : 'used' }));
+      s.cells = out.map((v, k) => ({ v, cls: k >= start ? 'pick' : '' }));
+      snap('დარჩენილი', 'pick',
+        `${fromL ? 'მარჯვენა' : 'მარცხენა'} სია ამოიწურა → ${fmt(rest)} პირდაპირ გადადის შედეგში`,
+        'დარჩენილი ელემენტები უკვე დალაგებულია და ყველა უკვე გადატანილზე დიდია ან ტოლია, ამიტომ შედარება აღარ გვჭირდება.',
+        nd.id);
+    }
+
+    // ---- შედეგი ----
+    s.status = 'sorted';
+    s.cells = out.map(v => ({ v, cls: '' }));
+    Ls.status = 'done'; Rs.status = 'done';
+    Ls.cells = left.map(v => ({ v, cls: '' }));
+    Rs.cells = right.map(v => ({ v, cls: '' }));
+    snap(nd.depth === 0 ? 'დასრულდა' : 'ბლოკი დალაგდა', 'base',
+      `${fmt(left)} + ${fmt(right)} → ${fmt(out)}`,
+      nd.depth === 0
+        ? 'მთელი მასივი დალაგებულია. ყოველ დონეზე ჯამში n ელემენტი გადავიდა, დონეები კი log n-ია, სულ O(n log n).'
+        : 'ეს ბლოკი ახლა დალაგებულია და მშობელი მას შემდეგ merge-ში გამოიყენებს.',
+      nd.id);
+    return out;
+  }
+
+  const root = mk(0, arr.length, 0);
+  st[root.id].vis = true;
+  snap('დასაწყისი', 'split',
+    `საწყისი მასივი: ${fmt(arr)}`,
+    'Merge Sort ჯერ მასივს ყოფს ერთელემენტიან ბლოკებამდე, შემდეგ კი დალაგებულ ბლოკებს აერთიანებს. დააჭირეთ „შემდეგს".',
+    root.id);
+  sort(root);
+  return { steps, nodes };
+}
 
 function mrgInit(){
   const raw = document.getElementById('mrgArrInput').value;
-  const arr = raw.split(',').map(s=>parseInt(s.trim(),10)).filter(x=>!isNaN(x));
+  const arr = raw.split(',').map(s => parseInt(s.trim(), 10)).filter(x => !isNaN(x));
   if(arr.length < 2 || arr.length > 12){ alert('შეიყვანეთ 2-12 რიცხვი, მძიმით გამოყოფილი.'); return; }
-  mrgSnapshots = [];
-  const working = [...arr];
-
-  function mergeSortRecord(lo, hi){
-    if(hi - lo <= 1) return;
-    const mid = Math.floor((lo+hi)/2);
-    mergeSortRecord(lo, mid);
-    mergeSortRecord(mid, hi);
-    const left = working.slice(lo, mid);
-    const right = working.slice(mid, hi);
-    let i=0, j=0, k=lo;
-    while(i < left.length && j < right.length){
-      if(left[i] <= right[j]){ working[k] = left[i]; i++; }
-      else { working[k] = right[j]; j++; }
-      k++;
-    }
-    while(i < left.length){ working[k] = left[i]; i++; k++; }
-    while(j < right.length){ working[k] = right[j]; j++; k++; }
-    mrgSnapshots.push({ arr: [...working], lo, hi, label: `merge(arr, ${lo}, ${mid}, ${hi})` });
-  }
-  mergeSortRecord(0, working.length);
+  if(mrgTimer){ mrgPlay(); }
+  const res = mrgBuild(arr);
+  mrgSteps = res.steps; mrgNodes = res.nodes; mrgN = arr.length;
+  mrgMaxDepth = Math.max(...mrgNodes.map(n => n.depth));
   mrgIdx = 0;
-  renderMrg(arr, null, 'დააჭირეთ „შემდეგი ნაბიჯს" პირველი merge-ის სანახავად.');
+  mrgRender();
 }
 
 function mrgStep(){
-  if(mrgSnapshots.length === 0){ mrgInit(); return; }
-  if(mrgIdx >= mrgSnapshots.length){ return; }
-  const snap = mrgSnapshots[mrgIdx];
-  renderMrg(snap.arr, snap, `${snap.label} → [${snap.arr.slice(snap.lo, snap.hi).join(', ')}] დალაგებულია`);
-  mrgIdx++;
-  if(mrgIdx >= mrgSnapshots.length){
-    setTimeout(()=>{ document.getElementById('mrgStatus').innerHTML += ' — <strong>მთლიანად დალაგებულია!</strong>'; }, 50);
-  }
+  if(mrgSteps.length === 0){ mrgInit(); return; }
+  if(mrgIdx < mrgSteps.length - 1){ mrgIdx++; mrgRender(); }
+  else if(mrgTimer){ mrgPlay(); }
 }
 
-function renderMrg(arr, snap, statusText){
-  const box = document.getElementById('mrgBars');
-  const maxVal = Math.max(...arr, 1);
-  box.innerHTML = arr.map((v,idx)=>{
-    let cls = 'bar';
-    if(snap && idx >= snap.lo && idx < snap.hi) cls += ' sorted';
-    const heightPct = 20 + (v/maxVal)*75;
-    return `<div class="${cls}" style="height:${heightPct}%"><span>${v}</span></div>`;
-  }).join('');
-  document.getElementById('mrgStatus').innerHTML = statusText;
+function mrgPrev(){
+  if(mrgIdx > 0){ mrgIdx--; mrgRender(); }
 }
-mrgInit();
+
+function mrgPlay(){
+  const btn = document.getElementById('mrgPlayBtn');
+  if(mrgTimer){
+    clearInterval(mrgTimer); mrgTimer = null; btn.textContent = '▶ ავტომატურად';
+    return;
+  }
+  if(mrgSteps.length === 0){ mrgInit(); }
+  if(mrgIdx >= mrgSteps.length - 1){ mrgIdx = 0; mrgRender(); }
+  btn.textContent = '⏸ პაუზა';
+  mrgTimer = setInterval(() => {
+    if(mrgIdx < mrgSteps.length - 1){ mrgIdx++; mrgRender(); }
+    else { clearInterval(mrgTimer); mrgTimer = null; btn.textContent = '▶ ავტომატურად'; }
+  }, 1200);
+}
+
+function mrgRender(){
+  const step = mrgSteps[mrgIdx];
+  if(!step) return;
+  let html = '';
+  for(let d = 0; d <= mrgMaxDepth; d++){
+    html += '<div class="mv-row">';
+    mrgNodes.forEach(n => {
+      const s = step.st[n.id];                 // ამ ნაბიჯზე ბლოკი შეიძლება ჯერ არ არსებობდეს
+      if(n.depth !== d || !s || !s.vis) return;
+      const cls = ['mv-node', s.status, step.cur === n.id ? 'cur' : ''].join(' ');
+      const left = n.lo / mrgN * 100, width = (n.hi - n.lo) / mrgN * 100;
+      html += `<div class="mv-slot" style="left:${left}%;width:${width}%"><div class="${cls}">` +
+        s.cells.map(c => `<div class="mv-c ${c.cls}">${c.v}</div>`).join('') +
+        '</div></div>';
+    });
+    html += '</div>';
+  }
+  document.getElementById('mrgTree').innerHTML = html;
+  document.getElementById('mrgTag').className = 'mv-tag ' + step.kind;
+  document.getElementById('mrgTag').textContent = step.tag;
+  document.getElementById('mrgCount').textContent = `ნაბიჯი ${mrgIdx + 1} / ${mrgSteps.length}`;
+  document.getElementById('mrgWhat').textContent = step.what;
+  document.getElementById('mrgWhy').textContent = step.why;
+}
 /* ============ MERGE OPERATION STEP TABLE ============ */
 let mg = { L:[], R:[], i:0, j:0, out:[], done:false, last:-1, log:[] };
 const mgFmt = a => '[' + a.join(',') + ']';
