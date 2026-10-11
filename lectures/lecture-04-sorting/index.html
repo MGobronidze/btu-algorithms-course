@@ -145,6 +145,18 @@ details.exercise[open] summary::before{content:'–';}
 footer{ width:100%; display:flex; justify-content:center; align-items:center; justify-content:center; align-items:center; padding:40px 24px 60px; text-align:center; border-top:1px solid var(--line);}
 footer p{font-size:13px; margin:0;}
 .section-full{background:var(--bg-panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+.mg-label{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin:18px 0 8px;}
+.mg-row{display:flex; gap:6px; flex-wrap:wrap; min-height:42px; align-items:center;}
+.mg-cell{min-width:42px; height:42px; padding:0 8px; display:flex; align-items:center; justify-content:center; background:var(--bg-panel-2); border:1px solid var(--line); border-radius:8px; font-family:var(--mono); font-weight:700; font-size:14px; color:var(--ink); transition:all .3s ease;}
+.mg-cell.used{opacity:0.25;}
+.mg-cell.cmp{background:rgba(217,166,78,0.18); border-color:var(--gold); color:var(--gold);}
+.mg-cell.took{background:rgba(124,184,143,0.22); border-color:var(--green); color:var(--green);}
+.mg-empty{font-family:var(--mono); font-size:13px; color:var(--muted);}
+.mg-log-wrap{overflow-x:auto; margin-top:22px;}
+.mg-log-wrap .bigo-table{margin:0; font-family:var(--mono); font-size:13.5px; min-width:520px;}
+.mg-log-wrap .bigo-table td{color:var(--ink-dim);}
+.mg-log-wrap .bigo-table td.cmpcol{color:var(--gold);}
+.mg-log-wrap .bigo-table tr:last-child td{color:var(--green);}
 </style>
 </head>
 <body>
@@ -158,6 +170,7 @@ footer p{font-size:13px; margin:0;}
       <a href="#insertion-sort">Insertion Sort</a>
       <a href="#insertion-viz">ვიზუალიზაცია</a>
       <a href="#merge-sort">Merge Sort</a>
+      <a href="#merge-step">Merge ოპერაცია</a>
       <a href="#merge-viz">Merge ვიზუალიზაცია</a>
       <a href="#compare">შედარება</a>
       <a href="#industry">ინდუსტრია</a>
@@ -183,7 +196,7 @@ footer p{font-size:13px; margin:0;}
   <div class="wrap">
     <span class="section-label">01 — რატომ დალაგება</span>
     <h2 class="h-section">ორობითი ძებნიდან დალაგებამდე</h2>
-    <p class="lede">ლექცია 3-ში ვნახეთ, რომ ორობითი ძებნა — O(log n) — მუშაობს <strong>მხოლოდ</strong> დალაგებულ სტრუქტურაზე. მაგრამ თუ მონაცემი დაულაგებელი მოვიდა? სანამ ორობითი ძებნის სიჩქარეს ვისარგებლებთ, პირველ ჯერზე ის უნდა დავალაგოთ — და დღეს ვსწავლობთ ორ ურთიერთსაწინააღმდეგო ფილოსოფიას ამისთვის.</p>
+    <p class="lede">ლექცია 3-ში ვნახეთ, რომ ორობითი ძებნა — O(log n) — მუშაობს <strong>მხოლოდ</strong> დალაგებულ სტრუქტურაზე. მაგრამ თუ მონაცემი დაულაგებელი მოვიდა? სანამ ორობითი ძებნის ალგორითმს გამოვიყენებდეთ, პირველ რიგში ის უნდა დავალაგოთ — და დღეს სწორედ დალაგების ალგორითმდებს გავეცნობით.</p>
 
     <table class="bigo-table">
       <tr><th>ალგორითმი</th><th>ძებნის ტიპი</th><th>წინაპირობა</th></tr>
@@ -196,49 +209,17 @@ footer p{font-size:13px; margin:0;}
 
 <hr class="divider">
 
-<!-- ============ BISECTION SEARCH ============ -->
-<section id="bisection" class="section-full">
-  <div class="wrap">
-    <span class="section-label">02 — გვერდითი შენიშვნა</span>
-    <h2 class="h-section">Bisection Search — ორობითი ძებნა უწყვეტ სამყაროში</h2>
-    <p class="lede">ორობითი ძებნის იდეა მასივებს არ ეზღუდება. <strong>Bisection search</strong> იმავე „განახევრების" პრინციპს იყენებს უწყვეტი ფუნქციის ფესვის საპოვნელად — ეფუძნება <em>შუალედური მნიშვნელობის თეორემას</em> (Intermediate Value Theorem): თუ უწყვეტი ფუნქცია <code>f(x)</code> ნიშანს იცვლის <code>[a, b]</code> შუალედზე (ანუ <code>f(a) · f(b) &lt; 0</code>), მაშინ მას აქვს ფესვი ამ შუალედში.</p>
-
-    <div class="code-window">
-      <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">bisection_search.py</span></div>
-      <pre><code class="language-python">def bisection_search(f, a: float, b: float, tol: float = 1e-6) -> float:
-    if f(a) * f(b) >= 0:
-        raise ValueError("f(a)-სა და f(b)-ს საწინააღმდეგო ნიშანი უნდა ჰქონდეთ.")
-    while (b - a) / 2 > tol:
-        m = (a + b) / 2
-        if f(m) == 0:
-            return m                # ზუსტად ვიპოვეთ ფესვი
-        elif f(a) * f(m) < 0:
-            b = m                   # ფესვი მარცხენა ნახევარშია
-        else:
-            a = m                   # ფესვი მარჯვენა ნახევარშია
-    return (a + b) / 2
-
-# √2-ის მოძებნა: f(x) = x² − 2-ის ფესვი
-print(bisection_search(lambda x: x**2 - 2, 0, 2))   # ≈ 1.4142135...</code></pre>
-    </div>
-
-    <div class="callout insight">
-      <span class="icon">🔎</span>
-      <p><strong>განსხვავება მასივის ორობითი ძებნისგან:</strong> აქ <code>n</code> აღარ არის „ელემენტების რაოდენობა" — არეალი უწყვეტია. სირთულეს განსაზღვრავს არა შესატანი მონაცემის ზომა, არამედ სასურველი სიზუსტე: საჭირო ნაბიჯების რაოდენობაა <code>log₂((b−a)/tol)</code>. მაინც იგივე ლოგარითმული ბუნებაა — ყოველ ნაბიჯზე განუსაზღვრელობის არეალი ნახევრდება.</p>
-    </div>
-  </div>
-</section>
 
 <!-- ============ INSERTION SORT ============ -->
 <section id="insertion-sort">
   <div class="wrap">
-    <span class="section-label">03 — პირველი დალაგების ალგორითმი</span>
+    <span class="section-label">02 — პირველი დალაგების ალგორითმი</span>
     <h2 class="h-section">Insertion Sort</h2>
     <p class="lede">იდეა ბუნებრივია — ზუსტად ისე ალაგებთ სათამაშო ბანქოს ხელში: იღებთ შემდეგ ბარათს და სვამთ უკვე დალაგებულ ნაწილში სწორ ადგილას.</p>
 
     <ol style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
       <li style="margin-bottom:8px;">ვიწყებთ მეორე ელემენტიდან (პირველი, ცალკე აღებული, ავტომატურად „დალაგებულია").</li>
-      <li style="margin-bottom:8px;">მიმდინარე ელემენტს (<code>key</code>) ვადარებთ მის მარცხნივ მდგომ, უკვე დალაგებულ ნაწილს.</li>
+      <li style="margin-bottom:8px;">მიმდინარე ელემენტს (<code>key</code>) ვადარებთ მის მარცხნივ მდგომს, უკვე დალაგებულ ნაწილს.</li>
       <li style="margin-bottom:8px;">ყველა ელემენტს, რომელიც <code>key</code>-ზე დიდია, ერთი პოზიციით მარჯვნივ ვწევთ.</li>
       <li>ვსვამთ <code>key</code>-ს გამოთავისუფლებულ ადგილას. ვიმეორებთ მთელი მასივისთვის.</li>
     </ol>
@@ -277,7 +258,7 @@ print(bisection_search(lambda x: x**2 - 2, 0, 2))   # ≈ 1.4142135...</code></p
 <!-- ============ INSERTION SORT VISUALIZER ============ -->
 <section id="insertion-viz" class="section-full">
   <div class="wrap-wide">
-    <span class="section-label">04 — სცადეთ თავად</span>
+    <span class="section-label">03 — სცადეთ თავად</span>
     <h2 class="h-section">Insertion Sort ნაბიჯ-ნაბიჯ</h2>
     <p class="lede">ოქროსფერი — მიმდინარე <code>key</code>. მწვანე — უკვე დალაგებული ნაწილი. დააჭირეთ „შემდეგი ნაბიჯი" და თვალი ადევნეთ, როგორ „იძვრის" თითოეული ელემენტი თავის ადგილას.</p>
 
@@ -293,8 +274,7 @@ print(bisection_search(lambda x: x**2 - 2, 0, 2))   # ≈ 1.4142135...</code></p
     </div>
 
     <div class="callout insight">
-      <span class="icon">✅</span>
-      <p><strong>უპირატესობები:</strong> მარტივი და ადვილად წასაკითხი; <strong>სტაბილურია</strong> (თანაბარი ელემენტების ურთიერთწესრიგი არ ირღვევა); ძალიან ეფექტურია მცირე ან „თითქმის დალაგებულ" მონაცემზე — ე.წ. <em>adaptive</em> თვისება; ადგილზე მუშაობს, დამატებითი მეხსიერების გარეშე.<br><strong>ნაკლი:</strong> არაეფექტურია დიდი, შემთხვევითად დალაგებული მონაცემისთვის — <code>O(n²)</code> სწრაფად ხდება პრობლემა.</p>
+      <p><strong>უპირატესობები:</strong> მარტივი და ადვილად წასაკითხი; <strong>სტაბილურია</strong> (თანაბარი ელემენტების ურთირთგანლაგება არ ირღვევა); ძალიან ეფექტურია მცირე ან „თითქმის დალაგებულ" მონაცემზე — ე.წ. <em>adaptive</em> თვისება; ადგილზე მუშაობს, დამატებითი მეხსიერების გარეშე.<br><strong>ნაკლი:</strong> არაეფექტურია დიდი, შემთხვევითად დალაგებული მონაცემისთვის — <code>O(n²)</code> სწრაფად ხდება პრობლემა.</p>
     </div>
   </div>
 </section>
@@ -304,16 +284,49 @@ print(bisection_search(lambda x: x**2 - 2, 0, 2))   # ≈ 1.4142135...</code></p
 <!-- ============ MERGE SORT ============ -->
 <section id="merge-sort">
   <div class="wrap">
-    <span class="section-label">05 — დაყავი და იბატონე</span>
+    <span class="section-label">04 — დაყავი და იბატონე</span>
     <h2 class="h-section">Merge Sort</h2>
     <p class="lede">Merge Sort სრულიად განსხვავებული ფილოსოფიით მუშაობს — <strong>divide and conquer</strong>: მასივს ვყოფთ ორ ნახევრად, თითოეულს რეკურსიულად ვალაგებთ, შემდეგ ორ დალაგებულ ნახევარს ვაერთიანებთ (merge) ერთ დალაგებულ მასივში.</p>
 
     <ol style="color:var(--ink-dim); font-size:15.5px; padding-left:22px;">
       <li style="margin-bottom:8px;"><strong>საბაზისო შემთხვევა:</strong> თუ სიის სიგრძეა 0 ან 1 — უკვე დალაგებულია.</li>
       <li style="margin-bottom:8px;"><strong>გაყოფა:</strong> სიას ვყოფთ ორ თანაბარ ნახევრად და ორივეს რეკურსიულად ვალაგებთ.</li>
-      <li><strong>გაერთიანება:</strong> ვადარებთ ორივე დალაგებული ნახევრის „წამყვან" ელემენტებს — პატარას გადმოვაქვთ შედეგში; როცა ერთი ნახევარი ცარიელდება, მეორის დარჩენილს პირდაპირ ვაკოპირებთ.</li>
+      <li><strong>გაერთიანება:</strong> ვადარებთ ორივე დალაგებული ნახევრის „წამყვან" ელემენტებს — მცირე ელემენტი გადმოგვაქვს შედეგში; როცა ერთი ნახევარი ცარიელდება, მეორის დარჩენილ ელემენტებს პირდაპირ ვაკოპირებთ.</li>
     </ol>
+    <div class="wrap-wide">
+        <p class="lede">Merge Sort-ის გული <code>merge</code> ოპერაციაა. სანამ მთლიან რეკურსიას ვნახავთ, ერთი გაერთიანება ცალკე, ნაბიჯ-ნაბიჯ განვიხილოთ: ორივე სიის „წამყვან" ელემენტებს ვადარებთ, ნაკლების მნიშვნელობის მქონეს შედეგში გადავიტანთ და იმ სიაში ერთით წინ გადავდივართ.</p>
 
+        <div class="viz-panel">
+          <div class="viz-controls">
+            <label for="mgL">მარცხენა სია:</label>
+            <input type="text" id="mgL" value="1,5,12,18,19,20" style="width:180px;">
+            <label for="mgR">მარჯვენა სია:</label>
+            <input type="text" id="mgR" value="2,3,4,17" style="width:140px;">
+            <button class="btn" onclick="mgInit()">↺ დაწყება</button>
+            <button class="btn ghost" onclick="mgStep()">შემდეგი ნაბიჯი →</button>
+          </div>
+
+          <div class="mg-label">მარცხენა სია</div>
+          <div class="mg-row" id="mgLeftRow"></div>
+          <div class="mg-label">მარჯვენა სია</div>
+          <div class="mg-row" id="mgRightRow"></div>
+          <div class="mg-label">შედეგი</div>
+          <div class="mg-row" id="mgOutRow"></div>
+
+          <div class="viz-status" id="mgStatus"></div>
+
+          <div class="mg-log-wrap">
+            <table class="bigo-table">
+              <thead><tr><th>მარცხენა სია</th><th>მარჯვენა სია</th><th>შედარება</th><th>შედეგი</th></tr></thead>
+              <tbody id="mgLog"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="callout insight">
+          <span class="icon">🔑</span>
+          <p><strong>რატომ არის merge ეფექტური?</strong> სიები უკვე დალაგებულია, ამიტომ უმცირესი დარჩენილი ელემენტი ყოველთვის რომელიმე სიის თავშია. ყოველი ელემენტი შედეგში ზუსტად ერთხელ გადადის, ამიტომ ორი სიის გაერთიანება <code>O(n)</code>-ია, სადაც <code>n</code> ორივე სიის ჯამური სიგრძეა.</p>
+        </div>
+    </div>
     <div class="code-window">
       <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">merge_sort.py</span></div>
       <pre><code class="language-python">def merge_sort(arr: list) -> list:
@@ -327,7 +340,7 @@ print(bisection_search(lambda x: x**2 - 2, 0, 2))   # ≈ 1.4142135...</code></p
     merged = []
     i = j = 0
     while i < len(left) and j < len(right):
-        if left[i] <= right[j]:      # <= (და არა <) — ინარჩუნებს სტაბილურობას
+        if left[i] <= right[j]:     
             merged.append(left[i]); i += 1
         else:
             merged.append(right[j]); j += 1
@@ -335,15 +348,15 @@ print(bisection_search(lambda x: x**2 - 2, 0, 2))   # ≈ 1.4142135...</code></p
     merged.extend(right[j:])
     return merged</code></pre>
     </div>
-
+   
     <div class="callout fix">
       <span class="icon">🔍</span>
-      <p><strong>დახვეწილი, მაგრამ მნიშვნელოვანი შესწორება:</strong> ორიგინალი მასალის კოდი წერდა <code>if left_half[i] < right_half[j]</code> — მკაცრი <code>&lt;</code>. ეს ერთი სიმბოლო ამტვრევს <strong>სტაბილურობას</strong>: როცა ორივე ნახევარში ტოლი ელემენტებია, <code>&lt;</code> ირჩევს მარჯვენა ნახევრის ელემენტს პირველად — რაც ცვლის თანაბარი ელემენტების საწყის ურთიერთწესრიგს. Merge Sort-ი ცნობილია, როგორც „ბუნებრივად სტაბილური" ალგორითმი — მაგრამ ეს სტაბილურობა <strong>მხოლოდ</strong> მაშინ ვრცელდება, თუ merge-ის შედარებაში ტოლობისას მარცხენა ნახევარს ვანიჭებთ უპირატესობას (<code>&lt;=</code>). შემოწმებული იქნა ორივე ვერსია — ტესტმა ზუსტად დაადასტურა ეს განსხვავება.</p>
+      <p>თუ დავწერთ <code>if left_half[i] < right_half[j]</code>. ეს ერთი სიმბოლო ამტვრევს <strong>სტაბილურობას</strong>: როცა ორივე ნახევარში ტოლი ელემენტებია, <code>&lt;</code> ირჩევს მარჯვენა ნახევრის ელემენტს პირველად — რაც ცვლის თანაბარი ელემენტების საწყის ურთირთდალაგებას. Merge Sort-ი ცნობილია, როგორც „ბუნებრივად სტაბილური" ალგორითმი — მაგრამ ეს სტაბილურობა <strong>მხოლოდ</strong> მაშინ ვრცელდება, თუ merge-ის შედარებაში ტოლობისას მარცხენა ნახევარს ვანიჭებთ უპირატესობას (<code>&lt;=</code>).</p>
     </div>
 
     <div class="callout insight">
       <span class="icon">💡</span>
-      <p><strong>რატომ არის სტაბილურობა მნიშვნელოვანი?</strong> წარმოიდგინეთ ცხრილი თანამშრომლების შესახებ, უკვე დალაგებული სახელის მიხედვით ანბანურად. ახლა გინდათ იგივე ცხრილის დალაგება განყოფილების მიხედვით. სტაბილური ალგორითმით, ერთი და იმავე განყოფილების თანამშრომლები კვლავ ანბანურად დარჩება — არასტაბილურით კი ეს წესრიგი დაიკარგება, თითქმის შემთხვევით.</p>
+      <p><strong>რატომ არის სტაბილურობა მნიშვნელოვანი?</strong> წარმოიდგინეთ ცხრილი თანამშრომლების შესახებ, უკვე დალაგებული სახელის მიხედვით ანბანურად. ახლა გინდათ იგივე ცხრილის დალაგება განყოფილების მიხედვით. სტაბილური ალგორითმით, ერთი და იმავე განყოფილების თანამშრომლები კვლავ ანბანურად დარჩება — არასტაბილურით კი ეს წესრიგი დაიკარგება.</p>
     </div>
 
     <h3 style="font-size:19px; margin:34px 0 6px;">სირთულის ანალიზი</h3>
@@ -402,7 +415,7 @@ print(bisection_search(lambda x: x**2 - 2, 0, 2))   # ≈ 1.4142135...</code></p
       <tr><td>უარესი შემთხვევა</td><td class="num">O(n²)</td><td class="num">O(n log n)</td></tr>
       <tr><td>სივრცე</td><td class="num">O(1) — in-place</td><td class="num">O(n) — დამხმარე მასივი</td></tr>
       <tr><td>სტაბილურობა</td><td>დიახ</td><td>დიახ (თუ <code>&lt;=</code> გამოიყენება)</td></tr>
-      <tr><td>საუკეთესო გამოსაყენებელი</td><td>მცირე ან თითქმის დალაგებული მონაცემი; „online" დალაგება (მონაცემი ეტაპობრივად შემოდის)</td><td>დიდი მოცულობის მონაცემი; გარანტირებული წარმადობა საჭირო შემთხვევაში; ბმული სიები (linked lists — მომდევნო ლექციები)</td></tr>
+      <tr><td>საუკეთესოა გამოსაყენებელად</td><td>მცირე ან თითქმის დალაგებული მონაცემი; მონაცემი ეტაპობრივად შემოდის</td><td>დიდი მოცულობის მონაცემი; გარანტირებული წარმადობა საჭირო შემთხვევაში; ბმული სიები (linked lists — მომდევნო ლექციები)</td></tr>
     </table>
   </div>
 </section>
@@ -733,6 +746,77 @@ function renderMrg(arr, snap, statusText){
   document.getElementById('mrgStatus').innerHTML = statusText;
 }
 mrgInit();
+/* ============ MERGE OPERATION STEP TABLE ============ */
+let mg = { L:[], R:[], i:0, j:0, out:[], done:false, last:-1, log:[] };
+const mgFmt = a => '[' + a.join(',') + ']';
+const mgParse = id => document.getElementById(id).value.split(',')
+  .map(s => parseInt(s.trim(), 10)).filter(x => !isNaN(x)).sort((a,b) => a-b);
+
+function mgInit(){
+  const L = mgParse('mgL'), R = mgParse('mgR');
+  if(L.length === 0 && R.length === 0){ alert('შეიყვანეთ მინიმუმ ერთი სია.'); return; }
+  mg = { L, R, i:0, j:0, out:[], done:false, last:-1, log:[] };
+  mgRender('დააჭირეთ „შემდეგ ნაბიჯს" დასაწყებად.');
+}
+
+function mgStep(){
+  if(mg.done) return;
+  const { L, R } = mg;
+  const hasL = mg.i < L.length, hasR = mg.j < R.length;
+
+  if(!hasL && !hasR){
+    mg.log.push([mgFmt([]), mgFmt([]), '', mgFmt(mg.out)]);
+    mg.done = true;
+    mg.last = -1;
+    mgRender('გაერთიანება დასრულდა — შედეგი დალაგებულია.');
+    return;
+  }
+
+  const a = hasL ? L[mg.i] : '--';
+  const b = hasR ? R[mg.j] : '--';
+  mg.log.push([mgFmt(L.slice(mg.i)), mgFmt(R.slice(mg.j)), a + ', ' + b, mgFmt(mg.out)]);
+
+  let msg;
+  if(hasL && hasR){
+    if(a <= b){ mg.out.push(a); mg.i++; msg = `${a} ≤ ${b} → ${a} გადადის შედეგში (მარცხენა სიიდან)`; }
+    else      { mg.out.push(b); mg.j++; msg = `${a} > ${b} → ${b} გადადის შედეგში (მარჯვენა სიიდან)`; }
+  } else if(hasL){
+    mg.out.push(a); mg.i++;
+    msg = `მარჯვენა სია ცარიელია → ${a} პირდაპირ გადადის შედეგში`;
+  } else {
+    mg.out.push(b); mg.j++;
+    msg = `მარცხენა სია ცარიელია → ${b} პირდაპირ გადადის შედეგში`;
+  }
+  mg.last = mg.out.length - 1;
+  mgRender(msg);
+}
+
+function mgRender(statusText){
+  const { L, R, i, j, out, done, last } = mg;
+
+  const listHtml = (arr, ptr) => arr.length === 0
+    ? '<span class="mg-empty">[ ]</span>'
+    : arr.map((v, k) => {
+        let cls = 'mg-cell';
+        if(k < ptr) cls += ' used';
+        else if(k === ptr && !done) cls += ' cmp';
+        return `<div class="${cls}">${v}</div>`;
+      }).join('');
+
+  document.getElementById('mgLeftRow').innerHTML = listHtml(L, i);
+  document.getElementById('mgRightRow').innerHTML = listHtml(R, j);
+
+  document.getElementById('mgOutRow').innerHTML = out.length === 0
+    ? '<span class="mg-empty">[ ]</span>'
+    : out.map((v, k) => `<div class="mg-cell${k === last ? ' took' : ''}">${v}</div>`).join('');
+
+  document.getElementById('mgLog').innerHTML = mg.log.map(r =>
+    `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="cmpcol">${r[2]}</td><td>${r[3]}</td></tr>`
+  ).join('');
+
+  document.getElementById('mgStatus').innerHTML = statusText;
+}
+mgInit();
 </script>
 </body>
 </html>
