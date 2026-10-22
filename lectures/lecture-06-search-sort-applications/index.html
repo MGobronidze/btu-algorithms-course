@@ -162,7 +162,7 @@ footer p{font-size:13px; margin:0;}
   <svg class="hero-grid" id="heroGrid" viewBox="0 0 400 400"></svg>
   <span class="kicker">BIT-08.2022.G · <b>მონაცემთა სტრუქტურები და ალგორითმები I</b> · ლექცია 6</span>
   <h1>ამოცანები ძებნისა და დალაგების გამოყენებით</h1>
-  <p class="hero-sub">ლექცია 1-დან 5-მდე ავაშენეთ ხელსაწყოთა ყუთი — რეკურსია, Big-O, ორობითი ძებნა, დალაგების სამი ალგორითმი. დღეს ვხედავთ, როგორ წყვეტენ ეს ხელსაწყოები რეალურ, გასაუბრებაზე ხშირად შემხვედრ ამოცანებს.</p>
+  <p class="hero-sub">პირველ 5 ლექციაზე შევისწვლეთ — რეკურსია, Big-O, ორობითი ძებნა, დალაგების სამი ალგორითმი. დღეს ვნახავთ, როგორ შეიძლება გამოვიყენოთ ეს ხელსაწყოები რეალურ, გასაუბრებაზე ხშირად შემხვედრ ამოცანებში.</p>
   <div class="hero-terms">
     <span>Search Insert Position</span><span>Search a 2D Matrix</span><span>Missing Number</span><span>Intersection of Two Arrays</span>
   </div>
@@ -175,18 +175,18 @@ footer p{font-size:13px; margin:0;}
   <div class="wrap-wide">
     <span class="section-label">01 — ხელსაწყოთა ყუთი</span>
     <h2 class="h-section">რას ვეყრდნობით დღეს</h2>
-    <p class="lede">დღევანდელი ოთხივე ამოცანა წყდება უკვე ნასწავლი ტექნიკებით — ახალი ალგორითმის სწავლას კი არ ვცდილობთ, არამედ ვსწავლობთ <strong>რომელი ხელსაწყო რომელ სამუშაოსთვის გამოვიყენოთ</strong>.</p>
+    <p class="lede">დღევანდელი ოთხივე ამოცანა წყდება უკვე ნასწავლი ტექნიკებით — არ ვსწავლობთ ახალ ალგორითმს, ვცდილობთ მოვარგოთ ხელსაწყო ამოცანას.</p>
 
     <table class="recap-table">
       <tr><th>ტექნიკა</th><th>საიდან ვიცით</th><th>დღეს გამოიყენება</th></tr>
       <tr><td class="lec"><a href="../lecture-03-binary-search/index.html">ლექცია 3</a></td><td>ორობითი ძებნა — O(log n)</td><td>Search Insert Position, Search a 2D Matrix (ვარიანტი)</td></tr>
-      <tr><td class="lec"><a href="../lecture-02-complexity/index.html">ლექცია 2</a></td><td>O(n) წრფივი გავლა, O(1) დამატებითი მეხსიერება</td><td>Missing Number-ის ჯამის ფორმულა</td></tr>
+      <tr><td class="lec"><a href="../lecture-02-complexity/index.html">ლექცია 2</a></td><td>O(n) წრფივი ძებნა, O(1) დამატებითი მეხსიერება</td><td>Missing Number-ის ჯამის ფორმულა</td></tr>
       <tr><td class="lec"><a href="../lecture-02-complexity/index.html">ლექცია 2</a></td><td><code>set</code>-ის O(1) საშუალო წევრობის შემოწმება</td><td>Intersection of Two Arrays</td></tr>
     </table>
 
     <div class="callout insight">
       <span class="icon">🧭</span>
-      <p><strong>ინტერვიუს უნარი #1:</strong> ამოცანის ამოხსნამდე ყველაზე მნიშვნელოვანი ნაბიჯია საკუთარი თავისთვის კითხვა — „რა თვისება აქვს ამ მონაცემს, რომლის გამოყენებაც შემიძლია?" დალაგებულია? საზღვრები ცნობილია? მთელი რიცხვების უწყვეტი დიაპაზონია? სწორედ ეს დაკვირვება მიგვიყვანს სწორ ალგორითმამდე — არა დამახსოვრებული პასუხი კონკრეტულ ამოცანაზე.</p>
+      <p><strong>ინტერვიუს უნარი #1:</strong> ამოცანის ამოხსნამდე ყველაზე მნიშვნელოვანი ნაბიჯია ვიკითხოთ— „რა თვისება აქვს ამ მონაცემს, რისი გამოყენებაც შემიძლია?" დალაგებულია? საზღვრები ცნობილია? მთელი რიცხვების უწყვეტი დიაპაზონია? სწორედ ეს დაკვირვება მიგვიყვანს სწორ ალგორითმამდე.</p>
     </div>
   </div>
 </section>
@@ -309,7 +309,7 @@ footer p{font-size:13px; margin:0;}
 
     <div class="callout fix" style="display: flex; flex-direction: column; gap: 10px;">
       <span class="icon">🔍</span>
-      <p><strong>ინდუსტრიული ალტერნატივა — XOR ტექნიკა:</strong> ენებში, სადაც მთელი რიცხვის ზომა შეზღუდულია (Java, C++), დიდ <code>n</code>-ზე <code>n * (n+1)</code> შეიძლება overflow-ს იწვევდეს, სანამ 2-ზე გაიყოფოდეს. Python-ს ეს პრობლემა არ აქვს (მთელი რიცხვები თავისთავად იზრდება), მაგრამ ღირს იცოდეთ ალტერნატივა, რომელიც ამ პრობლემას სრულად გვერდს უვლის — <code>XOR</code> ოპერაცია:</p>
+      <p><strong>ინდუსტრიული ალტერნატივა — XOR ტექნიკა:</strong> ენებში, სადაც მთელი რიცხვის ზომა შეზღუდულია (Java, C++), დიდ <code>n</code>-ზე <code>n * (n+1)</code> შეიძლება overflow გამოიწვიოს, სანამ 2-ზე გაყოფას შეასრულებს. Python-ს ეს პრობლემა არ აქვს (მთელი რიცხვები თავისთავად იზრდება), მაგრამ ღირს იცოდეთ ალტერნატივა, რომელიც ამ პრობლემას სრულად გვერდს უვლის — <code>XOR</code> ოპერაცია:</p>
       <pre style="margin:10px 0 0; background:transparent; padding:0;"><code class="language-python" style="background:transparent;">def missing_number_xor(nums: list) -> int:
     result = len(nums)
     for i, num in enumerate(nums):
@@ -340,10 +340,7 @@ footer p{font-size:13px; margin:0;}
 
     <p><strong>სირთულე:</strong> <code>O(n + m)</code> საშუალოდ — თითოეული მასივიდან <code>set</code>-ის აგება <code>O(n)</code>/<code>O(m)</code>-ია, თანაკვეთა საშუალოდ <code>O(min(n, m))</code>-ია.</p>
 
-    <div class="callout fix">
-      <span class="icon">🔍</span>
-      <p><strong>შენიშვნა ორიგინალურობაზე:</strong> ეს ამოცანა კურსის მასალაში მხოლოდ სათაურის დონეზეა მოხსენიებული (სრული კოდი არ იყო მოცემული ორიგინალ სლაიდებში) — ამიტომ ზემოთ მოცემული ამოხსნა სრულად ჩვენს მიერაა დამატებული და გატესტილი, ლექცია 2-ის მასალის პირდაპირი გაგრძელების სახით.</p>
-    </div>
+
   </div>
 </section>
 
