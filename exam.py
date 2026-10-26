@@ -73,7 +73,9 @@ def int_to_str(i: int) -> str:
     i = abs(i)
     chars = []
     while i > 0:
-    #  აღადგინეთ გამოტოვებული ნაწილი
+        chars.append(digits[i % 10])
+        i //= 10
     if is_negative:
         chars.append('-')
     return ''.join(reversed(chars))
+
