@@ -396,10 +396,9 @@ footer p{font-size:13px; margin:0;}
       <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">power_set_recursive.py</span></div>
       <pre><code class="language-python">def gen_subsets(items: list) -> list[list]:
     if len(items) == 0:
-        return [[]]                         # ერთადერთი ქვესიმრავლე — ცარიელი
-    smaller = gen_subsets(items[:-1])        # ყველა ქვესიმრავლე ბოლო ელემენტის გარეშე
-    last = items[-1:]
-    with_last = [s + last for s in smaller]  # იგივეები + ბოლო ელემენტი
+        return [[]]                         
+    smaller = gen_subsets(items[:-1])       
+    with_last = [s + last for s in smaller] 
     return smaller + with_last</code></pre>
     </div>
 
