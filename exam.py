@@ -79,3 +79,105 @@ def int_to_str(i: int) -> str:
         chars.append('-')
     return ''.join(reversed(chars))
 
+# სწრაფი დალაგების ალგორითმი, ჰოარის დანაწილების სქემა
+def hoare_partition(arr: list, low: int, high: int) -> int:
+    pivot = arr[low]
+    i, j = low - 1, high + 1
+    while True:
+        i += 1
+        while arr[i] < pivot:
+            i += 1
+        j -= 1
+        while arr[j] > pivot:
+            j -= 1
+        if i >= j:
+            return j                
+        arr[i], arr[j] = arr[j], arr[i]
+
+def quick_sort_hoare(arr: list, low: int, high: int) -> None:
+    if low < high:
+        pi = hoare_partition(arr, low, high)
+        quick_sort_hoare(arr, low, pi)     
+        quick_sort_hoare(arr, pi + 1, high)
+
+
+# მატრიცაში ელემენტის ძებნა
+def search_matrix(matrix: list, target: int) -> bool:
+    if not matrix or not matrix[0]:
+        return False
+    rows, cols = len(matrix), len(matrix[0])
+    row, col = 0, cols - 1      
+    while row < rows and col >= 0:
+        if matrix[row][col] == target:
+            return True
+        elif matrix[row][col] > target:
+            col -= 1              
+        else:
+            row += 1               
+    return False
+
+# ბმული სიები
+# ბმული სიის კვანძის კლასის განსაზღვრა
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+# ბმული სიაში ელემენტის ძებნა
+def search_linked_list(head: "Node", target) -> bool:
+    current = head
+    while current is not None:
+        if current.data == target:
+            return True
+        current = current.next
+    return False
+
+# ბმული სიაში ელემენტების რაოდენობის დათვლა
+def find_length(head: "Node") -> int:
+    length = 0
+    current = head
+    while current is not None:
+        length += 1
+        current = current.next
+    return length
+
+
+# ბმული სიაში ელემენტის ჩასმა კონკრეტულ პოზიციაზე
+def insert_at_position(head: "Node", pos: int, data) -> "Node":
+    if pos < 1:
+        return head
+    if pos == 1:
+        new_node = Node(data)
+        new_node.next = head
+        return new_node
+
+    prev = head
+    count = 1
+    while count < pos - 1 and prev is not None:
+        prev = prev.next
+        count += 1
+    if prev is None:         
+        return head
+
+    new_node = Node(data)
+    new_node.next = prev.next
+    prev.next = new_node
+    return head
+
+# ბმული სიის კონკრეტული პოზიციიდან ელემენტის წაშლა
+def delete_at_position(head: "Node", position: int) -> "Node":
+    if head is None or position < 1:
+        return head
+    if position == 1:
+        return head.next
+
+    current = head
+    for _ in range(position - 2):
+        if current is not None:
+            current = current.next
+    if current is None or current.next is None:
+        return head            
+
+    current.next = current.next.next   
+    return head
+
