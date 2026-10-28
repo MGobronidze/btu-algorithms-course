@@ -300,7 +300,7 @@ footer p{font-size:13px; margin:0;}
       <div class="code-titlebar"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span><span class="code-filename">missing_number.py</span></div>
       <pre><code class="language-python">def missing_number(nums: list) -> int:
     n = len(nums)
-    expected_sum = n * (n + 1) // 2   # 0-დან n-მდე ჯამის ფორმულა
+    expected_sum = (n - 1) * n // 2   # 0-დან n-მდე ჯამის ფორმულა
     actual_sum = sum(nums)
     return expected_sum - actual_sum</code></pre>
     </div>
