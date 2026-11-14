@@ -182,12 +182,12 @@ footer p{font-size:13px; margin:0;}
 <section id="bridge">
   <div class="wrap">
     <span class="section-label">01 — გაგრძელება</span>
-    <h2 class="h-section">ლექცია 7-დან აქამდე</h2>
-    <p class="lede">შუალედური გამოცდის შემდეგ ვუბრუნდებით ბმულ სიას — ახლა კი აღარ ვაშენებთ საბაზისო ოპერაციებს, არამედ ვხსნით ოთხ კლასიკურ, გასაუბრებებზე ხშირად შემხვედრ ამოცანას, რომლებიც ყველა ამ საბაზისო ოპერაციებზეა აგებული.</p>
+    <h2 class="h-section">ვაგრძელებთ ბმულ სიებზე მუშაობას</h2>
+    <p class="lede">შუალედური გამოცდის შემდეგ ვუბრუნდებით ბმულ სიას — დღეს არ ვსწავლობთ რაიმე საბაზისო ოპერაციებს, არამედ ვხსნით ოთხ კლასიკურ, გასაუბრებებზე ხშირად შემხვედრ ამოცანას, რომლებიც მეშვიდე შეხვედრაზე ახსნილ საბაზისო ოპერაციებზეა აგებული.</p>
 
     <div class="callout insight">
       <span class="icon">🔗</span>
-      <p><strong>საერთო ძაფი:</strong> ოთხივე დღევანდელი ამოცანა ამოიხსნება ერთი-ორი მაჩვენებლით (<code>curr</code>, <code>prev</code>, <code>slow</code>/<code>fast</code>) და მასივის ან დამატებითი მეხსიერების გარეშე. სწორედ ეს არის ბმული სიების ამოცანების საერთო ხასიათი — ცოტა მეხსიერებით, ბევრი „მაჩვენებლების ჟონგლირებით".</p>
+      <p><strong>საერთო ძაფი:</strong> ოთხივე დღევანდელი ამოცანა ამოიხსნება ერთი-ორი მაჩვენებლით (<code>curr</code>, <code>prev</code>, <code>slow</code>/<code>fast</code>) და მასივის ან დამატებითი მეხსიერების გარეშე. </p>
     </div>
   </div>
 </section>
@@ -206,7 +206,7 @@ footer p{font-size:13px; margin:0;}
       <pre><code class="language-python">def detect_loop(head: "Node") -> bool:
     visited = set()
     while head is not None:
-        if head in visited:      # კვანძს უკვე ვნახეთ → ციკლია
+        if head in visited:      # კვანძი უკვე ვნახეთ → ციკლია
             return True
         visited.add(head)
         head = head.next
@@ -227,7 +227,7 @@ footer p{font-size:13px; margin:0;}
 
     <div class="callout insight">
       <span class="icon">🐢</span>
-      <p><strong>რატომ ბადებს კურდღელი კუს, თუ ციკლია:</strong> თუ ციკლი არსებობს, ორივე მაჩვენებელი მასში „ჩაიხვევა" და ვერასდროს გავა — ეს გარანტირებთ, რომ საბოლოოდ შეხვდებიან (fast აგდებს slow-ს, სანამ არ დაეწევა ციკლის შიგნით). თუ ციკლი არ არსებობს, <code>fast</code> უბრალოდ პირველი მიაღწევს <code>None</code>-ს.</p>
+      <p><strong>რატომ:</strong> თუ ციკლი არსებობს, ორივე მაჩვენებელი მასში „ჩაიხვევა" და ვერასდროს გავა — ეს განაპირობებს, რომ საბოლოოდ შეხვდებიან (fast აგდებს slow-ს, სანამ არ დაეწევა ციკლის შიგნით). თუ ციკლი არ არსებობს, <code>fast</code> უბრალოდ პირველი მიაღწევს <code>None</code>-ს.</p>
     </div>
 
     <table class="bigo-table">
@@ -235,11 +235,6 @@ footer p{font-size:13px; margin:0;}
       <tr><td>HashSet</td><td class="num">O(n)</td><td class="num">O(n)</td></tr>
       <tr><td>Floyd (slow/fast)</td><td class="num">O(n)</td><td class="num">O(1)</td></tr>
     </table>
-
-    <div class="callout fix">
-      <span class="icon">🔍</span>
-      <p><strong>სტილისტური დაკვირვება:</strong> ორიგინალ კოდში წერია <code>if slow == fast</code>. Node-ის კლასს საკუთარი <code>__eq__</code> არ აქვს განსაზღვრული, ამიტომ Python ავტომატურად უბრუნდება ობიექტის იდენტობის შედარებას — ანუ <code>==</code> აქ ფაქტობრივად იგივეა, რაც <code>is</code>. მაინც, როცა განზრახვა „იგივე ობიექტია თუ არა" შემოწმებაა (და არა მნიშვნელობითი ტოლობა), იდიომატური და მკაფიო Python მოითხოვს <code>is</code>-ს — ეს განზრახვას ცალსახად აცხადებს და მომავალში, თუ ვინმემ <code>Node</code>-ს <code>__eq__</code> დაამატებს, ბაგისგან იცავს კოდს.</p>
-    </div>
   </div>
 </section>
 
@@ -290,7 +285,7 @@ footer p{font-size:13px; margin:0;}
 
     <div class="callout warn">
       <span class="icon">⚠️</span>
-      <p><strong>Brute Force მიდგომა (რატომ არ ღირს):</strong> ორიგინალი მასალა აღწერს მიდგომას — ყველა ელემენტის მასივში/ვექტორში ჩაწერა, დალაგება, და ახალი ბმული სიის აგება. ეს მუშაობს, მაგრამ <strong>დაუსაბუთებლად ფლანგავს ინფორმაციას</strong>: ორივე შემავალი სია <em>უკვე</em> დალაგებულია — მთლიანი კომბინირებული მასივის ხელახლა დალაგება (<code>O((n+m) log(n+m))</code>) სრულიად ზედმეტია, როცა უბრალო შერწყმა (merge) საკმარისია <code>O(n+m)</code>-ში. ეს ლექცია 4-ის Merge Sort-ის <code>merge()</code> ეტაპის პირდაპირი გამოყენებაა.</p>
+      <p><strong>Brute Force მიდგომა (რატომ არ ღირს):</strong> — ყველა ელემენტის მასივში/ვექტორში ჩაწერა, დალაგება, და ახალი ბმული სიის აგება. ეს მუშაობს, მაგრამ <strong>დაუსაბუთებლად ფლანგავს ინფორმაციას</strong>: ორივე შემავალი სია <em>უკვე</em> დალაგებულია — მთლიანი კომბინირებული მასივის ხელახლა დალაგება (<code>O((n+m) log(n+m))</code>) სრულიად ზედმეტია, როცა უბრალო შერწყმა (merge) საკმარისია <code>O(n+m)</code>-ში. ეს ლექცია 4-ის Merge Sort-ის <code>merge()</code> ეტაპის პირდაპირი გამოყენებაა.</p>
     </div>
 
     <h3 style="font-size:19px; margin:30px 0 6px;">რეკურსიული შერწყმა</h3>
@@ -420,11 +415,6 @@ footer p{font-size:13px; margin:0;}
       <tr><td>Merge Two Sorted Lists</td><td>იტერაციული merge</td><td class="num">O(n+m)</td><td class="num">O(1)</td></tr>
       <tr><td>Reverse Linked List</td><td>იტერაციული სამი-მაჩვენებელი</td><td class="num">O(n)</td><td class="num">O(1)</td></tr>
     </table>
-
-    <div class="callout insight">
-      <span class="icon">🎯</span>
-      <p><strong>შესამჩნევი პატერნი:</strong> ოთხივე ამოცანის ოპტიმალურ ამონახსნს <strong>O(1) დამატებითი სივრცე</strong> აქვს — HashSet-ები, ვექტორები და call stack-ის ღრმა გამოყენება ყოველთვის შესაძლებელია ერიდოთ ერთი-ორი მაჩვენებლის ჭკვიანური მართვით. ეს ბმული სიის ამოცანების ერთ-ერთი მთავარი, გადამწყვეტი უნარია.</p>
-    </div>
   </div>
 </section>
 
